@@ -450,23 +450,24 @@
                 const currentBrandKey = p.brandKey || 'NINCO';
                 const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
 
-                if (p.subtype === 'chicane3_entry' || p.subtype === 'chicane_entry') {
-                    p.subtype = 'chicane_entry';
+                if (p.subtype === 'chicane_entry') {
                     p.id = 'n_chicane_in';
                     p.width = brandDef.width;
                     p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane3_middle' || p.subtype === 'chicane_middle') {
-                    p.subtype = 'chicane_middle';
+                } else if (p.subtype === 'chicane_middle') {
                     p.id = 'n_chicane_mid';
                     p.width = brandDef.width;
                     p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane3_exit' || p.subtype === 'chicane_exit') {
-                    p.subtype = 'chicane_exit';
+                } else if (p.subtype === 'chicane_exit') {
                     p.id = 'n_chicane_out';
                     p.width = brandDef.width;
                     p.laneSpacing = brandDef.laneSpacing;
                 } else if (p.subtype === 'crossing') {
                     p.id = 'n_cross';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
+                } else if (p.subtype === 'squeeze') {
+                    p.subtype = 'chicane_middle';
                     p.width = brandDef.width;
                     p.laneSpacing = brandDef.laneSpacing;
                 }
@@ -608,6 +609,8 @@
                                 // Intercambiamos Entradas por Salidas para que el 3D no choque
                                 if (nextPiece.subtype === 'chicane_entry') nextPiece.subtype = 'chicane_exit';
                                 else if (nextPiece.subtype === 'chicane_exit') nextPiece.subtype = 'chicane_entry';
+                                else if (nextPiece.subtype === 'chicane3_entry') nextPiece.subtype = 'chicane3_exit';
+                                else if (nextPiece.subtype === 'chicane3_exit') nextPiece.subtype = 'chicane3_entry';
                                 if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit';
                                 else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
                                 
