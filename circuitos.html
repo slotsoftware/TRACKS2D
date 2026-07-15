@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -445,16 +445,51 @@
                 const currentBrandKey = p.brandKey || 'NINCO';
                 const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
 
-                if (p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry') {
-                    p.id = 'n_chicane_in'; p.subtype = 'chicane_entry'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle' || p.subtype === 'squeeze') {
-                    p.id = 'n_chicane_mid'; p.subtype = 'chicane_middle'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit') {
-                    p.id = 'n_chicane_out'; p.subtype = 'chicane_exit'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane_curve') {
-                    p.id = 'n_chicane_curve'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'crossing') {
-                    p.id = 'n_cross'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
+                // Asignamos explícitamente las medidas físicas reales al JSON para que el 3D pueda generar la malla
+                p.width = brandDef.width;
+                p.laneSpacing = brandDef.laneSpacing;
+
+                // --- CORRECCIÓN FIEL DE CHICANES PARA EL 3D ---
+                // El usuario tiene razón: las piezas de chicane tienen type: "straight" en el 2D.
+                // Al enviarlas al 3D como "straight", el motor dibuja asfalto rectangular plano.
+                // Las pasamos a type: "chicane" respetando sus IDs originales (PT74, Squeeze) para que
+                // el simulador estreche la malla física adecuadamente basándose en su subtype.
+                if (p.type === 'straight' && p.subtype && (p.subtype.includes('chicane') || p.subtype === 'squeeze')) {
+                    p.type = 'chicane';
+                }
+
+                // --- CORRECCIÓN FIEL DE PISTAS DE UN SOLO CARRIL PARA EL 3D ---
+                // El 3D dibuja mallas basándose en el centro de la pieza. En el 2D, las piezas de 1 carril
+                // comparten el origen de una pista virtual de 2 carriles. Aquí desplazamos físicamente el origen (x,y) 
+                // y el radio de la curva al centro exacto del carril físico elegido, y reducimos su ancho a la mitad.
+                if (p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2') {
+                    p.width = brandDef.width / 2;
+                    p.laneSpacing = 0; // Al ser 1 carril, ya no hay espaciado interno
+                    
+                    const laneOff = brandDef.laneSpacing / 2;
+                    let offsetX = 0;
+                    let offsetY = 0;
+
+                    if (p.subtype === 'single_lane_1') {
+                        offsetX = Math.cos(p.rot - Math.PI / 2) * laneOff;
+                        offsetY = Math.sin(p.rot - Math.PI / 2) * laneOff;
+                        if (p.type === 'curve') {
+                            p.radius = p.direction === 'left' ? p.radius - laneOff : p.radius + laneOff;
+                        }
+                    } else if (p.subtype === 'single_lane_2') {
+                        offsetX = Math.cos(p.rot + Math.PI / 2) * laneOff;
+                        offsetY = Math.sin(p.rot + Math.PI / 2) * laneOff;
+                        if (p.type === 'curve') {
+                            p.radius = p.direction === 'left' ? p.radius + laneOff : p.radius - laneOff;
+                        }
+                    }
+
+                    p.x += offsetX;
+                    p.y += offsetY;
+                }
+
+                if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+                    p.width = brandDef.width / 2; // Las rotondas de rally también se dibujan con ancho de 1 carril
                 }
 
                 if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
