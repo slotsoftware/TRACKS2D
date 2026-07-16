@@ -479,17 +479,20 @@
                 }
 
                 if (p.type === 'straight' && p.subtype && p.subtype.includes('chicane')) {
-                    p.type = 'chicane';
-                    // Normalizamos los subtipos complejos para que el motor 3D los interprete como chicanes estándar
-                    if (p.subtype === 'chicane3_entry' || p.subtype === 'chicane_obs_entry') {
-                        p.subtype = 'chicane_entry';
-                        p.id = 'n_chicane_in';
-                    } else if (p.subtype === 'chicane3_middle' || p.subtype === 'chicane_obs_middle') {
-                        p.subtype = 'chicane_middle';
-                        p.id = 'n_chicane_mid';
-                    } else if (p.subtype === 'chicane3_exit' || p.subtype === 'chicane_obs_exit') {
-                        p.subtype = 'chicane_exit';
-                        p.id = 'n_chicane_out';
+                    // Excluimos la chicane de obstáculos para que no se convierta en una chicane simétrica estándar
+                    if (!p.subtype.includes('chicane_obs')) {
+                        p.type = 'chicane';
+                        // Normalizamos los subtipos complejos para que el motor 3D los interprete como chicanes estándar
+                        if (p.subtype === 'chicane3_entry') {
+                            p.subtype = 'chicane_entry';
+                            p.id = 'n_chicane_in';
+                        } else if (p.subtype === 'chicane3_middle') {
+                            p.subtype = 'chicane_middle';
+                            p.id = 'n_chicane_mid';
+                        } else if (p.subtype === 'chicane3_exit') {
+                            p.subtype = 'chicane_exit';
+                            p.id = 'n_chicane_out';
+                        }
                     }
                 }
 
@@ -500,6 +503,7 @@
                 if (p.subtype === 'single_lane' || p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2') {
                     p.width = brandDef.width / 2;
                     p.laneSpacing = 0; // Al ser 1 carril, ya no hay espaciado interno
+                    p.lanes = 1; // Añadido para que el 3D dibuje solo 1 carril
                     
                     if (p.subtype !== 'single_lane') {
                         const laneOff = brandDef.laneSpacing / 2;
@@ -527,6 +531,7 @@
 
                 if (p.type === 'rotonda' || p.subtype === 'rotonda') {
                     p.width = brandDef.width / 2; // Las rotondas de rally también se dibujan con ancho de 1 carril
+                    p.lanes = 1; // Añadido para que el 3D dibuje solo 1 carril
                 }
 
                 if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
