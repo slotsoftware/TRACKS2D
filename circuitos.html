@@ -396,12 +396,32 @@
             });
             
             // 1. Clonamos profundamente las piezas para no corromper la memoria de React
+            const expandedPieces = [];
+
             Array.from(uniquePiecesMap.values()).forEach(p => {
                 
                 // Mantenemos los subtypes originales para que el motor 3D dibuje las curvas 
                 // digitales exactamente igual que en 2D, sin alterar su comportamiento.
                 if (p.subtype === 'crossing_curve') {
                     p.subtype = 'crossing'; // Adaptamos para que el motor 3D la dibuje sin dejar un hueco y cruce los carriles
+                }
+
+                // --- FIX CHICANE DESLIZANTE 3D ---
+                if (p.subtype === 'chicane_full' || p.subtype === 'squeeze') {
+                    const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
+                    const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
+                    
+                    const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
+                    const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_out', subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
+                    
+                    p2.x = p1.x + (p.length / 2) * Math.cos(p.rot || 0);
+                    p2.y = p1.y + (p.length / 2) * Math.sin(p.rot || 0);
+                    
+                    delete p1.groupId; delete p1.cat; delete p1.brandKey;
+                    delete p2.groupId; delete p2.cat; delete p2.brandKey;
+                    
+                    expandedPieces.push(p1, p2);
+                    return; // Saltamos la original
                 }
 
                 // SANITIZACIÓN PARA 3D: Cambios en Curva de Carrera.
@@ -427,11 +447,23 @@
                     p.direction = 'left'; 
                 }
 
+                if (p.subtype === 'crossing') {
+                    const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
+                    const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
+                    p.id = 'n_cross';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
+                }
+
                 // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
                 delete p.groupId;
                 delete p.cat;
                 delete p.brandKey;
 
+                expandedPieces.push(p);
+            });
+
+            expandedPieces.forEach(p => {
                 const laneId = p.lane || 0;
                 if (!lanes[laneId]) lanes[laneId] = [];
                 lanes[laneId].push(p);
@@ -539,8 +571,14 @@
                                 nextPiece.borderRight = tmpL;
                                 
                                 // Intercambiamos Entradas por Salidas para que el 3D no choque
-                                if (nextPiece.subtype === 'chicane_entry') nextPiece.subtype = 'chicane_exit';
-                                else if (nextPiece.subtype === 'chicane_exit') nextPiece.subtype = 'chicane_entry';
+                                if (nextPiece.subtype === 'chicane_entry') {
+                                    nextPiece.subtype = 'chicane_exit';
+                                    if (nextPiece.id === 'n_chicane_in') nextPiece.id = 'n_chicane_out';
+                                } else if (nextPiece.subtype === 'chicane_exit') {
+                                    nextPiece.subtype = 'chicane_entry';
+                                    if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in';
+                                }
+                                
                                 if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit';
                                 else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
                                 
@@ -807,8 +845,13 @@
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; DrawEngine2D.drawRails(ctx, l, narrowLane, brand);
                             } else if (p.subtype === 'chicane_exit') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke();
-                            } else if (p.subtype === 'chicane_full') {
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.3, -narrowLane, l*0.5, -narrowLane); ctx.bezierCurveTo(l*0.7, -narrowLane, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.3, narrowLane, l*0.5, narrowLane); ctx.bezierCurveTo(l*0.7, narrowLane, l*0.7, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.3, -narrowLane, l*0.5, -narrowLane); ctx.bezierCurveTo(l*0.7, -narrowLane, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.3, narrowLane, l*0.5, narrowLane); ctx.bezierCurveTo(l*0.7, narrowLane, l*0.7, laneOff, l, laneOff); ctx.stroke();
+                            } else if (p.subtype === 'chicane_full' || p.subtype === 'squeeze') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); 
+                                const pinchOff = laneOff * 0.25;
+                                ctx.fillStyle = '#c2b280'; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, -hw + 1); ctx.bezierCurveTo(l*0.7, -laneOff, l*0.6, -pinchOff - 4*(s/5), l*0.5, -pinchOff - 4*(s/5)); ctx.bezierCurveTo(l*0.4, -pinchOff - 4*(s/5), l*0.3, -laneOff, 0, -hw + 1); ctx.fill();
+                                ctx.beginPath(); ctx.moveTo(0, hw); ctx.lineTo(l, hw); ctx.lineTo(l, hw - 1); ctx.bezierCurveTo(l*0.7, laneOff, l*0.6, pinchOff + 4*(s/5), l*0.5, pinchOff + 4*(s/5)); ctx.bezierCurveTo(l*0.4, pinchOff + 4*(s/5), l*0.3, laneOff, 0, hw - 1); ctx.fill();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
                             } else if (p.subtype === 'adapter_ninco_scx') {
                                 const scxW = 15.6 * s; const nincoW = w; const scxLaneOff = (7.7 / 2) * s; const nincoLaneOff = laneOff;
                                 ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -scxW/2); ctx.lineTo(l, scxW/2); ctx.lineTo(0, nincoW/2); ctx.closePath(); ctx.fill();
@@ -2366,29 +2409,46 @@
               )}
 
               <div className="bg-[#0f172a] border-b border-[#1e293b] shadow-lg z-20 flex flex-col shrink-0 relative">
-                  <div className="flex items-center justify-between px-4 py-3 overflow-x-auto hide-scrollbar bg-black/50"> 
-                      <div className="flex items-center gap-4">
-                          <div className="flex flex-col justify-center mr-4 shrink-0">
-                              <h1 className="text-xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
-                              <span className="text-[9px] text-[#39ff14]/70 font-mono tracking-widest uppercase text-right mt-1 animate-pulse">by Albert Closa</span>
-                          </div>
-                          <div className="flex gap-4">{Object.keys(TRACK_DEFINITIONS).map(k => (<button key={k} onClick={()=>{
-                              if (activeBrand === k) return;
-                              
-                              const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && k === 'SCX_ANALOG') || (activeBrand === 'SCX_ANALOG' && k === 'NINCO'));
-                              const isCompatibleScxAdv = hasAdapterScxAdv && ((activeBrand === 'SCX_ANALOG' && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && k === 'SCX_ANALOG'));
-                              const isCompatibleNincoSuk = hasAdapterNincoSuk && ((activeBrand === 'NINCO' && k === 'SCALEXTRIC_UK') || (activeBrand === 'SCALEXTRIC_UK' && k === 'NINCO'));
-                              const isCompatible = isCompatibleNincoScx || isCompatibleScxAdv || isCompatibleNincoSuk;
-                              
-                              if (pieces.length > 0 && !isCompatible) {
-                                  if (!window.confirm("¿Cambiar de marca? Se borrará el circuito actual.")) return;
-                              }
-                              setActiveBrand(k); 
-                              if (!isCompatible) {
-                                  setHistory([[]]); setHistoryStep(0); setSelectedPieceIds([]); 
-                              }
-                          }} className={`text-sm font-bold px-4 py-2 rounded-full uppercase tracking-widest transition-all shrink-0 border ${activeBrand === k ? TRACK_DEFINITIONS[k].activeClass : 'bg-transparent border-[#334155] text-gray-500 hover:text-gray-300 hover:border-gray-400'}`}>{TRACK_DEFINITIONS[k].name}</button>))}</div>
+                  {/* HEADER PRINCIPAL: Título, Login e Idiomas (FIJO SIN SCROLL) */}
+                  <div className="flex items-center justify-between px-4 py-2 bg-[#0f172a] border-b border-[#1e293b] shadow-md z-30">
+                      <div className="flex flex-col justify-center shrink-0">
+                          <h1 className="text-xl md:text-2xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
+                          <span className="text-[9px] md:text-[10px] text-[#39ff14]/70 font-mono tracking-widest uppercase mt-0.5 animate-pulse">by Albert Closa</span>
                       </div>
+                      
+                      <div className="flex items-center gap-3 shrink-0">
+                          {user && !user.isAnonymous ? (
+                              <div className="flex items-center gap-2">
+                                  <div className="hidden md:flex flex-col items-end"><span className="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Piloto</span><span className="text-[10px] font-bold text-[#39ff14]">{user.displayName || (user.email ? user.email.split('@')[0] : 'Piloto')}</span></div>
+                                  <button onClick={handleSignOut} title={t.auth.logoutBtn} className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition"><X size={14} /></button>
+                              </div>
+                          ) : (<button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded bg-gray-800 border border-gray-600 text-gray-300 hover:text-white hover:border-[#39ff14] transition text-[10px] font-bold uppercase tracking-wider"><User size={14} className="text-[#39ff14]"/> <span className="hidden md:inline">{t.auth.loginBtn}</span><span className="md:hidden">LOGIN</span></button>)}
+                          <div className="h-6 w-px bg-[#334155] mx-1 shrink-0"></div>
+                          <div className="flex gap-2 shrink-0">
+                              <button onClick={() => handleSetLang('es')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'es' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="Español"><svg viewBox="0 0 3 2" className="w-5 h-3 block"><rect width="3" height="2" fill="#c60b1e"/><rect width="3" height="1" y="0.5" fill="#ffc400"/></svg></button>
+                              <button onClick={() => handleSetLang('en')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'en' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="English"><svg viewBox="0 0 60 30" className="w-5 h-3 block"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" strokeWidth="4"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#C8102E" strokeWidth="6"/></svg></button>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* BARRA DE MARCAS DE PISTAS (CON SCROLL HORIZONTAL) */}
+                  <div className="flex items-center px-4 py-2 overflow-x-auto hide-scrollbar bg-black/50 gap-3"> 
+                      {Object.keys(TRACK_DEFINITIONS).map(k => (<button key={k} onClick={()=>{
+                          if (activeBrand === k) return;
+                          
+                          const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && k === 'SCX_ANALOG') || (activeBrand === 'SCX_ANALOG' && k === 'NINCO'));
+                          const isCompatibleScxAdv = hasAdapterScxAdv && ((activeBrand === 'SCX_ANALOG' && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && k === 'SCX_ANALOG'));
+                          const isCompatibleNincoSuk = hasAdapterNincoSuk && ((activeBrand === 'NINCO' && k === 'SCALEXTRIC_UK') || (activeBrand === 'SCALEXTRIC_UK' && k === 'NINCO'));
+                          const isCompatible = isCompatibleNincoScx || isCompatibleScxAdv || isCompatibleNincoSuk;
+                          
+                          if (pieces.length > 0 && !isCompatible) {
+                              if (!window.confirm("¿Cambiar de marca? Se borrará el circuito actual.")) return;
+                          }
+                          setActiveBrand(k); 
+                          if (!isCompatible) {
+                              setHistory([[]]); setHistoryStep(0); setSelectedPieceIds([]); 
+                          }
+                      }} className={`text-sm font-bold px-4 py-2 rounded-full uppercase tracking-widest transition-all shrink-0 border ${activeBrand === k ? TRACK_DEFINITIONS[k].activeClass : 'bg-transparent border-[#334155] text-gray-500 hover:text-gray-300 hover:border-gray-400'}`}>{TRACK_DEFINITIONS[k].name}</button>))}
                   </div>
                   <div className="flex items-center overflow-x-auto hide-scrollbar px-4 py-2 gap-2 bg-[#1e293b] shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)]"> 
                       {categories.map(cat => ( <button key={cat} onClick={() => setActiveCategory(cat)} className="px-6 py-2 text-xs font-bold rounded-lg uppercase shrink-0 transition-all duration-300 border backdrop-blur-sm" style={{ borderColor: activeCategory === cat ? currentBrand.neonColor : '#334155', color: activeCategory === cat ? '#ffffff' : '#64748b', backgroundColor: activeCategory === cat ? `${currentBrand.neonColor}20` : 'transparent', boxShadow: activeCategory === cat ? `0 0 15px ${currentBrand.neonColor}60, inset 0 0 10px ${currentBrand.neonColor}20` : 'none', textShadow: activeCategory === cat ? `0 0 10px ${currentBrand.neonColor}` : 'none' }}> {t.cat[cat] || cat} </button> ))} 
@@ -2432,19 +2492,6 @@
                           <button onClick={() => handleProtectedAction(() => setShowCommunityModal(true))} title={t.tools.community} className="btn-neon-purple flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-purple-400 border rounded-lg hover:bg-purple-500/20 hover:text-purple-100 transition-all font-bold text-xs shrink-0"><Users size={16}/> {t.tools.community}</button>
                           <button onClick={() => handleProtectedAction(() => { setShowChat(!showChat); setShowBordersTools(false); setShowBoardTools(false); setShowBridgesTools(false); setShowMultiLaneTools(false); setIsPaintElevationMode(false); setPaintBorderMode('none'); })} title={t.tools.chat} className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border transition-all font-bold text-xs shrink-0 ${showChat ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(6,182,212,0.8)] border-cyan-400' : 'btn-neon-cyan bg-transparent text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-100'}`}><MessageSquare size={16}/> {t.tools.chat}</button>
                           <button onClick={toggleFullScreen} title={t.tools.fullscreen} className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-pink-400 border border-pink-500/50 rounded-lg hover:bg-pink-500/10 hover:border-pink-400 hover:text-pink-200 hover:shadow-[0_0_15px_rgba(236,72,153,0.4)] shadow-[0_0_10px_rgba(236,72,153,0.2)] transition-all font-bold text-xs shrink-0"> {isFullScreen ? <Minimize size={16}/> : <Maximize size={16}/>} {t.tools.fullscreen} </button>
-                          <div className="h-8 w-px bg-white/10 mx-2 shrink-0"></div>
-                          <div className="flex items-center gap-3 shrink-0">
-                              {user && !user.isAnonymous ? (
-                                  <div className="flex items-center gap-2">
-                                      <div className="flex flex-col items-end"><span className="text-[10px] text-gray-500 uppercase tracking-widest leading-none">Piloto</span><span className="text-xs font-bold text-[#39ff14]">{user.displayName || (user.email ? user.email.split('@')[0] : 'Piloto')}</span></div>
-                                      <button onClick={handleSignOut} title={t.auth.logoutBtn} className="w-8 h-8 flex items-center justify-center rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition"><X size={14} /></button>
-                                  </div>
-                              ) : (<button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded bg-gray-800 border border-gray-600 text-gray-300 hover:text-white hover:border-[#39ff14] transition text-xs font-bold uppercase tracking-wider"><User size={14} className="text-[#39ff14]"/> {t.auth.loginBtn}</button>)}
-                              <div className="flex gap-2 border-l border-[#334155] pl-3 shrink-0">
-                                  <button onClick={() => handleSetLang('es')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'es' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="Español"><svg viewBox="0 0 3 2" className="w-6 h-4 block"><rect width="3" height="2" fill="#c60b1e"/><rect width="3" height="1" y="0.5" fill="#ffc400"/></svg></button>
-                                  <button onClick={() => handleSetLang('en')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'en' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="English"><svg viewBox="0 0 60 30" className="w-6 h-4 block"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" strokeWidth="4"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#C8102E" strokeWidth="6"/></svg></button>
-                              </div>
-                          </div>
                   </div>
               </div>
 
