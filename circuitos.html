@@ -389,9 +389,10 @@
             rawPieces.forEach(rawP => {
                 if (!rawP) return;
                 const p = JSON.parse(JSON.stringify(rawP));
-                // Clave basada en posición con precisión de 1mm
-                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
-                // Guardamos la pieza. Si hay un fantasma superpuesto, se sobreescribe, dejando solo 1 pieza real en ese espacio.
+                // Clave basada en posición con precisión de 1mm, ID, dirección y elevación
+                // Esto asegura que pistas complementarias (ej. bifurcaciones de Rally o Pit Lanes) no se borren por error.
+                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}_${p.id}_${p.direction || 'none'}_${p.elevation || 0}`;
+                // Guardamos la pieza. Si hay un fantasma superpuesto idéntico, se sobreescribe.
                 uniquePiecesMap.set(key, p);
             });
             
@@ -468,6 +469,8 @@
                 if (!lanes[laneId]) lanes[laneId] = [];
                 lanes[laneId].push(p);
             });
+
+            let globalChainCounter = 0;
 
             Object.keys(lanes).sort((a,b)=>a-b).forEach(laneId => {
                 let pool = lanes[laneId];
@@ -624,10 +627,18 @@
                         }
                     }
                     
-                    // Nos quedamos estrictamente con la cadena más larga (elimina basura suelta y ramales fallidos)
-                    if (currentChain.length > bestChainForLane.length) {
-                        bestChainForLane = currentChain;
-                    }
+                    // Asignamos un ID de carril virtual único a cada ramal desconectado.
+                    // Esto evita que el motor 3D intente unir el final del circuito principal con el principio 
+                    // de una bifurcación (lo que creaba una spline retorcida invisible que destrozaba la pista).
+                    const virtualLaneId = parseInt(laneId) * 100 + globalChainCounter;
+                    currentChain.forEach(p => {
+                        p.lane = virtualLaneId;
+                    });
+                    globalChainCounter++;
+
+                    // En lugar de quedarnos solo con la cadena más larga, acumulamos TODAS.
+                    // Esto evita que ramales secundarios válidos (Pit Lanes, Splits de Rally) desaparezcan en 3D.
+                    bestChainForLane.push(...currentChain);
                 }
                 
                 // IMPORTANTE: ELIMINADA LA SUBDIVISIÓN DE PIEZAS.
@@ -1166,7 +1177,7 @@
         const I18N = {
             es: {
                 cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
-                tools: { move: 'MOVER LIENZO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
+                tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
                 actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
@@ -1183,7 +1194,7 @@
             },
             en: {
                 cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits' },
-                tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
+                tools: { move: 'MOVE BOARD', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
                 actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
@@ -2410,13 +2421,38 @@
 
               <div className="bg-[#0f172a] border-b border-[#1e293b] shadow-lg z-20 flex flex-col shrink-0 relative">
                   {/* HEADER PRINCIPAL: Título, Login e Idiomas (FIJO SIN SCROLL) */}
-                  <div className="flex items-center justify-between px-4 py-2 bg-[#0f172a] border-b border-[#1e293b] shadow-md z-30">
-                      <div className="flex flex-col justify-center shrink-0">
-                          <h1 className="text-xl md:text-2xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
-                          <span className="text-[9px] md:text-[10px] text-[#39ff14]/70 font-mono tracking-widest uppercase mt-0.5 animate-pulse">by Albert Closa</span>
+                  <div className="flex items-center justify-between px-4 py-2 bg-[#0f172a] border-b border-[#1e293b] shadow-md z-30 overflow-x-auto hide-scrollbar">
+                      <div className="flex items-center gap-4 shrink-0 pr-4">
+                          <div className="flex flex-col justify-center shrink-0">
+                              <h1 className="text-xl md:text-2xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
+                              <span className="text-[9px] md:text-[10px] text-[#39ff14]/70 font-mono tracking-widest uppercase mt-0.5 animate-pulse">by Albert Closa</span>
+                          </div>
+                          
+                          <div className="flex gap-1.5 items-center shrink-0 ml-2 bg-black/30 p-1.5 rounded-xl border border-cyan-500/20 shadow-inner"> 
+                              <button onClick={handleUndo} className={`shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group ${historyStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]'}`} title={t.actions.undo} disabled={historyStep === 0}> <Undo2 size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.undo}</span> </button> 
+                              <button onClick={handleRedo} className={`shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group ${historyStep < history.length - 1 ? 'hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]' : 'opacity-50 cursor-not-allowed'}`} title={t.actions.redo} disabled={historyStep === history.length - 1}> <Redo2 size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.redo}</span> </button> 
+                              <button onClick={handleZoomOut} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <ZoomOut size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.zoomOut}</span> </button> 
+                              <button onClick={fitToScreen} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <Crosshair size={16} className="mb-0.5 group-hover:rotate-45 transition-transform"/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.center}</span> </button> 
+                              <button onClick={handleZoomIn} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <ZoomIn size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.zoomIn}</span> </button> 
+                              <button onClick={() => setIsMultiSelectMode(!isMultiSelectMode)} className={`shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border rounded-lg transition-all group active:scale-95 ${isMultiSelectMode ? 'border-cyan-300 text-white shadow-[0_0_15px_rgba(6,182,212,0.8)] bg-cyan-700/80' : 'border-cyan-500/70 text-cyan-400 shadow-sm hover:bg-cyan-900/80 hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]'}`}> <CheckSquare size={16} className={`mb-0.5 transition-transform ${isMultiSelectMode ? 'scale-110' : 'group-hover:scale-110'}`}/> <span className="text-[7px] font-black tracking-widest uppercase">{t.actions.multiselect}</span> </button>
+                              
+                              <div className="w-px h-8 bg-cyan-500/30 mx-1"></div>
+                              
+                              <button onClick={goToSimulation} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-[#39ff14]/70 shadow-sm rounded-lg text-[#39ff14] hover:bg-[#39ff14]/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(57,255,20,0.6)] relative overflow-hidden"> 
+                                  <div className="absolute inset-0 bg-gradient-to-t from-[#39ff14]/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Play size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[7px] font-black tracking-widest z-10 text-center uppercase">{t.actions.sim}</span> 
+                              </button> 
+
+                              <button onClick={goToDecoration} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-pink-500/70 shadow-sm rounded-lg text-pink-400 hover:bg-pink-500/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(236,72,153,0.6)] relative overflow-hidden"> 
+                                  <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><ImageIcon size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[7px] font-black tracking-widest z-10 text-center uppercase">{t.actions.deco}</span> 
+                              </button> 
+
+                              <button onClick={goToMulti} className="shrink-0 flex flex-col items-center justify-center w-14 h-11 bg-gray-900/90 border border-amber-500/70 shadow-sm rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(245,158,11,0.6)] relative overflow-hidden"> 
+                                  <div className="absolute inset-0 bg-gradient-to-t from-amber-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Flag size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[7px] font-black tracking-widest z-10 text-center uppercase">{t.actions.clubs}</span> 
+                              </button> 
+                          </div>
                       </div>
                       
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-3 shrink-0 ml-4">
                           {user && !user.isAnonymous ? (
                               <div className="flex items-center gap-2">
                                   <div className="hidden md:flex flex-col items-end"><span className="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Piloto</span><span className="text-[10px] font-bold text-[#39ff14]">{user.displayName || (user.email ? user.email.split('@')[0] : 'Piloto')}</span></div>
@@ -2662,29 +2698,6 @@
                       </div>
                   )}
 
-                  <div className="absolute bottom-6 left-0 w-full flex justify-center md:justify-start md:left-6 px-4 md:px-0 pointer-events-none z-30"> 
-                      <div onPointerDown={(e)=>e.stopPropagation()} className="flex gap-3 pointer-events-auto bg-black/40 p-3 rounded-xl backdrop-blur-sm border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] relative overflow-x-auto hide-scrollbar max-w-full"> 
-                          <button onClick={handleUndo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group ${historyStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]'}`} title={t.actions.undo} disabled={historyStep === 0}> <Undo2 size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.undo}</span> </button> 
-                          <button onClick={handleRedo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group ${historyStep < history.length - 1 ? 'hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]' : 'opacity-50 cursor-not-allowed'}`} title={t.actions.redo} disabled={historyStep === history.length - 1}> <Redo2 size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.redo}</span> </button> 
-                          <button onClick={handleZoomOut} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <ZoomOut size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.zoomOut}</span> </button> 
-                          <button onClick={fitToScreen} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <Crosshair size={24} className="mb-1 group-hover:rotate-45 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.center}</span> </button> 
-                          <button onClick={handleZoomIn} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <ZoomIn size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.zoomIn}</span> </button> 
-                          <button onClick={() => setIsMultiSelectMode(!isMultiSelectMode)} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border rounded-lg transition-all group active:scale-95 ${isMultiSelectMode ? 'border-cyan-300 text-white shadow-[0_0_25px_rgba(6,182,212,0.8)] bg-cyan-800/80' : 'border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:bg-cyan-950/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]'}`}> <CheckSquare size={24} className={`mb-1 transition-transform ${isMultiSelectMode ? 'scale-110' : 'group-hover:scale-110'}`}/> <span className="text-[9px] font-black tracking-widest">{t.actions.multiselect}</span> </button>
-                          
-                          <button onClick={goToSimulation} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-[#39ff14] shadow-[0_0_15px_rgba(57,255,20,0.4)] rounded-lg text-[#39ff14] hover:bg-[#39ff14]/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(57,255,20,0.6)] relative overflow-hidden"> 
-                              <div className="absolute inset-0 bg-gradient-to-t from-[#39ff14]/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Play size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.sim}</span> 
-                          </button> 
-
-                          <button onClick={goToDecoration} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)] rounded-lg text-pink-400 hover:bg-pink-500/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(236,72,153,0.6)] relative overflow-hidden"> 
-                              <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><ImageIcon size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.deco}</span> 
-                          </button> 
-
-                          <button onClick={goToMulti} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)] rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] relative overflow-hidden"> 
-                              <div className="absolute inset-0 bg-gradient-to-t from-amber-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Flag size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.clubs}</span> 
-                          </button> 
-                      </div> 
-                  </div>
-                  
                   {(() => {
                       const selectedPieces = selectedPieceIds.map(id => pieces.find(p=>p && p.uid===id)).filter(Boolean);
                       if (selectedPieces.length === 0) return null;
