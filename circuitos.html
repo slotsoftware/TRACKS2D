@@ -391,62 +391,35 @@
         };
 
         const compileCircuitFor3D = (rawPieces) => {
-            if (!rawPieces || rawPieces.length === 0) return [];
-            
-            const finalCompiled = [];
-            
-            // 0. ANTI-FANTASMAS: Eliminamos piezas superpuestas exactamente en la misma posición
-            const uniquePiecesMap = new Map();
-            rawPieces.forEach(rawP => {
-                if (!rawP) return;
-                const p = JSON.parse(JSON.stringify(rawP));
-                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
-                uniquePiecesMap.set(key, p);
-            });
-            
-            // 1. Sanitización estricta (Sin alterar bifurcaciones ni carriles únicos)
-            Array.from(uniquePiecesMap.values()).forEach(p => {
-                // Mantenemos p.subtype === 'single_lane_1' o 'single_lane_2' INTACTOS 
-                // para que el motor 3D genere correctamente las mallas de 1 solo carril.
-                
-                if (p.subtype === 'crossing_curve') {
-                    p.subtype = 'crossing';
-                }
+    if (!rawPieces || rawPieces.length === 0) return [];
+    
+    // Agrupamos las piezas por su carril (lane). 
+    // Si no tienen 'lane', las metemos en el carril 0.
+    const lanes = {};
+    rawPieces.forEach(p => {
+        const lane = p.lane || 0;
+        if (!lanes[lane]) lanes[lane] = [];
+        lanes[lane].push(p);
+    });
 
-                // Ajuste exclusivo para Carrera Digital
-                if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
-                    delete p.subtype;
-                    p.id = 'car_345'; 
-                    p.direction = 'left';
-                } else if (p.subtype === 'digital_arc_curve_in') {
-                    p.subtype = p.direction === 'left' ? 'change_left' : 'change_right';
-                } else if (p.subtype === 'digital_arc_curve_out') {
-                    p.subtype = p.direction === 'left' ? 'change_right' : 'change_left';
-                }
+    const finalCompiled = [];
+    let fakeTimestamp = Date.now();
 
-                // Las rectas siempre left para evitar conflictos de rotación 3D
-                if (p.type === 'straight' || (p.type && p.type.includes('pit'))) {
-                    p.direction = 'left'; 
-                }
+    // Procesamos cada carril de forma totalmente aislada para el motor 3D
+    Object.keys(lanes).sort((a, b) => a - b).forEach(laneKey => {
+        lanes[laneKey].forEach((p, idx) => {
+            // Clonamos para evitar mutar el estado de React
+            const piece = JSON.parse(JSON.stringify(p));
+            // Forzamos un UID único y secuencial por carril para que el 3D los procese ordenadamente
+            piece.uid = fakeTimestamp + (parseInt(laneKey) * 100000) + idx;
+            // Aseguramos que el motor 3D sepa que es una pieza independiente
+            piece.laneId = laneKey; 
+            finalCompiled.push(piece);
+        });
+    });
 
-                // Limpieza de variables del editor 2D
-                delete p.groupId;
-                delete p.cat;
-                delete p.brandKey;
-
-                // PASAMOS LA PIEZA AL 3D TAL CUAL. 
-                // Ya no descartamos ramales en las bifurcaciones.
-                finalCompiled.push(p);
-            });
-
-            // 2. Reescritura de UIDs secuenciales por si el motor 3D los necesita
-            let fakeTimestamp = Date.now() - 1000000;
-            finalCompiled.forEach((p, idx) => {
-                p.uid = fakeTimestamp + (idx * 1000) + 0.1234; 
-            });
-
-            return finalCompiled;
-        };
+    return finalCompiled;
+};
 
         const DrawEngine2D = {
             drawRails: (ctx, l, off, brand) => {
