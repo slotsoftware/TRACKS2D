@@ -436,6 +436,29 @@
                     p.subtype = p.direction === 'left' ? 'change_right' : 'change_left';
                 }
 
+                // CORRECCIÓN RALLY: Calcular el radio físico real para pistas de un solo carril
+                if (p.type === 'curve' && (p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2')) {
+                    const brandDef = TRACK_DEFINITIONS[p.brandKey || 'SCX_ANALOG'];
+                    // Obtener la distancia desde el centro del carril al centro de la pista (laneOffset)
+                    const laneOffset = (brandDef.laneSpacing || 7.7) / 2;
+                    
+                    if (p.subtype === 'single_lane_1') {
+                        // Carril 1 siempre es el interior en curvas de izquierda, exterior en curvas de derecha
+                        p.radius = p.direction === 'left' ? p.radius - laneOffset : p.radius + laneOffset;
+                    } else if (p.subtype === 'single_lane_2') {
+                        // Carril 2 siempre es el exterior en curvas de izquierda, interior en curvas de derecha
+                        p.radius = p.direction === 'left' ? p.radius + laneOffset : p.radius - laneOffset;
+                    }
+                    
+                    // Convertir a curva genérica para el motor 3D una vez calculado su radio real
+                    delete p.subtype;
+                }
+                
+                // Las rectas de carril único se tratan como rectas normales en 3D
+                if (p.type === 'straight' && (p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2')) {
+                    delete p.subtype;
+                }
+
                 // Limpieza de seguridad: las rectas no giran, forzamos left para evitar cuelgues
                 if (p.type === 'straight' || (p.type && p.type.includes('pit'))) {
                     p.direction = 'left'; 
