@@ -436,26 +436,27 @@
                     p.subtype = p.direction === 'left' ? 'change_right' : 'change_left';
                 }
 
-                // CORRECCIÓN RALLY: Calcular el radio físico real para pistas de un solo carril
-                if (p.type === 'curve' && (p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2')) {
-                    const brandDef = TRACK_DEFINITIONS[p.brandKey || 'SCX_ANALOG'];
-                    // Obtener la distancia desde el centro del carril al centro de la pista (laneOffset)
-                    const laneOffset = (brandDef.laneSpacing || 7.7) / 2;
-                    
-                    if (p.subtype === 'single_lane_1') {
-                        // Carril 1 siempre es el interior en curvas de izquierda, exterior en curvas de derecha
+                // CORRECCIÓN BIFURCACIONES RALLY (Single Lane)
+                // Separamos físicamente el trazado en dos sub-redes (Lane 1 y Lane 2) 
+                // para que el motor 3D no intente unirlas a la fuerza en una sola pista.
+                let targetLane = p.lane || 0;
+                
+                if (p.subtype === 'single_lane_1') {
+                    targetLane = 1;
+                    if (p.type === 'curve') {
+                        const brandDef = TRACK_DEFINITIONS[p.brandKey || 'SCX_ANALOG'];
+                        const laneOffset = (brandDef.laneSpacing || 7.7) / 2;
+                        // Ajustamos el radio físico para que no colisione con el otro carril
                         p.radius = p.direction === 'left' ? p.radius - laneOffset : p.radius + laneOffset;
-                    } else if (p.subtype === 'single_lane_2') {
-                        // Carril 2 siempre es el exterior en curvas de izquierda, interior en curvas de derecha
+                    }
+                    delete p.subtype; // Lo limpiamos para que el 3D lo trate como pista normal
+                } else if (p.subtype === 'single_lane_2') {
+                    targetLane = 2;
+                    if (p.type === 'curve') {
+                        const brandDef = TRACK_DEFINITIONS[p.brandKey || 'SCX_ANALOG'];
+                        const laneOffset = (brandDef.laneSpacing || 7.7) / 2;
                         p.radius = p.direction === 'left' ? p.radius + laneOffset : p.radius - laneOffset;
                     }
-                    
-                    // Convertir a curva genérica para el motor 3D una vez calculado su radio real
-                    delete p.subtype;
-                }
-                
-                // Las rectas de carril único se tratan como rectas normales en 3D
-                if (p.type === 'straight' && (p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2')) {
                     delete p.subtype;
                 }
 
@@ -464,14 +465,13 @@
                     p.direction = 'left'; 
                 }
 
-                // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
+                // SANITIZAR PROPIEDADES EXTRAS
                 delete p.groupId;
                 delete p.cat;
                 delete p.brandKey;
 
-                const laneId = p.lane || 0;
-                if (!lanes[laneId]) lanes[laneId] = [];
-                lanes[laneId].push(p);
+                if (!lanes[targetLane]) lanes[targetLane] = [];
+                lanes[targetLane].push(p);
             });
 
             Object.keys(lanes).sort((a,b)=>a-b).forEach(laneId => {
