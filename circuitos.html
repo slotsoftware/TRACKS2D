@@ -487,15 +487,28 @@
                     origGeos.set(p.uid, getPieceGeometry(p));
                 });
 
-                const findNextPiece = (searchPoint, availablePool) => {
+                const findNextPiece = (searchPoint, availablePool, currentPiece) => {
                     let bestIdx = -1;
-                    let bestDist = Infinity;
+                    let bestScore = Infinity;
                     let connectedToIn = true;
+
+                    const currentAffinity = (currentPiece && currentPiece.subtype && currentPiece.subtype.includes('single_lane_1')) ? 1 : 
+                                            (currentPiece && currentPiece.subtype && currentPiece.subtype.includes('single_lane_2')) ? 2 : 0;
 
                     for (let i = 0; i < availablePool.length; i++) {
                         const cand = availablePool[i];
                         const ep = origGeos.get(cand.uid);
                         
+                        const candAffinity = (cand.subtype && cand.subtype.includes('single_lane_1')) ? 1 :
+                                             (cand.subtype && cand.subtype.includes('single_lane_2')) ? 2 : 0;
+                                             
+                        let penalty = 0;
+                        if (currentAffinity !== 0 && candAffinity !== 0 && currentAffinity !== candAffinity) {
+                            penalty = 1000;
+                        } else if (currentAffinity !== 0 && candAffinity === currentAffinity) {
+                            penalty = -10;
+                        }
+
                         const distIn = Math.hypot(searchPoint.x - ep.inX, searchPoint.y - ep.inY);
                         const angleInDiff = getAngleDiff(searchPoint.angle, ep.inAngle);
                         
@@ -504,18 +517,19 @@
 
                         const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
 
-                        // Relajamos distancia de búsqueda (15px), la reconstrucción matemática lo enderezará perfecto
                         if (distIn < 15.0 && angleInDiff < 0.5) {
-                            if (distIn < bestDist) {
-                                bestDist = distIn;
+                            const score = distIn + penalty;
+                            if (score < bestScore) {
+                                bestScore = score;
                                 bestIdx = i;
                                 connectedToIn = true;
                             }
                         }
                         
                         if (!isCandRotonda && distOut < 15.0 && angleOutDiff < 0.5) {
-                            if (distOut < bestDist) {
-                                bestDist = distOut;
+                            const score = distOut + penalty;
+                            if (score < bestScore) {
+                                bestScore = score;
                                 bestIdx = i;
                                 connectedToIn = false;
                             }
@@ -564,7 +578,7 @@
 
                     let chainContinues = true;
                     while (chainContinues && pool.length > 0) {
-                        const { bestIdx, connectedToIn } = findNextPiece(currentSearchExit, pool);
+                        const { bestIdx, connectedToIn } = findNextPiece(currentSearchExit, pool, current);
 
                         if (bestIdx !== -1) {
                             let nextPiece = pool.splice(bestIdx, 1)[0];
@@ -628,6 +642,7 @@
                             };
                             
                             currentChain.push(nextPiece);
+                            current = nextPiece;
                         } else {
                             chainContinues = false; // Fin de este tren
                         }
