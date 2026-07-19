@@ -171,24 +171,8 @@
         const TRACK_DEFINITIONS = {
           NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff',
             pieces: [ { id: 'n_40', label: 'Recta 40cm', type: 'straight', length: 40.0, cat: 'Rectas' }, { id: 'n_20', label: 'Media 20cm', type: 'straight', length: 20.0, cat: 'Rectas' }, { id: 'n_sl_1', label: 'Recta 1C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_sl_2', label: 'Recta 2C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_grid', label: 'Media Parrilla', type: 'straight', length: 20.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 'n_10', label: 'Cuarto 10cm', type: 'straight', length: 10.0, cat: 'Rectas' }, { id: 'n_05', label: 'Cierre 5cm', type: 'straight', length: 5.0, cat: 'Rectas' }, { id: 'n_adapt_scx', label: 'NINCO ▶ SCX', type: 'straight', length: 20.0, subtype: 'adapter_ninco_scx', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.7 }, { id: 'n_adapt_scx_rev', label: 'SCX ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_scx_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.7, laneSpacingOut: 9.0 }, { id: 'n_adapt_suk', label: 'NINCO ▶ SCX UK', type: 'straight', length: 20.0, subtype: 'adapter_ninco_suk', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.8 }, { id: 'n_adapt_suk_rev', label: 'SCX UK ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_suk_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.8, laneSpacingOut: 9.0 }, { id: 'n_connect', label: 'Conexiones', type: 'straight', length: 40.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 'n_cross', label: 'Cruce 40cm', type: 'straight', length: 40.0, subtype: 'crossing', cat: 'Rectas' }, { id: 'n_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 40.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 'n_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 40.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 'n_chicane_out', label: 'Salida Chicane', type: 'straight', length: 40.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 'n_r1', label: 'R1 (Int)', type: 'curve', radius: 15.137, angle: 45, cat: 'Curvas' }, { id: 'n_r1_22', label: 'R1 (22.5°)', type: 'curve', radius: 15.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r2', label: 'R2 (Std)', type: 'curve', radius: 33.137, angle: 45, cat: 'Curvas' }, { id: 'n_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 33.137, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 'n_r2_22', label: 'R2 (22.5°)', type: 'curve', radius: 33.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r3', label: 'R3 (22.5°)', type: 'curve', radius: 51.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r4', label: 'R4 (22.5°)', type: 'curve', radius: 69.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r5', label: 'R5 (11.25°)', type: 'curve', radius: 87.137, angle: 11.25, cat: 'Curvas' }, { id: 'n_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda_connect', cat: 'RALLY' }, { id: 'n_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda', cat: 'RALLY' }, { id: 'n_console', label: 'Centralita', type: 'straight', length: 20.0, subtype: 'digital_console', cat: 'Digital' }, { id: 'n_x', label: 'Cambio X', type: 'straight', length: 40.0, subtype: 'digital_x', cat: 'Digital' }, { id: 'n_ch_r', label: 'Cambio Der', type: 'straight', length: 40.0, subtype: 'change_right', cat: 'Digital' }, { id: 'n_ch_l', label: 'Cambio Izq', type: 'straight', length: 40.0, subtype: 'change_left', cat: 'Digital' }, { id: 'n_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 40.0, cat: 'Boxes' }, { id: 'n_pit_fuel', label: 'Zona Fuel', type: 'straight', length: 40.0, subtype: 'pit_parallel', cat: 'Boxes' }, { id: 'n_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 40.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, { id: 'n_pit_straight', label: 'Recta Pit', type: 'straight', length: 40.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, { id: 'n_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 40.0, cat: 'Boxes' } ] },
-          SCX_CLASSIC: { name: 'SCX CLASIC', themeColor: 'emerald', neonColor: '#10b981', uiClass: 'border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:bg-emerald-950/30', activeClass: 'bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.6)] border-emerald-500 font-bold', trackColor: '#1a1a1a', railColor: '#a0a0a0', slotColor: '#000000', width: 15.6, laneSpacing: 7.8, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
-            pieces: [ 
-              { id: 'scxc_350', label: 'Recta 350', type: 'straight', length: 35.0, cat: 'Rectas' }, 
-              { id: 'scxc_175', label: 'Media 175', type: 'straight', length: 17.5, cat: 'Rectas' }, 
-              { id: 'scxc_87', label: 'Cuarto 87', type: 'straight', length: 8.7, cat: 'Rectas' }, 
-              { id: 'scxc_connect', label: 'Conexión Exin', type: 'straight', length: 35.0, subtype: 'analog_connect', cat: 'Rectas' }, 
-              { id: 'scxc_cross', label: 'Recta Cruce', type: 'straight', length: 35.0, subtype: 'crossing', cat: 'Rectas' }, 
-              { id: 'scxc_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 35.0, subtype: 'chicane_entry', cat: 'Rectas' }, 
-              { id: 'scxc_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 35.0, subtype: 'chicane_middle', cat: 'Rectas' }, 
-              { id: 'scxc_chicane_out', label: 'Salida Chicane', type: 'straight', length: 35.0, subtype: 'chicane_exit', cat: 'Rectas' }, 
-              { id: 'scxc_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 31.2, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, 
-              { id: 'scxc_r1', label: 'R1 (Int)', type: 'curve', radius: 15.6, angle: 45, cat: 'Curvas' }, 
-              { id: 'scxc_r2', label: 'R2 (Std)', type: 'curve', radius: 31.2, angle: 45, cat: 'Curvas' }, 
-              { id: 'scxc_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.8, angle: 22.5, cat: 'Curvas' }, 
-              { id: 'scxc_r4', label: 'R4 (Super)', type: 'curve', radius: 62.4, angle: 22.5, cat: 'Curvas' } 
-            ] },
           SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
-            pieces: [ { id: 's_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, { id: 's_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, { id: 's_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 's_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, { id: 's_connect', label: 'Conexión', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 's_cross', label: 'Recta Cruce', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Rectas' }, { id: 's_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 's_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 's_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 's_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 's_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, { id: 's_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, { id: 's_r2_ice', label: 'R2 (Hielo)', type: 'curve', radius: 30.6, angle: 45, subtype: 'ice', cat: 'Curvas' }, { id: 's_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, { id: 's_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' }, { id: 's_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'RALLY' }, { id: 's_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' } ] },
+            pieces: [ { id: 's_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, { id: 's_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, { id: 's_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 's_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 's_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 's_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, { id: 's_adapt_adv', label: 'ANALOG ▶ ADV', type: 'straight', length: 18.0, subtype: 'adapter_scx_adv', cat: 'Rectas', widthIn: 15.6, widthOut: 15.6, laneSpacingIn: 7.7, laneSpacingOut: 7.7 }, { id: 's_adapt_adv_rev', label: 'ADV ▶ ANALOG', type: 'straight', length: 18.0, subtype: 'adapter_adv_scx', cat: 'Rectas', widthIn: 15.6, widthOut: 15.6, laneSpacingIn: 7.7, laneSpacingOut: 7.7 }, { id: 's_connect', label: 'Conexión', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 's_cross', label: 'Recta Cruce', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Rectas' }, { id: 's_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 's_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 's_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 's_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 's_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, { id: 's_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, { id: 's_r2_ice', label: 'R2 (Hielo)', type: 'curve', radius: 30.6, angle: 45, subtype: 'ice', cat: 'Curvas' }, { id: 's_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, { id: 's_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' }, { id: 's_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'RALLY' }, { id: 's_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' } ] },
           SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
             pieces: [ { id: 'adv_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, { id: 'adv_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, { id: 'adv_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'adv_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'adv_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'adv_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'adv_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'adv_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'adv_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'RALLY' }, { id: 'adv_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' }, { id: 'adv_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 'adv_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, { id: 'adv_connect', label: 'Bluetooth', type: 'straight', length: 36.0, subtype: 'connection', cat: 'Digital' }, { id: 'adv_x', label: 'Cambio Recta', type: 'straight', length: 36.0, subtype: 'digital_x', cat: 'Digital' }, { id: 'adv_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 36.0, cat: 'Boxes' }, { id: 'adv_pit_fuel', label: 'Recta Fuel', type: 'straight', length: 36.0, subtype: 'pit_parallel', cat: 'Boxes' }, { id: 'adv_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 36.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, { id: 'adv_pit_straight', label: 'Recta Pit', type: 'straight', length: 36.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, { id: 'adv_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 36.0, cat: 'Boxes' }, { id: 'adv_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, { id: 'adv_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, { id: 'adv_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, { id: 'adv_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' } ] },
           SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#4d4d4d', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff',
@@ -390,36 +374,242 @@
             return diff;
         };
 
+        // Compilador 3D MEJORADO: ENCADENAMIENTO ESTRICTO Y CONTINUO
+        // Transforma un "puzzle" caótico en un circuito perfecto dibujado "del tirón"
         const compileCircuitFor3D = (rawPieces) => {
-    if (!rawPieces || rawPieces.length === 0) return [];
-    
-    // Agrupamos las piezas por su carril (lane). 
-    // Si no tienen 'lane', las metemos en el carril 0.
-    const lanes = {};
-    rawPieces.forEach(p => {
-        const lane = p.lane || 0;
-        if (!lanes[lane]) lanes[lane] = [];
-        lanes[lane].push(p);
-    });
+            if (!rawPieces || rawPieces.length === 0) return [];
+            
+            const finalCompiled = [];
+            const lanes = {};
+            
+            // 0. ANTI-FANTASMAS: Eliminamos piezas superpuestas en las mismas coordenadas exactas
+            const uniquePiecesMap = new Map();
+            rawPieces.forEach(rawP => {
+                if (!rawP) return;
+                const p = JSON.parse(JSON.stringify(rawP));
+                // Clave basada en posición con precisión de 1mm
+                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
+                // Guardamos la pieza. Si hay un fantasma superpuesto, se sobreescribe, dejando solo 1 pieza real en ese espacio.
+                uniquePiecesMap.set(key, p);
+            });
+            
+            // 1. Clonamos profundamente las piezas para no corromper la memoria de React
+            Array.from(uniquePiecesMap.values()).forEach(p => {
+                
+                // Mantenemos los subtypes originales para que el motor 3D dibuje las curvas 
+                // digitales exactamente igual que en 2D, sin alterar su comportamiento.
+                if (p.subtype === 'crossing_curve') {
+                    p.subtype = 'crossing'; // Adaptamos para que el motor 3D la dibuje sin dejar un hueco y cruce los carriles
+                }
 
-    const finalCompiled = [];
-    let fakeTimestamp = Date.now();
+                // SANITIZACIÓN PARA 3D: Cambios en Curva de Carrera.
+                // A petición del piloto, queremos que el cambio de carril ocurra EN LA CURVA.
+                // Para que el motor 3D no se vuelva loco con el "compound spline" original, 
+                // transformamos la recta de entrada en una recta normal, y le asignamos 
+                // la orden matemática de "cambio de carril" directamente al arco de la curva.
+                if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
+                    // La recta previa actúa solo de aproximación (recta estándar 34.5cm)
+                    delete p.subtype;
+                    p.id = 'car_345'; 
+                    p.direction = 'left'; // Normalizamos rectas para el 3D
+                } else if (p.subtype === 'digital_arc_curve_in') {
+                    // La curva ejecuta dinámicamente el cambio hacia el INTERIOR mientras gira
+                    p.subtype = p.direction === 'left' ? 'change_left' : 'change_right';
+                } else if (p.subtype === 'digital_arc_curve_out') {
+                    // La curva ejecuta dinámicamente el cambio hacia el EXTERIOR mientras gira
+                    p.subtype = p.direction === 'left' ? 'change_right' : 'change_left';
+                }
 
-    // Procesamos cada carril de forma totalmente aislada para el motor 3D
-    Object.keys(lanes).sort((a, b) => a - b).forEach(laneKey => {
-        lanes[laneKey].forEach((p, idx) => {
-            // Clonamos para evitar mutar el estado de React
-            const piece = JSON.parse(JSON.stringify(p));
-            // Forzamos un UID único y secuencial por carril para que el 3D los procese ordenadamente
-            piece.uid = fakeTimestamp + (parseInt(laneKey) * 100000) + idx;
-            // Aseguramos que el motor 3D sepa que es una pieza independiente
-            piece.laneId = laneKey; 
-            finalCompiled.push(piece);
-        });
-    });
+                // Limpieza de seguridad: las rectas no giran, forzamos left para evitar cuelgues
+                if (p.type === 'straight' || (p.type && p.type.includes('pit'))) {
+                    p.direction = 'left'; 
+                }
 
-    return finalCompiled;
-};
+                // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
+                delete p.groupId;
+                delete p.cat;
+                delete p.brandKey;
+
+                const laneId = p.lane || 0;
+                if (!lanes[laneId]) lanes[laneId] = [];
+                lanes[laneId].push(p);
+            });
+
+            Object.keys(lanes).sort((a,b)=>a-b).forEach(laneId => {
+                let pool = lanes[laneId];
+                if (pool.length === 0) return;
+
+                const origGeos = new Map();
+                pool.forEach(p => {
+                    origGeos.set(p.uid, getPieceGeometry(p));
+                });
+
+                const findNextPiece = (searchPoint, availablePool) => {
+                    let bestIdx = -1;
+                    let bestDist = Infinity;
+                    let connectedToIn = true;
+
+                    for (let i = 0; i < availablePool.length; i++) {
+                        const cand = availablePool[i];
+                        const ep = origGeos.get(cand.uid);
+                        
+                        const distIn = Math.hypot(searchPoint.x - ep.inX, searchPoint.y - ep.inY);
+                        const angleInDiff = getAngleDiff(searchPoint.angle, ep.inAngle);
+                        
+                        const distOut = Math.hypot(searchPoint.x - ep.outX, searchPoint.y - ep.outY);
+                        const angleOutDiff = getAngleDiff(searchPoint.angle, (ep.outAngle + Math.PI) % (Math.PI * 2));
+
+                        const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
+
+                        // Relajamos distancia de búsqueda (15px), la reconstrucción matemática lo enderezará perfecto
+                        if (distIn < 15.0 && angleInDiff < 0.5) {
+                            if (distIn < bestDist) {
+                                bestDist = distIn;
+                                bestIdx = i;
+                                connectedToIn = true;
+                            }
+                        }
+                        
+                        if (!isCandRotonda && distOut < 15.0 && angleOutDiff < 0.5) {
+                            if (distOut < bestDist) {
+                                bestDist = distOut;
+                                bestIdx = i;
+                                connectedToIn = false;
+                            }
+                        }
+                    }
+
+                    return { bestIdx, connectedToIn };
+                };
+
+                let bestChainForLane = [];
+
+                while(pool.length > 0) {
+                    let currentChain = [];
+
+                    let startIdx = pool.findIndex(p => p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect');
+                    if (startIdx === -1) startIdx = pool.findIndex(p => p.subtype === 'analog_connect' || p.subtype === 'connection' || p.subtype === 'starting_grid' || p.subtype === 'digital_console');
+                    
+                    if (startIdx === -1) {
+                        startIdx = pool.findIndex(p => {
+                            const ep = origGeos.get(p.uid);
+                            let hasIncoming = false;
+                            for (const other of pool) {
+                                if (other.uid === p.uid) continue;
+                                const oEp = origGeos.get(other.uid);
+                                const distFromOut = Math.hypot(ep.inX - oEp.outX, ep.inY - oEp.outY);
+                                const distFromIn = Math.hypot(ep.inX - oEp.inX, ep.inY - oEp.inY);
+                                if ((distFromOut < 15.0 && getAngleDiff(ep.inAngle, oEp.outAngle) < 0.5) || 
+                                    (distFromIn < 15.0 && getAngleDiff(ep.inAngle, (oEp.inAngle + Math.PI)) < 0.5)) {
+                                    hasIncoming = true;
+                                    break;
+                                }
+                            }
+                            return !hasIncoming;
+                        });
+                    }
+                    if (startIdx === -1) startIdx = 0;
+
+                    let current = pool.splice(startIdx, 1)[0];
+                    // NO normalizamos ángulos. Dejamos que sumen infinitamente como necesita el 3D
+                    current.inZ = current.elevation || 0;
+                    current.outZ = current.elevation || 0;
+                    currentChain.push(current);
+                    
+                    let firstGeo = getPieceGeometry(current);
+                    let currentSearchExit = { x: firstGeo.outX, y: firstGeo.outY, z: current.outZ, angle: firstGeo.outAngle };
+
+                    let chainContinues = true;
+                    while (chainContinues && pool.length > 0) {
+                        const { bestIdx, connectedToIn } = findNextPiece(currentSearchExit, pool);
+
+                        if (bestIdx !== -1) {
+                            let nextPiece = pool.splice(bestIdx, 1)[0];
+
+                            // 2. RECONSTRUCCIÓN MATEMÁTICA FÍSICA PARA EVITAR EL TELETRANSPORTE
+                            if (!connectedToIn) {
+                                // Si se montó al revés, físicamente la volvemos del derecho
+                                if (nextPiece.type === 'curve' || nextPiece.subtype === 'chicane_curve' || nextPiece.type === 'rotonda' || nextPiece.subtype === 'rotonda' || nextPiece.subtype === 'rotonda_connect') {
+                                    nextPiece.direction = nextPiece.direction === 'left' ? 'right' : 'left';
+                                }
+                                const tmpL = nextPiece.borderLeft;
+                                nextPiece.borderLeft = nextPiece.borderRight;
+                                nextPiece.borderRight = tmpL;
+                                
+                                // Intercambiamos Entradas por Salidas para que el 3D no choque
+                                if (nextPiece.subtype === 'chicane_entry') nextPiece.subtype = 'chicane_exit';
+                                else if (nextPiece.subtype === 'chicane_exit') nextPiece.subtype = 'chicane_entry';
+                                if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit';
+                                else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
+                                
+                                // Invertir propiedades de pistas de adaptación para que el motor 3D entienda el cambio de ancho
+                                if (nextPiece.subtype === 'adapter_ninco_scx') nextPiece.subtype = 'adapter_scx_ninco';
+                                else if (nextPiece.subtype === 'adapter_scx_ninco') nextPiece.subtype = 'adapter_ninco_scx';
+                                else if (nextPiece.subtype === 'adapter_ninco_suk') nextPiece.subtype = 'adapter_suk_ninco';
+                                else if (nextPiece.subtype === 'adapter_suk_ninco') nextPiece.subtype = 'adapter_ninco_suk';
+                                else if (nextPiece.subtype === 'adapter_scx_adv') nextPiece.subtype = 'adapter_adv_scx';
+                                else if (nextPiece.subtype === 'adapter_adv_scx') nextPiece.subtype = 'adapter_scx_adv';
+
+                                if (nextPiece.widthIn !== undefined) {
+                                    const tw = nextPiece.widthIn; nextPiece.widthIn = nextPiece.widthOut; nextPiece.widthOut = tw;
+                                }
+                                if (nextPiece.laneSpacingIn !== undefined) {
+                                    const tls = nextPiece.laneSpacingIn; nextPiece.laneSpacingIn = nextPiece.laneSpacingOut; nextPiece.laneSpacingOut = tls;
+                                }
+                            }
+
+                            nextPiece.invert = false;
+                            nextPiece.rot = currentSearchExit.angle;
+                            
+                            const ep = getPieceGeometry(nextPiece);
+                            
+                            const newDx = ep.localDx * Math.cos(nextPiece.rot) - ep.localDy * Math.sin(nextPiece.rot);
+                            const newDy = ep.localDx * Math.sin(nextPiece.rot) + ep.localDy * Math.cos(nextPiece.rot);
+                            
+                            nextPiece.x = currentSearchExit.x;
+                            nextPiece.y = currentSearchExit.y;
+                            nextPiece.inZ = currentSearchExit.z;
+                            nextPiece.outZ = nextPiece.elevation || 0;
+                            
+                            currentSearchExit = { 
+                                x: nextPiece.x + newDx, 
+                                y: nextPiece.y + newDy, 
+                                z: nextPiece.outZ, 
+                                angle: nextPiece.rot + ep.localDa 
+                            };
+                            
+                            currentChain.push(nextPiece);
+                        } else {
+                            chainContinues = false; // Fin de este tren
+                        }
+                    }
+                    
+                    // Nos quedamos estrictamente con la cadena más larga (elimina basura suelta y ramales fallidos)
+                    if (currentChain.length > bestChainForLane.length) {
+                        bestChainForLane = currentChain;
+                    }
+                }
+                
+                // IMPORTANTE: ELIMINADA LA SUBDIVISIÓN DE PIEZAS.
+                // Al subdividir pistas largas (como Carrera y Scalextric UK), el motor de físicas 3D 
+                // creaba múltiples colliders invisibles. Las ruedas del coche chocaban con estas 
+                // juntas internas ("Ghost Collisions"), causando los temidos trompicones.
+                // Ahora cada pista se envía como UN ÚNICO bloque físico sólido, permitiendo que el
+                // coche se deslice con fluidez extrema sin enganchones.
+
+                finalCompiled.push(...bestChainForLane);
+            });
+
+            // 3. MAGIA FINAL PARA EL MOTOR 3D:
+            // Engañamos al motor 3D reescribiendo los "uid" (DNI de la pista) en estricto orden secuencial.
+            // Así el motor cree que se ha construido seguido (como en tu archivo 222.json)
+            let fakeTimestamp = Date.now() - 1000000;
+            finalCompiled.forEach((p, idx) => {
+                p.uid = fakeTimestamp + (idx * 1000) + 0.1234; 
+            });
+
+            return finalCompiled;
+        };
 
         const DrawEngine2D = {
             drawRails: (ctx, l, off, brand) => {
@@ -929,7 +1119,7 @@
         const I18N = {
             es: {
                 cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
-                tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
+                tools: { move: 'MOVER LIENZO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
                 actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
@@ -946,7 +1136,7 @@
             },
             en: {
                 cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits' },
-                tools: { move: 'MOVE BOARD', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
+                tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
                 actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
