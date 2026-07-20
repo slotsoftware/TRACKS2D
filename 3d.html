@@ -328,7 +328,7 @@
             }
         };
 
-        const LanguageContext = React.createContext({ lang: 'es', t: (key) => key });
+        const LanguageContext = React.createContext({ lang: 'es', t: (key) => key, handleLangChange: () => {} });
         const useTranslation = () => React.useContext(LanguageContext);
 
         /* --- OPTIMIZACIÓN DRACO LOADER (SINGLETON) --- */
@@ -2589,7 +2589,7 @@
 
         /* --- 3. VISOR 3D (CORE LOGIC) --- */
         const Telemetry3DViewer = ({ circuitData, carSettings, customCarAssets, onCarAssetUpdate, onClose }) => {
-            const { t, lang } = useTranslation();
+            const { t, lang, handleLangChange } = useTranslation();
             const containerRef = useRef(null);
             const [paused, setPaused] = useState(false); 
             const [selectedCarId, setSelectedCarId] = useState(1);
@@ -6404,9 +6404,15 @@
 
                     {activeButton !== 'ANALOG' && activeButton !== 'DIGITAL' && activeButton !== 'PRACTICE' && (
                         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[70] flex items-start gap-8 pointer-events-none w-full justify-center px-4">
-                            <div className="flex flex-col gap-2 mt-2 pointer-events-auto animate-in items-center transition-opacity duration-300">
-                                <button onClick={enterGridMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'GRID' ? 'bg-[#22d3ee] border-[#22d3ee] text-black shadow-[0_0_30px_rgba(34,211,238,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{t('prep')}</button>
-                                <button onClick={startPracticeMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'PRACTICE' ? 'bg-[#a3e635] border-[#a3e635] text-black shadow-[0_0_30px_rgba(163,230,53,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{hasRotonda ? t('rally') : t('practice')}</button>
+                            <div className="flex items-start gap-3">
+                                <div className="flex flex-col gap-3 mt-2 pointer-events-auto animate-in items-center bg-black/40 p-2 rounded-lg border border-white/10 backdrop-blur-md shadow-lg">
+                                    <button onClick={() => handleLangChange('es')} className={`text-xl leading-none transition-all ${lang === 'es' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="Español">🇪🇸</button>
+                                    <button onClick={() => handleLangChange('en')} className={`text-xl leading-none transition-all ${lang === 'en' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="English">🇬🇧</button>
+                                </div>
+                                <div className="flex flex-col gap-2 mt-2 pointer-events-auto animate-in items-center transition-opacity duration-300">
+                                    <button onClick={enterGridMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'GRID' ? 'bg-[#22d3ee] border-[#22d3ee] text-black shadow-[0_0_30px_rgba(34,211,238,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{t('prep')}</button>
+                                    <button onClick={startPracticeMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'PRACTICE' ? 'bg-[#a3e635] border-[#a3e635] text-black shadow-[0_0_30px_rgba(163,230,53,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{hasRotonda ? t('rally') : t('practice')}</button>
+                                </div>
                             </div>
                             
                             <div className="flex flex-col items-center mt-2 shrink-0 pointer-events-auto">
@@ -7029,13 +7035,8 @@
 
           if (circuitData) {
             return (
-                <LanguageContext.Provider value={{ lang, t }}>
+                <LanguageContext.Provider value={{ lang, t, handleLangChange }}>
                     <React.Fragment>
-                        {/* BANDERAS DE IDIOMA EN EL VISOR 3D */}
-                        <div className="absolute top-6 right-24 z-[90] flex gap-3 bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md pointer-events-auto">
-                            <button onClick={() => handleLangChange('es')} className={`text-2xl transition-all ${lang === 'es' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="Español">🇪🇸</button>
-                            <button onClick={() => handleLangChange('en')} className={`text-2xl transition-all ${lang === 'en' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="English">🇬🇧</button>
-                        </div>
                         <Telemetry3DViewer 
                             circuitData={circuitData} 
                             carSettings={carSettings} 
@@ -7049,7 +7050,7 @@
           }
 
           return (
-            <LanguageContext.Provider value={{ lang, t }}>
+            <LanguageContext.Provider value={{ lang, t, handleLangChange }}>
                 <div className="flex flex-col h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden font-sans select-none text-gray-200 justify-center items-center relative">
                     
                     {/* BANDERAS DE IDIOMA */}
