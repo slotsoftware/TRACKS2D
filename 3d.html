@@ -2594,22 +2594,27 @@
             
             // Función para volver al 2D enviando el circuito actual
             const goTo2DFrom3D = () => {
-                if (circuitData) {
-                    const dataStr = JSON.stringify(circuitData);
-                    
-                    // 1. Inundamos la memoria con las claves más comunes para garantizar que el 2D lo encuentre
-                    localStorage.setItem('slot_circuit_transfer', dataStr);
-                    localStorage.setItem('slot_circuit', dataStr);
-                    localStorage.setItem('slot_last_circuit', dataStr);
-                    localStorage.setItem('circuit_data', dataStr);
-                    localStorage.setItem('slot_save', dataStr);
-                    localStorage.setItem('circuitData', dataStr);
+                let dataStr = localStorage.getItem('slot_last_circuit');
+                if (!dataStr && circuitData) {
+                    dataStr = JSON.stringify(circuitData);
                 }
                 
-                // 2. RETARDO CRÍTICO: Da tiempo a la memoria a guardarse antes de matar el proceso actual
+                if (dataStr) {
+                    // 1. Borramos transfer para que el 2D no entre en bucles extraños
+                    localStorage.removeItem('slot_circuit_transfer');
+                    sessionStorage.removeItem('slot_circuit_transfer');
+                    
+                    // 2. Inundamos TODAS las claves posibles que puede usar un diseñador 2D
+                    const keys = ['slot_circuit', 'slot_save', 'circuit_data', 'circuitData', 'slot_track', 'slot_estado'];
+                    keys.forEach(k => {
+                        localStorage.setItem(k, dataStr);
+                    });
+                }
+                
+                // 3. RETARDO DE SEGURIDAD
                 setTimeout(() => {
                     window.location.href = 'circuitos.html';
-                }, 150);
+                }, 250);
             };
 
             // ESTADO PARA KRONO CAM
@@ -6951,11 +6956,10 @@
                           setCircuitData(d);
                           console.log("⚡ Circuito importado desde el Diseñador 2D.");
                           
-                          // Lo guardamos como nuestro "último circuito" persistente
+                          // Lo guardamos como nuestro "último circuito" persistente (STRING EXACTO)
                           localStorage.setItem('slot_last_circuit', transferData);
                           
                           // IMPORTANTE: Borramos la transferencia para consumir el evento
-                          // Así, si el usuario luego carga otro manual, al refrescar no volverá a salir este
                           localStorage.removeItem('slot_circuit_transfer');
                       }
                   } catch (e) {
@@ -6989,8 +6993,8 @@
                     const d = JSON.parse(ev.target.result); 
                     if (d.brand && (d.pieces || d.lanes)) { 
                         setCircuitData(d); // Guardamos el objeto completo para no perder datos que necesita el 2D
-                        // 2. GUARDAR EN MEMORIA AL CARGAR MANUALMENTE
-                        localStorage.setItem('slot_last_circuit', JSON.stringify(d));
+                        // 2. GUARDAR EN MEMORIA AL CARGAR MANUALMENTE (STRING EXACTO)
+                        localStorage.setItem('slot_last_circuit', ev.target.result);
                     } else {
                         console.error("Formato de circuito inválido");
                     }
@@ -7058,25 +7062,23 @@
 
                                 {/* BOTÓN IR AL DISEÑADOR 2D */}
                                 <button onClick={() => {
-                                    let savedStr = null;
-                                    if (circuitData) {
-                                        savedStr = JSON.stringify(circuitData);
-                                    } else {
-                                        savedStr = localStorage.getItem('slot_last_circuit');
+                                    let dataStr = localStorage.getItem('slot_last_circuit');
+                                    if (!dataStr && circuitData) {
+                                        dataStr = JSON.stringify(circuitData);
                                     }
-                                    if (savedStr) {
-                                        localStorage.setItem('slot_circuit_transfer', savedStr);
-                                        localStorage.setItem('slot_circuit', savedStr);
-                                        localStorage.setItem('slot_last_circuit', savedStr);
-                                        localStorage.setItem('circuit_data', savedStr);
-                                        localStorage.setItem('slot_save', savedStr);
-                                        localStorage.setItem('circuitData', savedStr);
+                                    
+                                    if (dataStr) {
+                                        localStorage.removeItem('slot_circuit_transfer');
+                                        sessionStorage.removeItem('slot_circuit_transfer');
+                                        
+                                        const keys = ['slot_circuit', 'slot_save', 'circuit_data', 'circuitData', 'slot_track', 'slot_estado'];
+                                        keys.forEach(k => localStorage.setItem(k, dataStr));
                                     }
                                     
                                     // Retardo de seguridad para evitar condición de carrera en navegadores
                                     setTimeout(() => {
                                         window.location.href = 'circuitos.html';
-                                    }, 150);
+                                    }, 250);
                                 }} className="group relative flex-1 max-w-xs">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                                     <div className="relative px-6 py-8 bg-gray-900 ring-1 ring-gray-900/5 rounded-xl leading-none flex flex-col items-center justify-center gap-4 h-full hover:bg-gray-800 transition-colors">
