@@ -2595,8 +2595,10 @@
             // Función para volver al 2D enviando el circuito actual
             const goTo2DFrom3D = () => {
                 if (circuitData) {
-                    localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData));
-                    localStorage.setItem('slot_last_circuit', JSON.stringify(circuitData));
+                    const dataStr = JSON.stringify(circuitData);
+                    localStorage.setItem('slot_circuit_transfer', dataStr);
+                    localStorage.setItem('slot_circuit', dataStr); // Forza la carga automática en el 2D
+                    localStorage.setItem('slot_last_circuit', dataStr);
                 }
                 window.location.href = 'circuitos.html';
             };
@@ -6976,10 +6978,10 @@
             r.onload = (ev) => { 
                 try { 
                     const d = JSON.parse(ev.target.result); 
-                    if (d.brand && d.pieces) { 
-                        setCircuitData({ brand: d.brand, pieces: d.pieces }); 
+                    if (d.brand && (d.pieces || d.lanes)) { 
+                        setCircuitData(d); // Guardamos el objeto completo para no perder datos que necesita el 2D
                         // 2. GUARDAR EN MEMORIA AL CARGAR MANUALMENTE
-                        localStorage.setItem('slot_last_circuit', JSON.stringify({ brand: d.brand, pieces: d.pieces }));
+                        localStorage.setItem('slot_last_circuit', JSON.stringify(d));
                     } else {
                         console.error("Formato de circuito inválido");
                     }
@@ -7047,11 +7049,15 @@
 
                                 {/* BOTÓN IR AL DISEÑADOR 2D */}
                                 <button onClick={() => {
+                                    let savedStr = null;
                                     if (circuitData) {
-                                        localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData));
+                                        savedStr = JSON.stringify(circuitData);
                                     } else {
-                                        const saved = localStorage.getItem('slot_last_circuit');
-                                        if (saved) localStorage.setItem('slot_circuit_transfer', saved);
+                                        savedStr = localStorage.getItem('slot_last_circuit');
+                                    }
+                                    if (savedStr) {
+                                        localStorage.setItem('slot_circuit_transfer', savedStr);
+                                        localStorage.setItem('slot_circuit', savedStr); // Forza la carga automática en el 2D
                                     }
                                     window.location.href = 'circuitos.html';
                                 }} className="group relative flex-1 max-w-xs">
