@@ -2600,9 +2600,9 @@
                 }
                 
                 if (dataStr) {
-                    // 1. Borramos transfer para que el 2D no entre en bucles extraños
-                    localStorage.removeItem('slot_circuit_transfer');
-                    sessionStorage.removeItem('slot_circuit_transfer');
+                    // 1. ESTABLECEMOS la clave de transferencia para que el 2D la lea al arrancar (¡Antes la estaba borrando por error!)
+                    localStorage.setItem('slot_circuit_transfer', dataStr);
+                    sessionStorage.setItem('slot_circuit_transfer', dataStr);
                     
                     // 2. Inundamos TODAS las claves posibles que puede usar un diseñador 2D
                     const keys = ['slot_circuit', 'slot_save', 'circuit_data', 'circuitData', 'slot_track', 'slot_estado'];
@@ -2613,7 +2613,7 @@
                 
                 // 3. RETARDO DE SEGURIDAD
                 setTimeout(() => {
-                    window.location.href = 'circuitos.html';
+                    window.location.href = 'circuitos.html'; 
                 }, 250);
             };
 
@@ -7068,8 +7068,9 @@
                                     }
                                     
                                     if (dataStr) {
-                                        localStorage.removeItem('slot_circuit_transfer');
-                                        sessionStorage.removeItem('slot_circuit_transfer');
+                                        // Guardar el circuito en la clave de transferencia (¡No borrarla!)
+                                        localStorage.setItem('slot_circuit_transfer', dataStr);
+                                        sessionStorage.setItem('slot_circuit_transfer', dataStr);
                                         
                                         const keys = ['slot_circuit', 'slot_save', 'circuit_data', 'circuitData', 'slot_track', 'slot_estado'];
                                         keys.forEach(k => localStorage.setItem(k, dataStr));
