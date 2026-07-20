@@ -2596,11 +2596,20 @@
             const goTo2DFrom3D = () => {
                 if (circuitData) {
                     const dataStr = JSON.stringify(circuitData);
+                    
+                    // 1. Inundamos la memoria con las claves más comunes para garantizar que el 2D lo encuentre
                     localStorage.setItem('slot_circuit_transfer', dataStr);
-                    localStorage.setItem('slot_circuit', dataStr); // Forza la carga automática en el 2D
+                    localStorage.setItem('slot_circuit', dataStr);
                     localStorage.setItem('slot_last_circuit', dataStr);
+                    localStorage.setItem('circuit_data', dataStr);
+                    localStorage.setItem('slot_save', dataStr);
+                    localStorage.setItem('circuitData', dataStr);
                 }
-                window.location.href = 'circuitos.html';
+                
+                // 2. RETARDO CRÍTICO: Da tiempo a la memoria a guardarse antes de matar el proceso actual
+                setTimeout(() => {
+                    window.location.href = 'circuitos.html';
+                }, 150);
             };
 
             // ESTADO PARA KRONO CAM
@@ -7057,9 +7066,17 @@
                                     }
                                     if (savedStr) {
                                         localStorage.setItem('slot_circuit_transfer', savedStr);
-                                        localStorage.setItem('slot_circuit', savedStr); // Forza la carga automática en el 2D
+                                        localStorage.setItem('slot_circuit', savedStr);
+                                        localStorage.setItem('slot_last_circuit', savedStr);
+                                        localStorage.setItem('circuit_data', savedStr);
+                                        localStorage.setItem('slot_save', savedStr);
+                                        localStorage.setItem('circuitData', savedStr);
                                     }
-                                    window.location.href = 'circuitos.html';
+                                    
+                                    // Retardo de seguridad para evitar condición de carrera en navegadores
+                                    setTimeout(() => {
+                                        window.location.href = 'circuitos.html';
+                                    }, 150);
                                 }} className="group relative flex-1 max-w-xs">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                                     <div className="relative px-6 py-8 bg-gray-900 ring-1 ring-gray-900/5 rounded-xl leading-none flex flex-col items-center justify-center gap-4 h-full hover:bg-gray-800 transition-colors">
