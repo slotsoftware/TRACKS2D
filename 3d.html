@@ -2592,6 +2592,15 @@
             const [sessionResults, setSessionResults] = useState(null);
             const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
             
+            // Función para volver al 2D enviando el circuito actual
+            const goTo2DFrom3D = () => {
+                if (circuitData) {
+                    localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData));
+                    localStorage.setItem('slot_last_circuit', JSON.stringify(circuitData));
+                }
+                window.location.href = 'circuitos.html';
+            };
+
             // ESTADO PARA KRONO CAM
             const [showKrono, setShowKrono] = useState(false);
             const [kronoSyncActive, setKronoSyncActive] = useState(false);
@@ -6707,7 +6716,7 @@
                     {/* BARRA DE CONTROL INFERIOR - CENTRADA */}
                     <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 pointer-events-auto z-[70] flex items-end gap-4 max-w-[95vw]">
                         <div className="flex flex-col gap-2 shrink-0">
-                            <button onClick={() => window.location.href = 'circuitos.html'} className="flex items-center justify-center gap-2 bg-blue-600/90 hover:bg-blue-500 text-white border border-blue-400 px-6 py-3 rounded-full font-bold text-sm h-12 transition shadow-lg w-full">
+                            <button onClick={goTo2DFrom3D} className="flex items-center justify-center gap-2 bg-blue-600/90 hover:bg-blue-500 text-white border border-blue-400 px-6 py-3 rounded-full font-bold text-sm h-12 transition shadow-lg w-full">
                                 <Layers size={20}/> 2D
                             </button>
                             <button onClick={onClose} className="flex items-center justify-center gap-2 bg-red-600/90 hover:bg-red-500 text-white border border-red-400 px-6 py-3 rounded-full font-bold text-sm h-12 transition shadow-lg w-full">
@@ -6871,64 +6880,31 @@
                               const glbFiles = data.filter(f => f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf'));
                               
                               if (glbFiles.length > 0) {
-                                  // Coche 1: 1er archivo
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 1);
-                              }
-                              
-                              if (glbFiles.length > 1) {
-                                  // Coche 3: 2do archivo (posición 2 de la nube)
-                                  loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 3);
-                              }
-                              
-                              if (glbFiles.length > 3) {
-                                  // Coche 2: 4to archivo
-                                  loadFromUrl(getRawUrl(glbFiles[3].name), glbFiles[3].name, 2);
-                              } else if (glbFiles.length > 2) {
-                                  // Si hay 3 archivos, asigna el 3ro al Coche 2
-                                  loadFromUrl(getRawUrl(glbFiles[2].name), glbFiles[2].name, 2);
-                              } else if (glbFiles.length > 1) {
-                                  // Fallback: si solo hay 2, usa el 2do para el Coche 2 también
-                                  loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 2);
-                              }
+                                  // Coche 1: 9no archivo (posición 9 de la nube, índice 8)
+                                  if (glbFiles.length > 8) loadFromUrl(getRawUrl(glbFiles[8].name), glbFiles[8].name, 1);
+                                  else loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 1);
+                                  
+                                  // Coche 2: 10mo archivo (posición 10 de la nube, índice 9)
+                                  if (glbFiles.length > 9) loadFromUrl(getRawUrl(glbFiles[9].name), glbFiles[9].name, 2);
+                                  else loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 2);
 
-                              if (glbFiles.length > 12) {
-                                  // Coche 4: 13vo archivo (posición 13 de la nube, índice 12)
-                                  loadFromUrl(getRawUrl(glbFiles[12].name), glbFiles[12].name, 4);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 13 archivos, repite el 1ero para el coche 4
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 4);
-                              }
-
-                              if (glbFiles.length > 11) {
-                                  // Coche 5: 12vo archivo (posición 12 de la nube, índice 11)
-                                  loadFromUrl(getRawUrl(glbFiles[11].name), glbFiles[11].name, 5);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 12 archivos, repite el 1ero para el coche 5
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 5);
-                              }
-
-                              if (glbFiles.length > 10) {
-                                  // Coche 6: 11vo archivo (posición 11 de la nube, índice 10)
-                                  loadFromUrl(getRawUrl(glbFiles[10].name), glbFiles[10].name, 6);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 11 archivos, repite el 1ero para el coche 6
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 6);
-                              }
-
-                              if (glbFiles.length > 8) {
-                                  // Coche 7: 9no archivo (posición 9 de la nube, índice 8)
-                                  loadFromUrl(getRawUrl(glbFiles[8].name), glbFiles[8].name, 7);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 9 archivos, repite el 1ero para el coche 7
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 7);
-                              }
-
-                              if (glbFiles.length > 9) {
-                                  // Coche 8: 10mo archivo (posición 10 de la nube, índice 9)
-                                  loadFromUrl(getRawUrl(glbFiles[9].name), glbFiles[9].name, 8);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 10 archivos, repite el 1ero para el coche 8
-                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 8);
+                                  // Resto de coches asignados secuencialmente a los primeros archivos
+                                  if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 3);
+                                  
+                                  if (glbFiles.length > 1) loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 4);
+                                  else if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 4);
+                                  
+                                  if (glbFiles.length > 2) loadFromUrl(getRawUrl(glbFiles[2].name), glbFiles[2].name, 5);
+                                  else if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 5);
+                                  
+                                  if (glbFiles.length > 3) loadFromUrl(getRawUrl(glbFiles[3].name), glbFiles[3].name, 6);
+                                  else if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 6);
+                                  
+                                  if (glbFiles.length > 4) loadFromUrl(getRawUrl(glbFiles[4].name), glbFiles[4].name, 7);
+                                  else if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 7);
+                                  
+                                  if (glbFiles.length > 5) loadFromUrl(getRawUrl(glbFiles[5].name), glbFiles[5].name, 8);
+                                  else if (glbFiles.length > 0) loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 8);
                               }
                           }
                       })
@@ -7070,7 +7046,15 @@
                                 </label>
 
                                 {/* BOTÓN IR AL DISEÑADOR 2D */}
-                                <button onClick={() => window.location.href = 'circuitos.html'} className="group relative flex-1 max-w-xs">
+                                <button onClick={() => {
+                                    if (circuitData) {
+                                        localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData));
+                                    } else {
+                                        const saved = localStorage.getItem('slot_last_circuit');
+                                        if (saved) localStorage.setItem('slot_circuit_transfer', saved);
+                                    }
+                                    window.location.href = 'circuitos.html';
+                                }} className="group relative flex-1 max-w-xs">
                                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                                     <div className="relative px-6 py-8 bg-gray-900 ring-1 ring-gray-900/5 rounded-xl leading-none flex flex-col items-center justify-center gap-4 h-full hover:bg-gray-800 transition-colors">
                                         <PenTool className="w-12 h-12 text-cyan-400 group-hover:scale-110 transition-transform duration-300" />
