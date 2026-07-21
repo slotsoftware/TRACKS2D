@@ -6405,7 +6405,8 @@
                     {activeButton !== 'ANALOG' && activeButton !== 'DIGITAL' && activeButton !== 'PRACTICE' && (
                         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[70] flex items-start gap-8 pointer-events-none w-full justify-center px-4">
                             <div className="flex items-start gap-3">
-                                <div className="flex flex-col gap-3 mt-2 pointer-events-auto animate-in items-center bg-black/40 p-2 rounded-lg border border-white/10 backdrop-blur-md shadow-lg">
+                                {}
+                                <div className="flex flex-row gap-3 mt-2 pointer-events-auto animate-in items-center bg-black/40 px-3 py-2 rounded-lg border border-white/10 backdrop-blur-md shadow-lg h-fit">
                                     <button onClick={() => handleLangChange('es')} className={`text-xl leading-none transition-all ${lang === 'es' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="Español">🇪🇸</button>
                                     <button onClick={() => handleLangChange('en')} className={`text-xl leading-none transition-all ${lang === 'en' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="English">🇬🇧</button>
                                 </div>
@@ -6877,6 +6878,45 @@
               }
           };
 
+          // --- CIRCUITO RALLY POR DEFECTO DEL USUARIO ---
+          const USER_DEFAULT_CIRCUIT = {
+            "version": "2.0",
+            "date": "2026-07-19T11:53:12.570Z",
+            "brand": "SCX_ANALOG",
+            "pieces": [
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405287641.494, "elevation": 0, "x": 0, "y": 0, "rot": 0, "invert": false },
+              { "id": "s_cr2_sl1", "label": "Curva 1C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_1", "cat": "RALLY", "hideRightWall": true, "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405293712.836, "elevation": 0, "x": 36, "y": 0, "rot": 0, "invert": false },
+              { "id": "s_cr2_sl1", "label": "Curva 1C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_1", "cat": "RALLY", "hideRightWall": true, "brandKey": "SCX_ANALOG", "direction": "right", "uid": 1784405313056.947, "elevation": 0, "x": 57.637467504308354, "y": -8.962532495691645, "rot": -0.7853981633974483, "invert": false },
+              { "id": "s_cr2_sl1", "label": "Curva 1C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_1", "cat": "RALLY", "hideRightWall": true, "brandKey": "SCX_ANALOG", "direction": "right", "uid": 1784405314171.5889, "elevation": 0, "x": 79.27493500861671, "y": -17.92506499138329, "rot": 0, "invert": false },
+              { "id": "s_cr2_sl1", "label": "Curva 1C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_1", "cat": "RALLY", "hideRightWall": true, "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405315376.011, "elevation": 0, "x": 100.91240251292507, "y": -8.962532495691645, "rot": 0.7853981633974483, "invert": false },
+              { "id": "s_cr2_sl2", "label": "Curva 2C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_2", "cat": "RALLY", "hideLeftWall": true, "brandKey": "SCX_ANALOG", "direction": "right", "uid": 1784405353696.723, "elevation": 0, "x": 36, "y": 0, "rot": 0, "invert": false },
+              { "id": "s_cr2_sl2", "label": "Curva 2C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_2", "cat": "RALLY", "hideLeftWall": true, "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405355247.5896, "elevation": 0, "x": 57.637467504308354, "y": 8.962532495691645, "rot": 0.7853981633974483, "invert": false },
+              { "id": "s_cr2_sl2", "label": "Curva 2C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_2", "cat": "RALLY", "hideLeftWall": true, "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405356712.347, "elevation": 0, "x": 79.27493500861671, "y": 17.92506499138329, "rot": 0, "invert": false },
+              { "id": "s_cr2_sl2", "label": "Curva 2C (R2)", "type": "curve", "radius": 30.6, "angle": 45, "subtype": "single_lane_2", "cat": "RALLY", "hideLeftWall": true, "brandKey": "SCX_ANALOG", "direction": "right", "uid": 1784405357964.4841, "elevation": 0, "x": 100.91240251292507, "y": 8.962532495691645, "rot": -0.7853981633974483, "invert": false },
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405361301.5186, "elevation": 0, "x": 122.54987001723342, "y": 8.881784197001252e-16, "rot": 0, "invert": false },
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405433788.6118, "elevation": 0, "x": 158.54987001723342, "y": 8.881784197001252e-16, "rot": 0, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405437112.2595, "elevation": 0, "x": 194.54987001723342, "y": 8.881784197001252e-16, "rot": 0, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405437415.6926, "elevation": 0, "x": 216.18733752154176, "y": -8.962532495691644, "rot": -0.7853981633974483, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405437591.7266, "elevation": 0, "x": 225.1498700172334, "y": -30.599999999999998, "rot": -1.5707963267948966, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405437901.4739, "elevation": 0, "x": 216.18733752154176, "y": -52.237467504308356, "rot": -2.356194490192345, "invert": false },
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405441025.6003, "elevation": 0, "x": 194.5498700172334, "y": -61.2, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_chicane_in", "label": "Entrada Chicane", "type": "straight", "length": 36, "subtype": "chicane_entry", "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405443021.4343, "elevation": 0, "x": 158.5498700172334, "y": -61.20000000000001, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_chicane_mid", "label": "Recta Chicane", "type": "straight", "length": 36, "subtype": "chicane_middle", "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405443470.9548, "elevation": 0, "x": 122.54987001723339, "y": -61.20000000000002, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_chicane_out", "label": "Salida Chicane", "type": "straight", "length": 36, "subtype": "chicane_exit", "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405443820.9626, "elevation": 0, "x": 86.54987001723339, "y": -61.200000000000024, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405446070.071, "elevation": 0, "x": 50.54987001723339, "y": -61.20000000000003, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_360", "label": "Recta 360", "type": "straight", "length": 36, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405446825.603, "elevation": 0, "x": 14.549870017233388, "y": -61.20000000000004, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405450170.9824, "elevation": 0, "x": -21.45012998276661, "y": -61.200000000000045, "rot": -3.141592653589793, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405450433.135, "elevation": 0, "x": -43.087597487074966, "y": -52.2374675043084, "rot": -3.9269908169872414, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405450656.7083, "elevation": 0, "x": -52.05012998276662, "y": -30.600000000000044, "rot": -4.71238898038469, "invert": false },
+              { "id": "s_r2", "label": "R2 (Std)", "type": "curve", "radius": 30.6, "angle": 45, "cat": "Curvas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405450924.8752, "elevation": 0, "x": -43.08759748707498, "y": -8.962532495691688, "rot": -5.497787143782138, "invert": false },
+              { "id": "s_180", "label": "Media 180", "type": "straight", "length": 18, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405461709.503, "elevation": 0, "x": -21.450129982766626, "y": -3.6415315207705135e-14, "rot": -6.283185307179586, "invert": false },
+              { "id": "s_80", "label": "Cierre 80", "type": "straight", "length": 8, "cat": "Rectas", "brandKey": "SCX_ANALOG", "direction": "left", "uid": 1784405467810.1335, "elevation": 0, "x": -3.450129982766626, "y": -3.200658673077466e-14, "rot": -6.283185307179586, "invert": false }
+            ],
+            "boardPoints": [],
+            "boardClosed": false,
+            "autoBorders": false
+          };
+
           // NUEVO: Auto-cargar modelos GLB para los coches al iniciar
           const autoLoadDone = useRef(false);
           useEffect(() => {
@@ -7009,6 +7049,10 @@
                       } catch (e) {
                           console.warn("No se pudo recuperar el circuito guardado.");
                       }
+                  } else {
+                      // 3. AUTO-CARGAR EL JSON PROPORCIONADO POR EL USUARIO SI NO HAY NADA EN MEMORIA
+                      setCircuitData(USER_DEFAULT_CIRCUIT);
+                      localStorage.setItem('slot_last_circuit', JSON.stringify(USER_DEFAULT_CIRCUIT));
                   }
               }
 
