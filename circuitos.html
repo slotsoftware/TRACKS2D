@@ -813,18 +813,18 @@
                                 if (p.subtype === 'jump_up') {
                                     ctx.moveTo(l*0.6, -hw*0.6); ctx.lineTo(l*0.8, 0); ctx.lineTo(l*0.6, hw*0.6); ctx.fill();
                                 } else {
-                                    ctx.moveTo(l*0.8, -hw*0.6); ctx.lineTo(l*0.6, 0); ctx.lineTo(l*0.8, hw*0.6); ctx.fill();
+                                    ctx.moveTo(l*0.4, -hw*0.6); ctx.lineTo(l*0.2, 0); ctx.lineTo(l*0.4, hw*0.6); ctx.fill();
                                 }
-                            } else if (p.subtype === 'crossing') {
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight();
-                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, laneOff); ctx.moveTo(0, laneOff); ctx.lineTo(l, -laneOff); ctx.stroke();
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, laneOff); ctx.moveTo(0, laneOff); ctx.lineTo(l, -laneOff); ctx.stroke();
-                            } else if (['chicane_entry', 'chicane_middle', 'chicane_exit', 'chicane_full', 'squeeze'].includes(p.subtype)) {
-                                let marginColor = '#262626';
-                                if (p.deco === 'green') marginColor = '#16a34a';
-                                if (p.deco === 'brown') marginColor = '#c19a6b'; // Color marrón claro/tierra
-                                
-                                ctx.fillStyle = marginColor;
+                            } else if (p.subtype && p.subtype.includes('pit_parallel')) {
+                                const pitW = w/2 + 2*s; const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.fillRect(0, pitY - pitW/2, l, pitW); ctx.strokeStyle = '#222'; ctx.strokeRect(0, -hw, l, w); ctx.strokeRect(0, pitY - pitW/2, l, pitW); drawCarreraCenterLineStraight();
+                                if (p.subtype === 'pit_parallel' || p.subtype === 'pit_parallel_double_x') { const boxMargin = 4 * (s/5); DrawEngine2D.drawHazardZone(ctx, (c) => { c.rect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); }, s); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); ctx.strokeStyle = '#facc15'; ctx.strokeRect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); ctx.fillStyle = '#fff'; ctx.font = `bold ${10 * (s/5)}px Arial`; ctx.textAlign = "center"; ctx.fillText("BOXES", l/2, pitY); }
+                                if (p.subtype === 'pit_parallel_double_x') { ctx.strokeStyle = brand.railColor; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke(); DrawEngine2D.drawDigitalWedge(ctx, l, -laneOff, 1, s); DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, -1, s); }
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
+                            } else if (p.subtype === 'starting_grid') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5; const boxLen = 14 * (s/5); const boxWid = laneOff * 1.2; 
+                                const p1X = l * 0.7; const p1Y = -laneOff; ctx.beginPath(); ctx.moveTo(p1X - boxLen, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y + boxWid/2); ctx.lineTo(p1X - boxLen, p1Y + boxWid/2); ctx.stroke();
+                                const p2X = l * 0.3; const p2Y = laneOff; ctx.beginPath(); ctx.moveTo(p2X - boxLen, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y + boxWid/2); ctx.lineTo(p2X - boxLen, p2Y + boxWid/2); ctx.stroke();
+                            } else if (p.subtype === 'digital_console') {
                                 ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
                                 
                                 const narrowHW = hw * 0.55;
