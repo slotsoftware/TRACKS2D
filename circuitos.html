@@ -858,6 +858,61 @@
                                 };
                                 ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; drawS(ctx);
                                 ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; drawS(ctx);
+                            } else if (p.subtype && p.subtype.includes('pit_parallel')) {
+                                const pitY = laneOff + laneSpacing; const pitBottom = pitY + (w/2 * 0.6);
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
+                                ctx.fillRect(0, hw, l, pitBottom - hw); ctx.strokeRect(0, hw, l, pitBottom - hw); drawCarreraCenterLineStraight();
+                                if (p.subtype === 'pit_parallel' || p.subtype === 'pit_parallel_double_x') { DrawEngine2D.drawHazardZone(ctx, (c) => { c.rect(0, hw, l, pitBottom - hw); }, s); }
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
+                                
+                                // Indicador FUEL-BOXES en TODAS las rectas de Pit Lane
+                                ctx.save();
+                                ctx.translate(l/2, pitY);
+                                const isUpsideDown = Math.cos(p.rot || 0) < -0.01;
+                                
+                                ctx.fillStyle = '#facc15';
+                                ctx.font = `bold ${7 * (s/5)}px 'Share Tech Mono', Arial`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                const txt = "FUEL-BOXES";
+                                const tw = ctx.measureText(txt).width;
+                                
+                                // Mantener el texto siempre legible y en su sitio sin importar la rotación
+                                if (isUpsideDown) {
+                                    ctx.rotate(Math.PI);
+                                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                                    ctx.fillRect(-tw/2 - 4*(s/5), 4*(s/5), tw + 8*(s/5), 10*(s/5));
+                                    ctx.fillStyle = '#facc15';
+                                    ctx.fillText(txt, 0, 9*(s/5));
+                                } else {
+                                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                                    ctx.fillRect(-tw/2 - 4*(s/5), -14*(s/5), tw + 8*(s/5), 10*(s/5));
+                                    ctx.fillStyle = '#facc15';
+                                    ctx.fillText(txt, 0, -9*(s/5));
+                                }
+                                
+                                ctx.strokeStyle = '#facc15';
+                                ctx.lineWidth = 1.5 * (s/5);
+                                ctx.setLineDash([4*(s/5), 2*(s/5)]);
+                                ctx.strokeRect(-l*0.35, -(w*0.12), l*0.7, w*0.24);
+                                ctx.restore();
+                                
+                                if (p.subtype === 'pit_parallel_double_x') {
+                                     // X cruce en la parte INFERIOR (como debe ser)
+                                     ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); 
+                                     ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, pitY, l, pitY); 
+                                     ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.6, laneOff, l, laneOff); 
+                                     ctx.stroke();
+                                     
+                                     ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); 
+                                     ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, pitY, l, pitY); 
+                                     ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.6, laneOff, l, laneOff); 
+                                     ctx.stroke();
+                                     
+                                     DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, 1, s); DrawEngine2D.drawDigitalWedge(ctx, l, pitY, -1, s);
+                                }
                             } else {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); 
                                 if (p.subtype === 'analog_connect') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.3; const boxH = w * 0.3; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#222'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#ffffff'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand.name, l/2, boxY + boxH/2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(l/2, -hw); ctx.lineTo(l/2, hw); ctx.stroke(); ctx.setLineDash([]); } 
@@ -2819,3 +2874,4 @@
     </script>
 </body>
 </html>
+>
