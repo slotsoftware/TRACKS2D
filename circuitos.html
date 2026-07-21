@@ -818,7 +818,7 @@
                             } else if (p.subtype === 'crossing') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight();
                                 ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, laneOff); ctx.moveTo(0, laneOff); ctx.lineTo(l, -laneOff); ctx.stroke();
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, laneOff); ctx.moveTo(0, laneOff); ctx.lineTo(l, -laneOff); stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, laneOff); ctx.moveTo(0, laneOff); ctx.lineTo(l, -laneOff); ctx.stroke();
                             } else if (['chicane_entry', 'chicane_middle', 'chicane_exit', 'chicane_full', 'squeeze'].includes(p.subtype)) {
                                 let marginColor = '#262626';
                                 if (p.deco === 'green') marginColor = '#16a34a';
