@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- El archivo se ha limpiado. Por favor, vuelve a pegar tu código original aquí. --><<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -170,28 +170,81 @@
 
         const TRACK_DEFINITIONS = {
           NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff',
-            pieces: [ { id: 'n_40', label: 'Recta 40cm', type: 'straight', length: 40.0, cat: 'Rectas' }, { id: 'n_20', label: 'Media 20cm', type: 'straight', length: 20.0, cat: 'Rectas' }, { id: 'n_sl_1', label: 'Recta 1C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'n_sl_2', label: 'Recta 2C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'n_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'n_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'n_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'n_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'n_grid', label: 'Media Parrilla', type: 'straight', length: 20.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 'n_10', label: 'Cuarto 10cm', type: 'straight', length: 10.0, cat: 'Rectas' }, { id: 'n_05', label: 'Cierre 5cm', type: 'straight', length: 5.0, cat: 'Rectas' }, { id: 'n_adapt_scx', label: 'NINCO ▶ SCX', type: 'straight', length: 20.0, subtype: 'adapter_ninco_scx', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.7 }, { id: 'n_adapt_scx_rev', label: 'SCX ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_scx_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.7, laneSpacingOut: 9.0 }, { id: 'n_adapt_suk', label: 'NINCO ▶ SCX UK', type: 'straight', length: 20.0, subtype: 'adapter_ninco_suk', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.8 }, { id: 'n_adapt_suk_rev', label: 'SCX UK ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_suk_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.8, laneSpacingOut: 9.0 }, { id: 'n_connect', label: 'Conexiones', type: 'straight', length: 40.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 'n_cross', label: 'Cruce 40cm', type: 'straight', length: 40.0, subtype: 'crossing', cat: 'Rectas' }, { id: 'n_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 40.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 'n_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 40.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 'n_chicane_out', label: 'Salida Chicane', type: 'straight', length: 40.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 'n_r1', label: 'R1 (Int)', type: 'curve', radius: 15.137, angle: 45, cat: 'Curvas' }, { id: 'n_r1_22', label: 'R1 (22.5°)', type: 'curve', radius: 15.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r2', label: 'R2 (Std)', type: 'curve', radius: 33.137, angle: 45, cat: 'Curvas' }, { id: 'n_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 33.137, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 'n_r2_22', label: 'R2 (22.5°)', type: 'curve', radius: 33.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r3', label: 'R3 (22.5°)', type: 'curve', radius: 51.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r4', label: 'R4 (22.5°)', type: 'curve', radius: 69.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r5', label: 'R5 (11.25°)', type: 'curve', radius: 87.137, angle: 11.25, cat: 'Curvas' }, { id: 'n_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda_connect', cat: 'Hidden' }, { id: 'n_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda', cat: 'RALLY' }, { id: 'n_console', label: 'Centralita', type: 'straight', length: 20.0, subtype: 'digital_console', cat: 'Digital' }, { id: 'n_x', label: 'Cambio X', type: 'straight', length: 40.0, subtype: 'digital_x', cat: 'Digital' }, { id: 'n_ch_r', label: 'Cambio Der', type: 'straight', length: 40.0, subtype: 'change_right', cat: 'Digital' }, { id: 'n_ch_l', label: 'Cambio Izq', type: 'straight', length: 40.0, subtype: 'change_left', cat: 'Digital' }, { id: 'n_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 40.0, cat: 'Boxes' }, { id: 'n_pit_fuel', label: 'Zona Fuel', type: 'straight', length: 40.0, subtype: 'pit_parallel', cat: 'Boxes' }, { id: 'n_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 40.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, { id: 'n_pit_straight', label: 'Recta Pit', type: 'straight', length: 40.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, { id: 'n_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 40.0, cat: 'Boxes' } ] },
-          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
-            pieces: [ { id: 's_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, { id: 's_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, { id: 's_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 's_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 's_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 's_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 's_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 's_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 's_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 's_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, { id: 's_connect', label: 'Conexión', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 's_cross', label: 'Recta Cruce', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Rectas' }, { id: 's_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 's_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 's_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 's_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 's_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, { id: 's_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, { id: 's_r2_ice', label: 'R2 (Hielo)', type: 'curve', radius: 30.6, angle: 45, subtype: 'ice', cat: 'Curvas' }, { id: 's_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, { id: 's_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' }, { id: 's_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'Hidden' }, { id: 's_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' } ] },
-          SCX_CLASIC: { name: 'SCX CLASIC', themeColor: 'amber', neonColor: '#f59e0b', uiClass: 'border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:bg-amber-950/30', activeClass: 'bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.6)] border-amber-400 font-bold', trackColor: '#1a1a1a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
+            pieces: [ { id: 'n_40', label: 'Recta 40cm', type: 'straight', length: 40.0, cat: 'Rectas' }, { id: 'n_20', label: 'Media 20cm', type: 'straight', length: 20.0, cat: 'Rectas' }, { id: 'n_sl_1', label: 'Recta 1C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_sl_2', label: 'Recta 2C (40)', type: 'straight', length: 40.0, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 33.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, { id: 'n_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.137, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, { id: 'n_grid', label: 'Media Parrilla', type: 'straight', length: 20.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 'n_10', label: 'Cuarto 10cm', type: 'straight', length: 10.0, cat: 'Rectas' }, { id: 'n_05', label: 'Cierre 5cm', type: 'straight', length: 5.0, cat: 'Rectas' }, { id: 'n_adapt_scx', label: 'NINCO ▶ SCX', type: 'straight', length: 20.0, subtype: 'adapter_ninco_scx', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.7 }, { id: 'n_adapt_scx_rev', label: 'SCX ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_scx_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.7, laneSpacingOut: 9.0 }, { id: 'n_adapt_suk', label: 'NINCO ▶ SCX UK', type: 'straight', length: 20.0, subtype: 'adapter_ninco_suk', cat: 'Rectas', widthIn: 18.0, widthOut: 15.6, laneSpacingIn: 9.0, laneSpacingOut: 7.8 }, { id: 'n_adapt_suk_rev', label: 'SCX UK ▶ NINCO', type: 'straight', length: 20.0, subtype: 'adapter_suk_ninco', cat: 'Rectas', widthIn: 15.6, widthOut: 18.0, laneSpacingIn: 7.8, laneSpacingOut: 9.0 }, { id: 'n_connect', label: 'Conexiones', type: 'straight', length: 40.0, subtype: 'analog_connect', cat: 'Rectas' }, { id: 'n_cross', label: 'Cruce 40cm', type: 'straight', length: 40.0, subtype: 'crossing', cat: 'Rectas' }, { id: 'n_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 40.0, subtype: 'chicane_entry', cat: 'Rectas' }, { id: 'n_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 40.0, subtype: 'chicane_middle', cat: 'Rectas' }, { id: 'n_chicane_out', label: 'Salida Chicane', type: 'straight', length: 40.0, subtype: 'chicane_exit', cat: 'Rectas' }, { id: 'n_r1', label: 'R1 (Int)', type: 'curve', radius: 15.137, angle: 45, cat: 'Curvas' }, { id: 'n_r1_22', label: 'R1 (22.5°)', type: 'curve', radius: 15.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r2', label: 'R2 (Std)', type: 'curve', radius: 33.137, angle: 45, cat: 'Curvas' }, { id: 'n_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 33.137, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, { id: 'n_r2_22', label: 'R2 (22.5°)', type: 'curve', radius: 33.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r3', label: 'R3 (22.5°)', type: 'curve', radius: 51.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r4', label: 'R4 (22.5°)', type: 'curve', radius: 69.137, angle: 22.5, cat: 'Curvas' }, { id: 'n_r5', label: 'R5 (11.25°)', type: 'curve', radius: 87.137, angle: 11.25, cat: 'Curvas' }, { id: 'n_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda_connect', cat: 'Hidden' }, { id: 'n_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.137, angle: 180, subtype: 'rotonda', cat: 'RALLY' }, { id: 'n_console', label: 'Centralita', type: 'straight', length: 20.0, subtype: 'digital_console', cat: 'Digital' }, { id: 'n_x', label: 'Cambio X', type: 'straight', length: 40.0, subtype: 'digital_x', cat: 'Digital' }, { id: 'n_ch_r', label: 'Cambio Der', type: 'straight', length: 40.0, subtype: 'change_right', cat: 'Digital' }, { id: 'n_ch_l', label: 'Cambio Izq', type: 'straight', length: 40.0, subtype: 'change_left', cat: 'Digital' }, { id: 'n_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 40.0, cat: 'Boxes' }, { id: 'n_pit_fuel', label: 'Zona Fuel', type: 'straight', length: 40.0, subtype: 'pit_parallel', cat: 'Boxes' }, { id: 'n_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 40.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, { id: 'n_pit_straight', label: 'Recta Pit', type: 'straight', length: 40.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, { id: 'n_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 40.0, cat: 'Boxes' } ] },
+          SCX_CLASSIC: { name: 'SCX CLÁSICO (Negro)', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#262626', railColor: '#a0a0a0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
             pieces: [ 
-                { id: 'scxc_350', label: 'Recta Std 350', type: 'straight', length: 35.0, cat: 'Rectas' },
-                { id: 'scxc_175', label: 'Media 175', type: 'straight', length: 17.5, cat: 'Rectas' },
-                { id: 'scxc_87', label: 'Cuarto 87', type: 'straight', length: 8.7, cat: 'Rectas' },
-                { id: 'scxc_connect', label: 'Conexiones 175', type: 'straight', length: 17.5, subtype: 'analog_connect', cat: 'Rectas' },
-                { id: 'scxc_r1', label: 'Curva Interior R1', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' },
-                { id: 'scxc_r2', label: 'Curva Standard R2', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' },
-                { id: 'scxc_r3', label: 'Curva Exterior R3', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' },
-                { id: 'scxc_r4', label: 'Curva Super Ext R4', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' },
-                { id: 'scxc_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Chicanes', deco: 'brown' },
-                { id: 'scxc_chicane_full', label: 'Chicane Deslizante', type: 'straight', length: 35.0, subtype: 'chicane_full', cat: 'Chicanes', deco: 'brown' },
-                { id: 'scxc_cross', label: 'Cruce 350', type: 'straight', length: 35.0, subtype: 'crossing', cat: 'Chicanes' },
-                { id: 'scxc_chicane_in_g', label: 'Entrada Chicane', type: 'straight', length: 35.0, subtype: 'chicane_entry', cat: 'Chicanes', deco: 'green' },
-                { id: 'scxc_chicane_mid_g', label: 'Recta Chicane', type: 'straight', length: 35.0, subtype: 'chicane_middle', cat: 'Chicanes', deco: 'green' },
-                { id: 'scxc_chicane_out_g', label: 'Salida Chicane', type: 'straight', length: 35.0, subtype: 'chicane_exit', cat: 'Chicanes', deco: 'green' }
-            ] },
+              { id: 'c_pt51', label: 'Recta Std (PT51)', type: 'straight', length: 35.0, cat: 'Rectas' }, 
+              { id: 'c_pt51_conn', label: 'Conexión (PT51)', type: 'straight', length: 35.0, subtype: 'analog_connect', cat: 'Rectas' }, 
+              { id: 'c_pt58', label: 'Media Recta (PT58)', type: 'straight', length: 17.5, cat: 'Rectas' }, 
+              { id: 'c_pt59', label: 'Cuarto Recta (PT59)', type: 'straight', length: 8.7, cat: 'Rectas' }, 
+              { id: 'c_pt60', label: 'Cierre (PT60)', type: 'straight', length: 7.4, cat: 'Rectas' }, 
+              { id: 'c_pt54', label: 'Cruce en X (PT54)', type: 'straight', length: 35.0, subtype: 'crossing', cat: 'Cruces' }, 
+              { id: 'c_pt54_2', label: 'Chicane Deslizante', type: 'straight', length: 35.0, subtype: 'squeeze', cat: 'Cruces' }, 
+              { id: 'c_pt55', label: 'Entrada Chicane (PT55)', type: 'straight', length: 35.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
+              { id: 'c_pt61', label: 'Recta Chicane (PT61)', type: 'straight', length: 35.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
+              { id: 'c_pt56', label: 'Salida Chicane (PT56)', type: 'straight', length: 35.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
+              { id: 'c_macro_chicane2', label: 'Gran Chicane PT74', type: 'straight', isMacro: true, cat: 'Cruces', pieces: [ 
+                  { id: 'c_pt74_in', label: 'Chicane In (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_entry', cat: 'Cruces' }, 
+                  { id: 'c_pt74_mid', label: 'Chicane Med (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_middle', cat: 'Cruces' }, 
+                  { id: 'c_pt74_out', label: 'Chicane Out (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_exit', cat: 'Cruces' } 
+              ] },
+              { id: 'c_pt57', label: 'Curva Chicane (PT57)', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, 
+              { id: 'c_pt52', label: 'Curva R1 (PT52)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
+              { id: 'c_pt53', label: 'Curva R2 (PT53)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
+              { id: 'c_pt62', label: 'Curva R3 (PT62)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, 
+              { id: 'c_pt63', label: 'Curva R4 (PT63)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' } 
+            ] 
+          },
+          SCX_UNIVERSAL: { name: 'SCX UNIVERSAL (Gris)', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-500 text-black shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
+            pieces: [ 
+              { id: 'u_360', label: 'Recta Std 360', type: 'straight', length: 36.0, cat: 'Rectas' }, 
+              { id: 'u_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, 
+              { id: 'u_90', label: 'Cuarto 90', type: 'straight', length: 9.0, cat: 'Rectas' }, 
+              { id: 'u_connect', label: 'Conexión 360', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, 
+              { id: 'u_cross', label: 'Recta Cruce 360', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Cruces' }, 
+              { id: 'u_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
+              { id: 'u_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
+              { id: 'u_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
+              { id: 'u_r1', label: 'R1 (Interior)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
+              { id: 'u_r2', label: 'R2 (Standard)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
+              { id: 'u_r3', label: 'R3 (Exterior)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, 
+              { id: 'u_r4', label: 'R4 (Sup.Ext)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' },
+              { id: 'u_adapt_class', label: 'Transición a Negra', type: 'straight', length: 18.0, subtype: 'adapter_adv_scx', cat: 'Rectas', widthIn: 15.6, widthOut: 15.6, laneSpacingIn: 7.7, laneSpacingOut: 7.7 },
+              { id: 'u_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' },
+              { id: 'u_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' },
+              { id: 'u_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' },
+              { id: 'u_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' },
+              { id: 'u_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' },
+              { id: 'u_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' },
+              { id: 'u_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' }
+            ] 
+          },
           SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
-            pieces: [ { id: 'adv_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, { id: 'adv_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, { id: 'adv_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'adv_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'adv_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'adv_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'adv_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY', hideRightWall: true }, { id: 'adv_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY', hideLeftWall: true }, { id: 'adv_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'Hidden' }, { id: 'adv_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' }, { id: 'adv_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, { id: 'adv_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, { id: 'adv_connect', label: 'Bluetooth', type: 'straight', length: 36.0, subtype: 'connection', cat: 'Digital' }, { id: 'adv_x', label: 'Cambio Recta', type: 'straight', length: 36.0, subtype: 'digital_x', cat: 'Digital' }, { id: 'adv_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 36.0, cat: 'Boxes' }, { id: 'adv_pit_fuel', label: 'Recta Fuel', type: 'straight', length: 36.0, subtype: 'pit_parallel', cat: 'Boxes' }, { id: 'adv_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 36.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, { id: 'adv_pit_straight', label: 'Recta Pit', type: 'straight', length: 36.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, { id: 'adv_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 36.0, cat: 'Boxes' }, { id: 'adv_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, { id: 'adv_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, { id: 'adv_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, { id: 'adv_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' } ] },
+            pieces: [ 
+              { id: 'adv_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, 
+              { id: 'adv_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, 
+              { id: 'adv_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, 
+              { id: 'adv_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, 
+              { id: 'adv_connect', label: 'Bluetooth', type: 'straight', length: 36.0, subtype: 'connection', cat: 'Digital' }, 
+              { id: 'adv_x', label: 'Cambio Recta', type: 'straight', length: 36.0, subtype: 'digital_x', cat: 'Digital' }, 
+              { id: 'adv_macro_chicane', label: 'Gran Chicane Advance', type: 'straight', isMacro: true, cat: 'Cruces', pieces: [ 
+                  { id: 'adv_chicane_in', label: 'Entrada Chicane (LC)', type: 'straight', length: 36.0, subtype: 'chicane3_entry', cat: 'Cruces' }, 
+                  { id: 'adv_chicane_mid', label: 'Recta Chicane (1C)', type: 'straight', length: 36.0, subtype: 'chicane3_middle', cat: 'Cruces' }, 
+                  { id: 'adv_chicane_out', label: 'Salida Chicane (LC)', type: 'straight', length: 36.0, subtype: 'chicane3_exit', cat: 'Cruces' } 
+              ] },
+              { id: 'adv_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 36.0, cat: 'Boxes' }, 
+              { id: 'adv_pit_fuel', label: 'Recta Fuel', type: 'straight', length: 36.0, subtype: 'pit_parallel', cat: 'Boxes' }, 
+              { id: 'adv_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 36.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, 
+              { id: 'adv_pit_straight', label: 'Recta Pit', type: 'straight', length: 36.0, subtype: 'pit_parallel_black', cat: 'Boxes' }, 
+              { id: 'adv_pit_out', label: 'Salida Pit', type: 'pit_exit', length: 36.0, cat: 'Boxes' }, 
+              { id: 'adv_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'Boxes' }, 
+              { id: 'adv_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'Boxes' }, 
+              { id: 'adv_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
+              { id: 'adv_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
+              { id: 'adv_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, 
+              { id: 'adv_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' } 
+            ] 
+          },
           SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#4d4d4d', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff',
             pieces: [ 
               { id: 'sca_40', label: 'Recta Pro 40', type: 'straight', length: 40.0, cat: 'Rectas' }, 
@@ -273,17 +326,33 @@
             const [tag, attrs, children = []] = iconData;
             return <svg {...attrs} width={size} height={size} className={className} {...props}>{Array.isArray(children) && children.map(([childTag, childAttrs], index) => React.createElement(childTag, { ...childAttrs, key: index }))}</svg>;
         };
-        const icons = ['FilePlus','Trash2','Image','Fuel','Move','Zap','Bluetooth','RotateCw','X','Repeat','PenTool','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Square','FolderOpen','Save','FileText','Activity','Play','Pause','Flag','GitCommit','ZoomIn','ZoomOut','Crosshair','Undo2','Redo2','Layers','Clock','Hash','Plus','Minus','AlertTriangle', 'Cloud', 'CloudUpload', 'CloudDownload', 'Settings', 'Battery', 'Scale', 'Maximize', 'Minimize', 'User', 'Users', 'ChevronDown', 'Upload', 'FileJson', 'Eye', 'CheckCircle2', 'Github', 'Shield', 'MessageSquare', 'CheckSquare'].reduce((acc, name) => { acc[name] = (p) => <IconWrapper name={name} {...p} />; return acc; }, {});
-        const { FilePlus, Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, X, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Maximize, Minimize, User, Users, ChevronDown, Upload, FileJson, Eye, CheckCircle2, Github, Shield, MessageSquare, CheckSquare } = icons;
+        const icons = ['Trash2','Image','Fuel','Move','Zap','Bluetooth','RotateCw','X','Repeat','PenTool','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Square','FolderOpen','Save','FileText','Activity','Play','Pause','Flag','GitCommit','ZoomIn','ZoomOut','Crosshair','Undo2','Redo2','Layers','Clock','Hash','Plus','Minus','AlertTriangle', 'Cloud', 'CloudUpload', 'CloudDownload', 'Settings', 'Battery', 'Scale', 'Maximize', 'Minimize', 'User', 'Users', 'ChevronDown', 'Upload', 'FileJson', 'Eye', 'CheckCircle2', 'Github', 'Shield', 'MessageSquare', 'CheckSquare'].reduce((acc, name) => { acc[name] = (p) => <IconWrapper name={name} {...p} />; return acc; }, {});
+        const { Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, X, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Maximize, Minimize, User, Users, ChevronDown, Upload, FileJson, Eye, CheckCircle2, Github, Shield, MessageSquare, CheckSquare } = icons;
 
         // GEOMETRÍA ABSOLUTA
         const getPieceGeometry = (p) => {
             if (!p || p.type === 'set_origin' || p.type === 'goto') return null;
+            
+            const brand = TRACK_DEFINITIONS[p.brandKey || 'NINCO'] || TRACK_DEFINITIONS['NINCO'];
+            const laneOff = brand.laneSpacing / 2;
+            const isSingleLane = p.subtype && p.subtype.includes('single_lane');
+
             let dx = 0, dy = 0, da = 0;
+            let effectiveRadius = p.radius || 20;
+
+            if (p.type === 'curve') {
+                if (p.subtype === 'single_lane_1') {
+                    effectiveRadius = p.direction === 'left' ? p.radius - laneOff : p.radius + laneOff;
+                } else if (p.subtype === 'single_lane_2') {
+                    effectiveRadius = p.direction === 'left' ? p.radius + laneOff : p.radius - laneOff;
+                }
+            }
+
             if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { 
                 dx = p.length; 
+                if (p.shiftY) dy = p.shiftY;
             } else if (p.type === 'curve') {
-                const r = Math.abs(p.radius);
+                const r = Math.abs(effectiveRadius);
                 const aRad = (p.angle * Math.PI) / 180;
                 if (p.direction === 'left') { 
                     dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); da = -aRad; 
@@ -293,7 +362,7 @@
             } else if (p.type === 'rotonda' || p.subtype === 'rotonda') {
                 da = Math.PI;
             } else if (p.type === 'compound_curve_change') {
-                const r = Math.abs(p.radius);
+                const r = Math.abs(effectiveRadius);
                 const aRad = (p.angle * Math.PI) / 180;
                 if (p.direction === 'left') { 
                     dx = p.length + r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); da = -aRad; 
@@ -310,7 +379,7 @@
 
             let midX = (p.x + exitX) / 2;
             let midY = (p.y + exitY) / 2;
-            let hitRadius = p.type === 'straight' ? p.length / 2 : Math.abs(p.radius || 20);
+            let hitRadius = p.type === 'straight' ? p.length / 2 : Math.abs(effectiveRadius);
 
             if (p.type === 'rotonda' || p.subtype === 'rotonda') {
                 const straightLen = 1.0;
@@ -318,14 +387,29 @@
                 midY = p.y + (straightLen + (p.radius || 15)) * Math.sin(rot);
                 hitRadius = (p.radius || 15) + straightLen;
             } else if (p.type === 'compound_curve_change') {
-                hitRadius = Math.max(p.length, Math.abs(p.radius));
+                hitRadius = Math.max(p.length, Math.abs(effectiveRadius));
+            }
+
+            let inNodes = [];
+            let outNodes = [];
+
+            if (isSingleLane || p.type === 'rotonda' || p.subtype === 'rotonda') {
+                inNodes.push({ x: p.x, y: p.y, angle: rot, role: 'center' });
+                outNodes.push({ x: exitX, y: exitY, angle: exitAngle, role: 'center' });
+            } else {
+                inNodes.push({ x: p.x, y: p.y, angle: rot, role: 'center' });
+                outNodes.push({ x: exitX, y: exitY, angle: exitAngle, role: 'center' });
+                inNodes.push({ x: p.x + laneOff * Math.sin(rot), y: p.y - laneOff * Math.cos(rot), angle: rot, role: 'rail' });
+                outNodes.push({ x: exitX + laneOff * Math.sin(exitAngle), y: exitY - laneOff * Math.cos(exitAngle), angle: exitAngle, role: 'rail' });
+                inNodes.push({ x: p.x - laneOff * Math.sin(rot), y: p.y + laneOff * Math.cos(rot), angle: rot, role: 'rail' });
+                outNodes.push({ x: exitX - laneOff * Math.sin(exitAngle), y: exitY + laneOff * Math.cos(exitAngle), angle: exitAngle, role: 'rail' });
             }
 
             return {
                 inX: p.x, inY: p.y, inZ: z, inAngle: rot,
                 outX: exitX, outY: exitY, outZ: z, outAngle: exitAngle,
                 localDx: dx, localDy: dy, localDa: da,
-                midX, midY, hitRadius
+                midX, midY, hitRadius, inNodes, outNodes, isSingleLane
             };
         };
 
@@ -356,19 +440,30 @@
 
                 if (p.x !== undefined && p.rot !== undefined) return p; 
                 
+                const brand = TRACK_DEFINITIONS[p.brandKey || 'NINCO'] || TRACK_DEFINITIONS['NINCO'];
+                const laneOff = brand.laneSpacing / 2;
+                
                 let pX = cx, pY = cy, pRot = currentAngle;
                 if (p.invert && p.subtype !== 'rotonda') pRot += Math.PI;
 
                 let dx = 0, dy = 0, dAngle = 0;
                 if (p.type === 'rotonda' || p.subtype === 'rotonda') { dAngle = Math.PI; }
-                else if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { dx = p.length; }
+                else if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { 
+                    dx = p.length; 
+                    if (p.shiftY) dy = p.shiftY;
+                }
                 else if (p.type === 'compound_curve_change') {
-                    const r = Math.abs(p.radius); const aRad = (p.angle * Math.PI) / 180;
-                    if (p.direction === 'left') { dx = p.length + r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); dAngle = -aRad; }
-                    else { dx = p.length + r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); dAngle = aRad; }
+                    let effectiveRadius = Math.abs(p.radius);
+                    const aRad = (p.angle * Math.PI) / 180;
+                    if (p.direction === 'left') { dx = p.length + effectiveRadius * Math.sin(aRad); dy = -effectiveRadius * (1 - Math.cos(aRad)); dAngle = -aRad; }
+                    else { dx = p.length + effectiveRadius * Math.sin(aRad); dy = effectiveRadius * (1 - Math.cos(aRad)); dAngle = aRad; }
                 }
                 else if (p.type === 'curve') {
-                    const r = Math.abs(p.radius);
+                    let effectiveRadius = Math.abs(p.radius);
+                    if (p.subtype === 'single_lane_1') effectiveRadius = p.direction === 'left' ? effectiveRadius - laneOff : effectiveRadius + laneOff;
+                    else if (p.subtype === 'single_lane_2') effectiveRadius = p.direction === 'left' ? effectiveRadius + laneOff : effectiveRadius - laneOff;
+                    
+                    const r = effectiveRadius;
                     const aRad = (p.angle * Math.PI) / 180;
                     if (p.direction === 'left') { dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); dAngle = -aRad; }
                     else { dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); dAngle = aRad; }
@@ -404,10 +499,9 @@
             rawPieces.forEach(rawP => {
                 if (!rawP) return;
                 const p = JSON.parse(JSON.stringify(rawP));
-                // Clave basada en posición con precisión de 1mm, ID, dirección y elevación
-                // Esto asegura que pistas complementarias (ej. bifurcaciones de Rally o Pit Lanes) no se borren por error.
-                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}_${p.id}_${p.direction || 'none'}_${p.elevation || 0}`;
-                // Guardamos la pieza. Si hay un fantasma superpuesto idéntico, se sobreescribe.
+                // Clave basada en posición con precisión de 1mm
+                const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
+                // Guardamos la pieza. Si hay un fantasma superpuesto, se sobreescribe, dejando solo 1 pieza real en ese espacio.
                 uniquePiecesMap.set(key, p);
             });
             
@@ -422,14 +516,19 @@
                     p.subtype = 'crossing'; // Adaptamos para que el motor 3D la dibuje sin dejar un hueco y cruce los carriles
                 }
 
-                // --- FIX CHICANE DESLIZANTE 3D ---
-                if (p.subtype === 'chicane_full' || p.subtype === 'squeeze') {
-                    const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
-                    const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
-                    
+                // SANITIZACIÓN PARA 3D: Chicanes especiales SCX y Deslizantes
+                const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
+                const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
+
+                if (p.subtype === 'squeeze') {
+                    // EXPLICACIÓN DEL FALLO EN 3D:
+                    // El simulador 3D NO tiene programado el modelo "squeeze". Cuando lo lee, se rinde y dibuja una recta normal.
+                    // SOLUCIÓN MÁGICA: Dividimos el "squeeze" de 35cm en DOS piezas virtuales de 17.5cm (Entrada + Salida).
+                    // El motor 3D SÍ sabe dibujar entradas y salidas, así que ahora la pista se estrechará perfectamente.
                     const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
                     const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_out', subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
                     
+                    // Posicionamos la segunda pieza justo en la mitad
                     p2.x = p1.x + (p.length / 2) * Math.cos(p.rot || 0);
                     p2.y = p1.y + (p.length / 2) * Math.sin(p.rot || 0);
                     
@@ -438,6 +537,28 @@
                     
                     expandedPieces.push(p1, p2);
                     return; // Saltamos la original
+                }
+
+                if (p.subtype === 'chicane3_entry' || p.subtype === 'chicane_entry') {
+                    p.subtype = 'chicane_entry';
+                    p.id = 'n_chicane_in';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
+                } else if (p.subtype === 'chicane3_middle' || p.subtype === 'chicane_middle') {
+                    p.subtype = 'chicane_middle';
+                    p.id = 'n_chicane_mid';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
+                } else if (p.subtype === 'chicane3_exit' || p.subtype === 'chicane_exit') {
+                    p.subtype = 'chicane_exit';
+                    p.id = 'n_chicane_out';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
+                } else if (p.subtype === 'crossing') {
+                    // Forzar a que cualquier cruce X use el ID de Ninco para que el motor 3D no falle
+                    p.id = 'n_cross';
+                    p.width = brandDef.width;
+                    p.laneSpacing = brandDef.laneSpacing;
                 }
 
                 // SANITIZACIÓN PARA 3D: Cambios en Curva de Carrera.
@@ -463,14 +584,6 @@
                     p.direction = 'left'; 
                 }
 
-                if (p.subtype === 'crossing') {
-                    const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
-                    const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
-                    p.id = 'n_cross';
-                    p.width = brandDef.width;
-                    p.laneSpacing = brandDef.laneSpacing;
-                }
-
                 // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
                 delete p.groupId;
                 delete p.cat;
@@ -485,8 +598,6 @@
                 lanes[laneId].push(p);
             });
 
-            let globalChainCounter = 0;
-
             Object.keys(lanes).sort((a,b)=>a-b).forEach(laneId => {
                 let pool = lanes[laneId];
                 if (pool.length === 0) return;
@@ -496,56 +607,42 @@
                     origGeos.set(p.uid, getPieceGeometry(p));
                 });
 
-                const findNextPiece = (searchPoint, availablePool, currentPiece) => {
+                const findNextPiece = (searchPointNodes, availablePool) => {
                     let bestIdx = -1;
-                    let bestScore = Infinity;
+                    let bestDist = Infinity;
                     let connectedToIn = true;
-
-                    const currentAffinity = (currentPiece && currentPiece.subtype && currentPiece.subtype.includes('single_lane_1')) ? 1 : 
-                                            (currentPiece && currentPiece.subtype && currentPiece.subtype.includes('single_lane_2')) ? 2 : 0;
+                    let targetSearchNode = null;
+                    let targetPieceNodeIndex = -1;
 
                     for (let i = 0; i < availablePool.length; i++) {
                         const cand = availablePool[i];
                         const ep = origGeos.get(cand.uid);
                         
-                        const candAffinity = (cand.subtype && cand.subtype.includes('single_lane_1')) ? 1 :
-                                             (cand.subtype && cand.subtype.includes('single_lane_2')) ? 2 : 0;
-                                             
-                        let penalty = 0;
-                        if (currentAffinity !== 0 && candAffinity !== 0 && currentAffinity !== candAffinity) {
-                            penalty = 1000;
-                        } else if (currentAffinity !== 0 && candAffinity === currentAffinity) {
-                            penalty = -10;
-                        }
-
-                        const distIn = Math.hypot(searchPoint.x - ep.inX, searchPoint.y - ep.inY);
-                        const angleInDiff = getAngleDiff(searchPoint.angle, ep.inAngle);
-                        
-                        const distOut = Math.hypot(searchPoint.x - ep.outX, searchPoint.y - ep.outY);
-                        const angleOutDiff = getAngleDiff(searchPoint.angle, (ep.outAngle + Math.PI) % (Math.PI * 2));
-
-                        const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
-
-                        if (distIn < 15.0 && angleInDiff < 0.5) {
-                            const score = distIn + penalty;
-                            if (score < bestScore) {
-                                bestScore = score;
-                                bestIdx = i;
-                                connectedToIn = true;
+                        searchPointNodes.forEach(sNode => {
+                            ep.inNodes.forEach((inNode, idx) => {
+                                const dist = Math.hypot(sNode.x - inNode.x, sNode.y - inNode.y);
+                                const aDiff = getAngleDiff(sNode.angle, inNode.angle);
+                                if (dist < 15.0 && aDiff < 0.5 && dist < bestDist) {
+                                    bestDist = dist; bestIdx = i; connectedToIn = true;
+                                    targetSearchNode = sNode; targetPieceNodeIndex = idx;
+                                }
+                            });
+                            
+                            const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
+                            if (!isCandRotonda) {
+                                ep.outNodes.forEach((outNode, idx) => {
+                                    const dist = Math.hypot(sNode.x - outNode.x, sNode.y - outNode.y);
+                                    const aDiff = getAngleDiff(sNode.angle, (outNode.angle + Math.PI) % (Math.PI*2));
+                                    if (dist < 15.0 && aDiff < 0.5 && dist < bestDist) {
+                                        bestDist = dist; bestIdx = i; connectedToIn = false;
+                                        targetSearchNode = sNode; targetPieceNodeIndex = idx;
+                                    }
+                                });
                             }
-                        }
-                        
-                        if (!isCandRotonda && distOut < 15.0 && angleOutDiff < 0.5) {
-                            const score = distOut + penalty;
-                            if (score < bestScore) {
-                                bestScore = score;
-                                bestIdx = i;
-                                connectedToIn = false;
-                            }
-                        }
+                        });
                     }
 
-                    return { bestIdx, connectedToIn };
+                    return { bestIdx, connectedToIn, targetSearchNode, targetPieceNodeIndex };
                 };
 
                 let bestChainForLane = [];
@@ -577,17 +674,16 @@
                     if (startIdx === -1) startIdx = 0;
 
                     let current = pool.splice(startIdx, 1)[0];
-                    // NO normalizamos ángulos. Dejamos que sumen infinitamente como necesita el 3D
                     current.inZ = current.elevation || 0;
                     current.outZ = current.elevation || 0;
                     currentChain.push(current);
                     
                     let firstGeo = getPieceGeometry(current);
-                    let currentSearchExit = { x: firstGeo.outX, y: firstGeo.outY, z: current.outZ, angle: firstGeo.outAngle };
+                    let currentSearchExitNodes = firstGeo.outNodes.map(n => ({ ...n, z: current.outZ }));
 
                     let chainContinues = true;
                     while (chainContinues && pool.length > 0) {
-                        const { bestIdx, connectedToIn } = findNextPiece(currentSearchExit, pool, current);
+                        const { bestIdx, connectedToIn, targetSearchNode } = findNextPiece(currentSearchExitNodes, pool);
 
                         if (bestIdx !== -1) {
                             let nextPiece = pool.splice(bestIdx, 1)[0];
@@ -631,44 +727,37 @@
                             }
 
                             nextPiece.invert = false;
-                            nextPiece.rot = currentSearchExit.angle;
+                            nextPiece.rot = targetSearchNode.angle;
                             
                             const ep = getPieceGeometry(nextPiece);
+                            let bestLocalDist = Infinity;
+                            let alignNode = ep.inNodes[0];
+                            ep.inNodes.forEach(n => {
+                                const d = Math.hypot(targetSearchNode.x - n.x, targetSearchNode.y - n.y);
+                                if (d < bestLocalDist) { bestLocalDist = d; alignNode = n; }
+                            });
                             
-                            const newDx = ep.localDx * Math.cos(nextPiece.rot) - ep.localDy * Math.sin(nextPiece.rot);
-                            const newDy = ep.localDx * Math.sin(nextPiece.rot) + ep.localDy * Math.cos(nextPiece.rot);
+                            const newDx = targetSearchNode.x - alignNode.x;
+                            const newDy = targetSearchNode.y - alignNode.y;
                             
-                            nextPiece.x = currentSearchExit.x;
-                            nextPiece.y = currentSearchExit.y;
-                            nextPiece.inZ = currentSearchExit.z;
+                            nextPiece.x += newDx;
+                            nextPiece.y += newDy;
+                            nextPiece.inZ = targetSearchNode.z;
                             nextPiece.outZ = nextPiece.elevation || 0;
                             
-                            currentSearchExit = { 
-                                x: nextPiece.x + newDx, 
-                                y: nextPiece.y + newDy, 
-                                z: nextPiece.outZ, 
-                                angle: nextPiece.rot + ep.localDa 
-                            };
+                            const finalEp = getPieceGeometry(nextPiece);
+                            currentSearchExitNodes = finalEp.outNodes.map(n => ({ ...n, z: nextPiece.outZ }));
                             
                             currentChain.push(nextPiece);
-                            current = nextPiece;
                         } else {
                             chainContinues = false; // Fin de este tren
                         }
                     }
                     
-                    // Asignamos un ID de carril virtual único a cada ramal desconectado.
-                    // Esto evita que el motor 3D intente unir el final del circuito principal con el principio 
-                    // de una bifurcación (lo que creaba una spline retorcida invisible que destrozaba la pista).
-                    const virtualLaneId = parseInt(laneId) * 100 + globalChainCounter;
-                    currentChain.forEach(p => {
-                        p.lane = virtualLaneId;
-                    });
-                    globalChainCounter++;
-
-                    // En lugar de quedarnos solo con la cadena más larga, acumulamos TODAS.
-                    // Esto evita que ramales secundarios válidos (Pit Lanes, Splits de Rally) desaparezcan en 3D.
-                    bestChainForLane.push(...currentChain);
+                    // Nos quedamos estrictamente con la cadena más larga (elimina basura suelta y ramales fallidos)
+                    if (currentChain.length > bestChainForLane.length) {
+                        bestChainForLane = currentChain;
+                    }
                 }
                 
                 // IMPORTANTE: ELIMINADA LA SUBDIVISIÓN DE PIEZAS.
@@ -704,25 +793,45 @@
             drawHazardZone: (ctx, pathFn, s, color = '#facc15') => { ctx.save(); ctx.beginPath(); pathFn(ctx); ctx.clip(); ctx.strokeStyle = color; ctx.lineWidth = 2; const diagSpace = 8 * (s/5); for(let dx = -1000; dx < 1000; dx += diagSpace) { ctx.beginPath(); ctx.moveTo(dx, -500); ctx.lineTo(dx - 500, 500); ctx.stroke(); } ctx.restore(); },
             drawBorder: (ctx, p, l, trueR, startA, sweep, hw, bWidth, isRightSide, s, brand) => {
                 const isLeft = p.direction === 'left';
-                if (p.type.includes('pit') || p.type === 'rotonda' || p.subtype === 'rotonda') return; 
+                const isSingle1 = p.subtype === 'single_lane_1';
+                const isSingle2 = p.subtype === 'single_lane_2';
+                const isSingle = isSingle1 || isSingle2;
+                const laneOff = (brand.laneSpacing / 2) * s;
+                
+                if (p.type.includes('pit') || p.type === 'rotonda' || p.subtype === 'rotonda' || (p.subtype && p.subtype.startsWith('chicane3_'))) return; 
                 ctx.beginPath();
+                
+                let effectiveTrueR = trueR;
+                let trackWidthHalf = hw;
+
+                if (isSingle) {
+                    if (isSingle1) effectiveTrueR = isLeft ? trueR - laneOff : trueR + laneOff;
+                    if (isSingle2) effectiveTrueR = isLeft ? trueR + laneOff : trueR - laneOff;
+                    trackWidthHalf = hw / 2;
+                }
+
                 if (p.type === 'straight') {
-                    const y = isRightSide ? hw + bWidth/2 : -hw - bWidth/2;
+                    const shift = p.shiftY ? (p.shiftY * s) : 0;
+                    const y = isRightSide ? trackWidthHalf + bWidth/2 : -trackWidthHalf - bWidth/2;
                     ctx.moveTo(0, y);
-                    ctx.lineTo(l, y);
+                    if (shift !== 0) {
+                        ctx.bezierCurveTo(l*0.5, y, l*0.5, y + shift, l, y + shift);
+                    } else {
+                        ctx.lineTo(l, y);
+                    }
                 } else if (p.type === 'curve') {
                     let rBorder;
-                    if (isLeft) { rBorder = isRightSide ? trueR + hw + bWidth/2 : trueR - hw - bWidth/2; } 
-                    else { rBorder = isRightSide ? trueR - hw - bWidth/2 : trueR + hw + bWidth/2; }
+                    if (isLeft) { rBorder = isRightSide ? effectiveTrueR + trackWidthHalf + bWidth/2 : effectiveTrueR - trackWidthHalf - bWidth/2; } 
+                    else { rBorder = isRightSide ? effectiveTrueR - trackWidthHalf - bWidth/2 : effectiveTrueR + trackWidthHalf + bWidth/2; }
                     if (rBorder <= 0) return;
-                    ctx.arc(0, isLeft ? -trueR : trueR, rBorder, startA, startA + sweep, isLeft);
+                    ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, rBorder, startA, startA + sweep, isLeft);
                 } else if (p.type === 'compound_curve_change') {
-                    const y = isRightSide ? hw + bWidth/2 : -hw - bWidth/2;
+                    const y = isRightSide ? trackWidthHalf + bWidth/2 : -trackWidthHalf - bWidth/2;
                     ctx.moveTo(0, y); ctx.lineTo(l, y);
                     let rBorder;
-                    if (isLeft) { rBorder = isRightSide ? trueR + hw + bWidth/2 : trueR - hw - bWidth/2; } 
-                    else { rBorder = isRightSide ? trueR - hw - bWidth/2 : trueR + hw + bWidth/2; }
-                    if (rBorder > 0) { ctx.arc(l, isLeft ? -trueR : trueR, rBorder, startA, startA + sweep, isLeft); }
+                    if (isLeft) { rBorder = isRightSide ? effectiveTrueR + trackWidthHalf + bWidth/2 : effectiveTrueR - trackWidthHalf - bWidth/2; } 
+                    else { rBorder = isRightSide ? effectiveTrueR - trackWidthHalf - bWidth/2 : effectiveTrueR + trackWidthHalf + bWidth/2; }
+                    if (rBorder > 0) { ctx.arc(l, isLeft ? -effectiveTrueR : effectiveTrueR, rBorder, startA, startA + sweep, isLeft); }
                 } else { return; }
 
                 ctx.strokeStyle = '#222'; ctx.lineWidth = bWidth + 2; ctx.stroke();
@@ -802,11 +911,56 @@
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 2.5; ctx.beginPath();
                                 if (p.subtype !== 'change_left') { ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); } if (p.subtype !== 'change_right') { ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); } ctx.stroke();
                                 if (p.subtype !== 'change_left') DrawEngine2D.drawDigitalWedge(ctx, l, -laneOff, 1, s); if (p.subtype !== 'change_right') DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, -1, s);
+                            } else if (p.subtype && p.subtype.startsWith('chicane3_')) {
+                                const narrowHW = hw * 0.5;
+                                const c1 = hw - narrowHW;
+                                const narrowLaneOff = laneOff * 0.35;
+                                
+                                let yStartLeft, yStartRight, yEndLeft, yEndRight;
+                                let railStartL, railStartR, railEndL, railEndR;
+                                
+                                if (p.subtype === 'chicane3_entry') {
+                                    yStartLeft = -hw; yStartRight = hw;
+                                    yEndLeft = c1 - narrowHW; yEndRight = c1 + narrowHW;
+                                    railStartL = -laneOff; railStartR = laneOff;
+                                    railEndL = c1 - narrowLaneOff; railEndR = c1 + narrowLaneOff;
+                                } else if (p.subtype === 'chicane3_middle') {
+                                    yStartLeft = c1 - narrowHW; yStartRight = c1 + narrowHW;
+                                    yEndLeft = -c1 - narrowHW; yEndRight = -c1 + narrowHW;
+                                    railStartL = c1 - narrowLaneOff; railStartR = c1 + narrowLaneOff;
+                                    railEndL = -c1 - narrowLaneOff; railEndR = -c1 + narrowLaneOff;
+                                } else if (p.subtype === 'chicane3_exit') {
+                                    yStartLeft = -c1 - narrowHW; yStartRight = -c1 + narrowHW;
+                                    yEndLeft = -hw; yEndRight = hw;
+                                    railStartL = -c1 - narrowLaneOff; railStartR = -c1 + narrowLaneOff;
+                                    railEndL = -laneOff; railEndR = laneOff;
+                                }
+
+                                ctx.fillStyle = brand.trackColor;
+                                ctx.beginPath();
+                                ctx.moveTo(0, yStartLeft);
+                                ctx.bezierCurveTo(l*0.4, yStartLeft, l*0.6, yEndLeft, l, yEndLeft);
+                                ctx.lineTo(l, yEndRight);
+                                ctx.bezierCurveTo(l*0.6, yEndRight, l*0.4, yStartRight, 0, yStartRight);
+                                ctx.closePath();
+                                ctx.fill();
+                                
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+                                ctx.beginPath(); ctx.moveTo(0, yStartLeft); ctx.bezierCurveTo(l*0.4, yStartLeft, l*0.6, yEndLeft, l, yEndLeft); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(0, yStartRight); ctx.bezierCurveTo(l*0.4, yStartRight, l*0.6, yEndRight, l, yEndRight); ctx.stroke();
+                                
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
+                                ctx.beginPath(); ctx.moveTo(0, railStartL); ctx.bezierCurveTo(l*0.4, railStartL, l*0.6, railEndL, l, railEndL); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(0, railStartR); ctx.bezierCurveTo(l*0.4, railStartR, l*0.6, railEndR, l, railEndR); ctx.stroke();
+                                
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1;
+                                ctx.beginPath(); ctx.moveTo(0, railStartL); ctx.bezierCurveTo(l*0.4, railStartL, l*0.6, railEndL, l, railEndL); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(0, railStartR); ctx.bezierCurveTo(l*0.4, railStartR, l*0.6, railEndR, l, railEndR); ctx.stroke();
                             } else if (p.subtype && p.subtype.includes('single_lane')) {
-                                const isLane1 = p.subtype === 'single_lane_1'; const yStart = isLane1 ? -hw : 0; const yEnd = isLane1 ? 0 : hw; const railY = isLane1 ? -laneOff : laneOff;
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, yStart, l, hw); ctx.strokeStyle = '#222'; ctx.strokeRect(0, yStart, l, hw);
-                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, railY); ctx.lineTo(l, railY); ctx.stroke();
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, railY); ctx.lineTo(l, railY); ctx.stroke();
+                                const slWidth = hw;
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -slWidth/2, l, slWidth); ctx.strokeStyle = '#222'; ctx.strokeRect(0, -slWidth/2, l, slWidth);
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(l, 0); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(l, 0); ctx.stroke();
                             } else if (p.subtype === 'jump_up' || p.subtype === 'jump_down') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); DrawEngine2D.drawRails(ctx, l, laneOff, brand);
                                 ctx.fillStyle = '#facc15'; ctx.beginPath();
@@ -825,101 +979,126 @@
                                 const p1X = l * 0.7; const p1Y = -laneOff; ctx.beginPath(); ctx.moveTo(p1X - boxLen, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y + boxWid/2); ctx.lineTo(p1X - boxLen, p1Y + boxWid/2); ctx.stroke();
                                 const p2X = l * 0.3; const p2Y = laneOff; ctx.beginPath(); ctx.moveTo(p2X - boxLen, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y + boxWid/2); ctx.lineTo(p2X - boxLen, p2Y + boxWid/2); ctx.stroke();
                             } else if (p.subtype === 'digital_console') {
-                                ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); DrawEngine2D.drawRails(ctx, l, laneOff, brand); 
                                 
-                                const narrowHW = hw * 0.55;
-                                // MODIFICADO: Hacemos que los carriles de la chicane se junten mucho más al centro (20% en lugar de 35%)
-                                const narrowLaneOff = laneOff * 0.20;
-                                
-                                ctx.fillStyle = p.deco === 'brown' ? '#c19a6b' : brand.trackColor; ctx.beginPath();
-                                if (p.subtype === 'chicane_entry') { ctx.moveTo(0, -hw); ctx.lineTo(l, -narrowHW); ctx.lineTo(l, narrowHW); ctx.lineTo(0, hw); }
-                                else if (p.subtype === 'chicane_middle') { ctx.moveTo(0, -narrowHW); ctx.lineTo(l, -narrowHW); ctx.lineTo(l, narrowHW); ctx.lineTo(0, narrowHW); }
-                                else if (p.subtype === 'chicane_exit') { ctx.moveTo(0, -narrowHW); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(0, narrowHW); }
-                                else { ctx.moveTo(0, -hw); ctx.lineTo(l*0.4, -narrowHW); ctx.lineTo(l*0.6, -narrowHW); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(l*0.6, narrowHW); ctx.lineTo(l*0.4, narrowHW); ctx.lineTo(0, hw); }
-                                ctx.closePath(); ctx.fill(); ctx.stroke();
-                                
-                                const drawS = (ctx) => {
-                                    ctx.beginPath();
-                                    const y1 = -laneOff, yn1 = -narrowLaneOff, y2 = laneOff, yn2 = narrowLaneOff;
-                                    if (p.subtype === 'chicane_entry') {
-                                        ctx.moveTo(0, y1); ctx.bezierCurveTo(l*0.4, y1, l*0.6, yn1, l, yn1);
-                                        ctx.moveTo(0, y2); ctx.bezierCurveTo(l*0.4, y2, l*0.6, yn2, l, yn2);
-                                    } else if (p.subtype === 'chicane_middle') {
-                                        ctx.moveTo(0, yn1); ctx.lineTo(l, yn1);
-                                        ctx.moveTo(0, yn2); ctx.lineTo(l, yn2);
-                                    } else if (p.subtype === 'chicane_exit') {
-                                        ctx.moveTo(0, yn1); ctx.bezierCurveTo(l*0.4, yn1, l*0.6, y1, l, y1);
-                                        ctx.moveTo(0, yn2); ctx.bezierCurveTo(l*0.4, yn2, l*0.6, y2, l, y2);
-                                    } else {
-                                        ctx.moveTo(0, y1); ctx.bezierCurveTo(l*0.3, y1, l*0.4, yn1, l*0.5, yn1); ctx.bezierCurveTo(l*0.6, yn1, l*0.7, y1, l, y1);
-                                        ctx.moveTo(0, y2); ctx.bezierCurveTo(l*0.3, y2, l*0.4, yn2, l*0.5, yn2); ctx.bezierCurveTo(l*0.6, yn2, l*0.7, y2, l, y2);
-                                    }
-                                    ctx.stroke();
-                                };
-                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; drawS(ctx);
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; drawS(ctx);
-                            } else if (p.subtype && p.subtype.includes('pit_parallel')) {
-                                const pitY = laneOff + laneSpacing; const pitBottom = pitY + (w/2 * 0.6);
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
-                                ctx.fillRect(0, hw, l, pitBottom - hw); ctx.strokeRect(0, hw, l, pitBottom - hw); drawCarreraCenterLineStraight();
-                                if (p.subtype === 'pit_parallel' || p.subtype === 'pit_parallel_double_x') { DrawEngine2D.drawHazardZone(ctx, (c) => { c.rect(0, hw, l, pitBottom - hw); }, s); }
-                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
-                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
-                                
-                                // Indicador FUEL-BOXES en TODAS las rectas de Pit Lane
-                                ctx.save();
-                                ctx.translate(l/2, pitY);
-                                const isUpsideDown = Math.cos(p.rot || 0) < -0.01;
-                                
-                                ctx.fillStyle = '#facc15';
-                                ctx.font = `bold ${7 * (s/5)}px 'Share Tech Mono', Arial`;
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'middle';
-                                const txt = "FUEL-BOXES";
-                                const tw = ctx.measureText(txt).width;
-                                
-                                // Mantener el texto siempre legible y en su sitio sin importar la rotación
-                                if (isUpsideDown) {
-                                    ctx.rotate(Math.PI);
-                                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
-                                    ctx.fillRect(-tw/2 - 4*(s/5), 4*(s/5), tw + 8*(s/5), 10*(s/5));
-                                    ctx.fillStyle = '#facc15';
-                                    ctx.fillText(txt, 0, 9*(s/5));
+                                if (brand.name === 'CARRERA') {
+                                    const gridW = 6 * (s/5); const gridX = l / 2 - gridW; ctx.fillStyle = '#fff'; ctx.fillRect(gridX - gridW*0.5, -hw + 4*(s/5), gridW, hw/2 - 2*(s/5)); ctx.fillRect(gridX + gridW*0.5, -hw/2 + 2*(s/5), gridW, hw/2 - 4*(s/5)); ctx.fillRect(gridX - gridW*0.5, 4*(s/5), gridW, hw/2 - 2*(s/5)); ctx.fillRect(gridX + gridW*0.5, hw/2 + 2*(s/5), gridW, hw/2 - 4*(s/5));
+                                    ctx.font = `bold ${5*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.save(); ctx.translate(l/2 - 10*(s/5), 0); ctx.rotate(-Math.PI/2); ctx.fillText("START", 0, 0); ctx.restore(); ctx.save(); ctx.translate(l/2 + 10*(s/5), 0); ctx.rotate(Math.PI/2); ctx.fillText("FINISH", 0, 0); ctx.restore();
+                                    ctx.fillStyle = '#ef4444'; ctx.font = `italic bold ${8*(s/5)}px Arial`; ctx.fillText("Carrera", l*0.25, hw - 12*(s/5)); ctx.fillText("Carrera", l*0.75, hw - 12*(s/5)); ctx.fillStyle = '#eab308'; ctx.font = `italic bold ${5*(s/5)}px Arial`; ctx.fillText("DIGITAL 124", l*0.25, hw - 5*(s/5)); ctx.fillStyle = '#ffffff'; ctx.fillText("DIGITAL 132", l*0.75, hw - 5*(s/5));
+                                    const btnW = l * 0.4; const btnX = l * 0.3; const btnH = w * 0.3; const btnY = hw + w * 0.25; ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(btnX, btnY, btnW, btnH, 3*(s/5)); else ctx.rect(btnX, btnY, btnW, btnH); ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1; ctx.stroke();
+                                    ctx.fillStyle = '#333'; const btnCols = 4; for(let i=0; i<btnCols; i++) { ctx.fillRect(btnX + btnW*0.1 + i*(btnW*0.22), btnY + btnH*0.4, btnW*0.12, btnH*0.25); }
+                                    const extW = l * 0.9; const extX = l * 0.05; const extH = w * 0.45; const extY = hw; ctx.fillStyle = '#111'; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(extX, extY, extW, extH, [0, 0, 10*(s/5), 10*(s/5)]); } else { ctx.rect(extX, extY, extW, extH); } ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5; ctx.stroke();
+                                    const ledSpacing = extW * 0.16; const startLedX = extX + (extW - (ledSpacing * 4)) / 2; const ledY = extY + extH * 0.5; for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc(startLedX + i * ledSpacing, ledY, 3.5*(s/5), 0, Math.PI*2); ctx.fillStyle = '#450a0a'; ctx.fill(); ctx.beginPath(); ctx.arc(startLedX + i * ledSpacing, ledY, 1.5*(s/5), 0, Math.PI*2); ctx.fillStyle = '#ef4444'; ctx.fill(); ctx.beginPath(); ctx.arc(startLedX + i * ledSpacing, ledY, 4*(s/5), 0, Math.PI*2); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 0.5; ctx.stroke(); }
+                                    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.moveTo(extX, extY + extH*0.4); ctx.lineTo(extX + 6*(s/5), extY + extH*0.4); ctx.lineTo(extX, extY + extH*0.8); ctx.fill(); ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(extX, extY + extH*0.8); ctx.lineTo(extX + 6*(s/5), extY + extH*0.4); ctx.lineTo(extX + 6*(s/5), extY + extH*0.8); ctx.lineTo(extX, extY + extH); ctx.fill();
+                                    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.moveTo(extX + extW, extY + extH*0.4); ctx.lineTo(extX + extW - 6*(s/5), extY + extH*0.4); ctx.lineTo(extX + extW, extY + extH*0.8); ctx.fill(); ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(extX + extW, extY + extH*0.8); ctx.lineTo(extX + extW - 6*(s/5), extY + extH*0.4); ctx.lineTo(extX + extW - 6*(s/5), extY + extH*0.8); ctx.lineTo(extX + extW, extY + extH); ctx.fill();
                                 } else {
-                                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
-                                    ctx.fillRect(-tw/2 - 4*(s/5), -14*(s/5), tw + 8*(s/5), 10*(s/5));
-                                    ctx.fillStyle = '#facc15';
-                                    ctx.fillText(txt, 0, -9*(s/5));
+                                    const isArcBox = ['suk_arc_pro', 'suk_arc_air', 'suk_arc_one'].includes(p.id);
+                                    const consoleH = isArcBox ? w * 1.0 : w * 0.65; 
+                                    const consoleY = hw; 
+                                    const boxX = isArcBox ? l*0.05 : l*0.1;
+                                    const boxW = isArcBox ? l*0.9 : l*0.8;
+                                    ctx.fillStyle = isArcBox ? '#1a1a1a' : (brand.connectionBoxColor || '#b91c1c'); 
+                                    ctx.beginPath(); 
+                                    if (ctx.roundRect) { ctx.roundRect(boxX, consoleY, boxW, consoleH, 15 * (s/5)); } else { ctx.rect(boxX, consoleY, boxW, consoleH); } 
+                                    ctx.fill(); ctx.strokeStyle = isArcBox ? '#333' : '#222'; ctx.lineWidth = 2; ctx.stroke(); 
+                                    
+                                    if (isArcBox) {
+                                        let btnColors = []; let labelText = '';
+                                        if (p.id === 'suk_arc_pro') { btnColors = ['#ef4444', '#22c55e', '#3b82f6', '#eab308', '#f97316', '#a855f7', '#06b6d4', '#f8fafc']; labelText = 'ARC PRO'; }
+                                        else if (p.id === 'suk_arc_air') { btnColors = ['#ef4444', '#22c55e']; labelText = 'ARC AIR'; }
+                                        else if (p.id === 'suk_arc_one') { btnColors = ['#3f3f46', '#3f3f46']; labelText = 'ARC ONE'; }
+                                        
+                                        const numBtns = btnColors.length;
+                                        const baseSlot = (boxW * 0.75) / 8;
+                                        const actualBtnWidth = baseSlot * 0.8;
+                                        const actualBtnHeight = consoleH * 0.08;
+                                        const usedWidth = numBtns * baseSlot;
+                                        const startX = boxX + (boxW - usedWidth) / 2;
+                                        const btnY = consoleY + consoleH * 0.35;
+                                        
+                                        for (let i = 0; i < numBtns; i++) {
+                                            const btnX = startX + i * baseSlot + (baseSlot - actualBtnWidth) / 2;
+                                            ctx.fillStyle = btnColors[i];
+                                            ctx.fillRect(btnX, btnY, actualBtnWidth, actualBtnHeight);
+                                            ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+                                            ctx.strokeRect(btnX, btnY, actualBtnWidth, actualBtnHeight);
+                                        }
+                                        ctx.fillStyle = '#ffffff'; ctx.font = `bold ${7*(s/5)}px Arial`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(labelText, l/2, consoleY + consoleH*0.75);
+                                    } else {
+                                        ctx.fillStyle = '#000'; ctx.beginPath(); 
+                                        if (ctx.roundRect) { ctx.roundRect(boxX + l*0.1, consoleY + 8*(s/5), boxW - l*0.2, consoleH*0.55, 4*(s/5)); } else { ctx.rect(boxX + l*0.1, consoleY + 8*(s/5), boxW - l*0.2, consoleH*0.55); } 
+                                        ctx.fill(); 
+                                        ctx.fillStyle = '#4ade80'; ctx.font = `bold ${9*(s/5)}px monospace`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("00:00", l/2, consoleY + consoleH*0.35); 
+                                        ctx.fillStyle = '#ffffff'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.fillText(brand.name, l/2, consoleY + consoleH*0.85);
+                                    }
                                 }
-                                
-                                ctx.strokeStyle = '#facc15';
-                                ctx.lineWidth = 1.5 * (s/5);
-                                ctx.setLineDash([4*(s/5), 2*(s/5)]);
-                                ctx.strokeRect(-l*0.35, -(w*0.12), l*0.7, w*0.24);
-                                ctx.restore();
-                                
-                                if (p.subtype === 'pit_parallel_double_x') {
-                                     // X cruce en la parte INFERIOR (como debe ser)
-                                     ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); 
-                                     ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, pitY, l, pitY); 
-                                     ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.6, laneOff, l, laneOff); 
-                                     ctx.stroke();
-                                     
-                                     ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); 
-                                     ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, pitY, l, pitY); 
-                                     ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.6, laneOff, l, laneOff); 
-                                     ctx.stroke();
-                                     
-                                     DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, 1, s); DrawEngine2D.drawDigitalWedge(ctx, l, pitY, -1, s);
-                                }
-                            } else {
+                            } else if (p.subtype === 'crossing') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke();
+                            } else if (p.subtype === 'squeeze') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); 
-                                if (p.subtype === 'analog_connect') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.3; const boxH = w * 0.3; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#222'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#ffffff'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand.name, l/2, boxY + boxH/2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(l/2, -hw); ctx.lineTo(l/2, hw); ctx.stroke(); ctx.setLineDash([]); } 
-                                else if (p.subtype === 'connection') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.25; const boxH = w * 0.4; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = '#111'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#333'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(l/2, boxY + boxH/2, boxH*0.3, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; const cx = l/2, cy = boxY + boxH/2, r = boxH*0.15; ctx.beginPath(); ctx.moveTo(cx-r/2, cy-r); ctx.lineTo(cx+r/2, cy); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx+r/2, cy-r); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx, cy-r*1.2); ctx.lineTo(cx, cy+r*1.2); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `bold ${6 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.fillText("CONEXIÓN", l/2, boxY + boxH * 0.85); } 
-                                else { DrawEngine2D.drawRails(ctx, l, laneOff, brand); }
-                                
-                                if (p.deco === 'green') { ctx.fillStyle = 'rgba(34, 197, 94, 0.4)'; ctx.fillRect(0, -hw, l, w); }
+                                const pinchOff = laneOff * 0.25;
+                                ctx.fillStyle = '#c2b280'; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, -hw + 1); ctx.bezierCurveTo(l*0.7, -laneOff, l*0.6, -pinchOff - 4*(s/5), l*0.5, -pinchOff - 4*(s/5)); ctx.bezierCurveTo(l*0.4, -pinchOff - 4*(s/5), l*0.3, -laneOff, 0, -hw + 1); ctx.fill();
+                                ctx.beginPath(); ctx.moveTo(0, hw); ctx.lineTo(l, hw); ctx.lineTo(l, hw - 1); ctx.bezierCurveTo(l*0.7, laneOff, l*0.6, pinchOff + 4*(s/5), l*0.5, pinchOff + 4*(s/5)); ctx.bezierCurveTo(l*0.4, pinchOff + 4*(s/5), l*0.3, laneOff, 0, hw - 1); ctx.fill();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
+                            } else if (p.subtype === 'chicane_entry') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.5, -laneOff, l*0.5, -narrowLane, l, -narrowLane); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.5, laneOff, l*0.5, narrowLane, l, narrowLane); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.5, -laneOff, l*0.5, -narrowLane, l, -narrowLane); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.5, laneOff, l*0.5, narrowLane, l, narrowLane); ctx.stroke();
+                            } else if (p.subtype === 'chicane_middle') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; DrawEngine2D.drawRails(ctx, l, narrowLane, brand);
+                            } else if (p.subtype === 'chicane_exit') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke();
+                            } else if (p.subtype === 'adapter_ninco_scx') {
+                                const scxW = 15.6 * s; const nincoW = w; const scxLaneOff = (7.7 / 2) * s; const nincoLaneOff = laneOff;
+                                ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -scxW/2); ctx.lineTo(l, scxW/2); ctx.lineTo(0, nincoW/2); ctx.closePath(); ctx.fill();
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -scxW/2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoW/2); ctx.lineTo(l, scxW/2); ctx.stroke();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -nincoLaneOff); ctx.lineTo(l, -scxLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoLaneOff); ctx.lineTo(l, scxLaneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -nincoLaneOff); ctx.lineTo(l, -scxLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoLaneOff); ctx.lineTo(l, scxLaneOff); ctx.stroke();
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#ef4444'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("NINCO", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#facc15'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("SCX", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'adapter_scx_ninco') {
+                                const scxW = 15.6 * s; const nincoW = w; const scxLaneOff = (7.7 / 2) * s; const nincoLaneOff = laneOff;
+                                ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -scxW/2); ctx.lineTo(l, -nincoW/2); ctx.lineTo(l, nincoW/2); ctx.lineTo(0, scxW/2); ctx.closePath(); ctx.fill();
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -scxW/2); ctx.lineTo(l, -nincoW/2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, scxW/2); ctx.lineTo(l, nincoW/2); ctx.stroke();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -scxLaneOff); ctx.lineTo(l, -nincoLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, scxLaneOff); ctx.lineTo(l, nincoLaneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -scxLaneOff); ctx.lineTo(l, -nincoLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, scxLaneOff); ctx.lineTo(l, nincoLaneOff); ctx.stroke();
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#facc15'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("SCX", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#ef4444'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("NINCO", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'adapter_scx_adv') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#facc15'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("ANALOG", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#3b82f6'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("ADVANCE", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'adapter_adv_scx') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w);
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#3b82f6'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("ADVANCE", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#facc15'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("ANALOG", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'adapter_ninco_suk') {
+                                const sukW = 15.6 * s; const nincoW = w; const sukLaneOff = (7.8 / 2) * s; const nincoLaneOff = laneOff;
+                                ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -sukW/2); ctx.lineTo(l, sukW/2); ctx.lineTo(0, nincoW/2); ctx.closePath(); ctx.fill();
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -sukW/2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoW/2); ctx.lineTo(l, sukW/2); ctx.stroke();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -nincoLaneOff); ctx.lineTo(l, -sukLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoLaneOff); ctx.lineTo(l, sukLaneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -nincoLaneOff); ctx.lineTo(l, -sukLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, nincoLaneOff); ctx.lineTo(l, sukLaneOff); ctx.stroke();
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#ef4444'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("NINCO", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#94a3b8'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("SCX UK", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'adapter_suk_ninco') {
+                                const sukW = 15.6 * s; const nincoW = w; const sukLaneOff = (7.8 / 2) * s; const nincoLaneOff = laneOff;
+                                ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -sukW/2); ctx.lineTo(l, -nincoW/2); ctx.lineTo(l, nincoW/2); ctx.lineTo(0, sukW/2); ctx.closePath(); ctx.fill();
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -sukW/2); ctx.lineTo(l, -nincoW/2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, sukW/2); ctx.lineTo(l, nincoW/2); ctx.stroke();
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -sukLaneOff); ctx.lineTo(l, -nincoLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, sukLaneOff); ctx.lineTo(l, nincoLaneOff); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -sukLaneOff); ctx.lineTo(l, -nincoLaneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, sukLaneOff); ctx.lineTo(l, nincoLaneOff); ctx.stroke();
+                                ctx.save(); ctx.translate(l*0.25, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#94a3b8'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("SCX UK", 0, 0); ctx.restore();
+                                ctx.save(); ctx.translate(l*0.75, 0); ctx.rotate(-Math.PI/2); ctx.fillStyle = '#ef4444'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("NINCO", 0, 0); ctx.restore();
+                            } else if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
+                                drawCarreraCenterLineStraight(); 
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                                // El spline continuo a la curva se dibujará en la Pasada 2 por encima de todo
+                            } else {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); if (p.subtype === 'analog_connect') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.3; const boxH = w * 0.3; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#222'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#ffffff'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand.name, l/2, boxY + boxH/2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(l/2, -hw); ctx.lineTo(l/2, hw); ctx.stroke(); ctx.setLineDash([]); } else if (p.subtype === 'connection') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.25; const boxH = w * 0.4; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = '#111'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#333'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(l/2, boxY + boxH/2, boxH*0.3, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; const cx = l/2, cy = boxY + boxH/2, r = boxH*0.15; ctx.beginPath(); ctx.moveTo(cx-r/2, cy-r); ctx.lineTo(cx+r/2, cy); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx+r/2, cy-r); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx, cy-r*1.2); ctx.lineTo(cx, cy+r*1.2); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `bold ${6 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.fillText("CONEXIÓN", l/2, boxY + boxH * 0.85); } else { DrawEngine2D.drawRails(ctx, l, laneOff, brand); }
                             }
                        } else if (p.type === 'pit_entry') {
                             const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(l, pitY + (w/2 * 0.6)); ctx.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); drawCarreraCenterLineStraight(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(l, hw); c.lineTo(l, pitY + (w/2 * 0.6)); c.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.fillStyle = '#333'; ctx.beginPath(); ctx.moveTo(l*0.2, laneOff); ctx.lineTo(l*0.25, laneOff+5); ctx.lineTo(l*0.25, laneOff-5); ctx.fill();
@@ -947,15 +1126,24 @@
                            const isSingle1 = p.subtype === 'single_lane_1';
                            const isSingle2 = p.subtype === 'single_lane_2';
                            const isSingle = isSingle1 || isSingle2;
+                           
+                           let effectiveTrueR = trueR;
+                           if (isSingle1) effectiveTrueR = isLeft ? trueR - laneOff : trueR + laneOff;
+                           else if (isSingle2) effectiveTrueR = isLeft ? trueR + laneOff : trueR - laneOff;
 
                            if (isSingle) {
-                               const bgRadius = isSingle1 ? (isLeft ? trueR - hw/2 : trueR + hw/2) : (isLeft ? trueR + hw/2 : trueR - hw/2);
-                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = hw; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, bgRadius), startA, startA + sweep, isLeft); ctx.stroke();
+                               const slWidth = hw;
+                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = slWidth; ctx.beginPath(); 
+                               ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, Math.max(0.1, effectiveTrueR), startA, startA + sweep, isLeft); ctx.stroke();
+                               
                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
-                               const rInnerEdge = isSingle1 ? (isLeft ? trueR - hw : trueR + hw) : (isLeft ? trueR : trueR);
-                               const rOuterEdge = isSingle1 ? (isLeft ? trueR : trueR) : (isLeft ? trueR + hw : trueR - hw);
-                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, rInnerEdge), startA, startA + sweep, isLeft); ctx.stroke();
-                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, rOuterEdge), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, Math.max(0.1, effectiveTrueR - slWidth/2), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, Math.max(0.1, effectiveTrueR + slWidth/2), startA, startA + sweep, isLeft); ctx.stroke();
+                               
+                               ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; 
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, Math.max(0.1, effectiveTrueR), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -effectiveTrueR : effectiveTrueR, Math.max(0.1, effectiveTrueR), startA, startA + sweep, isLeft); ctx.stroke();
                            } else if (p.subtype === 'crossing_curve') {
                                const cx = 0; const cy = isLeft ? -trueR : trueR;
                                ctx.strokeStyle = brand.trackColor; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(cx, cy, Math.max(0.1, trueR), startA, startA + sweep, isLeft); ctx.stroke(); drawCarreraCenterLineCurve(cx, cy);
@@ -1005,6 +1193,10 @@
                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; 
                                drawCrossPath(ctx, r1, r2); ctx.stroke();
                                drawCrossPath(ctx, r2, r1); ctx.stroke();
+                               
+                               ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
+                               drawCrossPath(ctx, r1, r2); ctx.stroke();
+                               drawCrossPath(ctx, r2, r1); ctx.stroke();
                            } else {
                                ctx.strokeStyle = brand.trackColor; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR), startA, startA + sweep, isLeft); ctx.stroke(); 
                                if (p.subtype === 'ice') { ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = w; ctx.stroke(); } 
@@ -1012,18 +1204,19 @@
                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR - hw), startA, startA + sweep, isLeft); ctx.stroke(); ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR + hw), startA, startA + sweep, isLeft); ctx.stroke(); 
                            }
                            
-                           const currentLaneOff = (p.subtype === 'chicane_curve') ? laneOff * 0.2 : laneOff;
-                           const drawSlot1 = !isSingle2; const drawSlot2 = !isSingle1; 
-                           const radiusLane1 = isLeft ? trueR - currentLaneOff : trueR + currentLaneOff;
-                           const radiusLane2 = isLeft ? trueR + currentLaneOff : trueR - currentLaneOff;
+                           if (!isSingle && p.subtype !== 'crossing_curve') {
+                               const currentLaneOff = (p.subtype === 'chicane_curve') ? laneOff * 0.2 : laneOff;
+                               const radiusLane1 = isLeft ? trueR - currentLaneOff : trueR + currentLaneOff;
+                               const radiusLane2 = isLeft ? trueR + currentLaneOff : trueR - currentLaneOff;
 
-                           ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; 
-                           if (drawSlot1) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); }
-                           if (drawSlot2) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke(); }
-                           
-                           ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
-                           if (drawSlot1) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); }
-                           if (drawSlot2) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke(); }
+                               ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; 
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke();
+                               
+                               ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke();
+                           }
                        } else if (p.type === 'compound_curve_change') {
                            const isOutToIn = p.subtype === 'in';
                            const cy = isLeft ? -trueR : trueR;
@@ -1181,8 +1374,8 @@
 
         const I18N = {
             es: {
-                cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Chicanes': 'Chicanes' },
-                tools: { new: 'NUEVO', move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
+                cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
+                tools: { move: 'MOVER LIENZO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
                 actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
@@ -1194,12 +1387,11 @@
                 chat: { title: 'CHAT DE PILOTOS', placeholder: 'Escribe un mensaje...', loginReq: 'Inicia sesión o verifica tu correo.', empty: 'No hay mensajes aún. ¡Sé el primero en saludar!' },
                 auth: { loginBtn: 'INICIAR SESIÓN', logoutBtn: 'CERRAR SESIÓN', titleLogin: 'ACCESO PILOTOS', titleReg: 'NUEVA LICENCIA', email: 'Correo Electrónico', pass: 'Contraseña', name: 'Alias de Piloto', submitLogin: 'ENTRAR A BOXES', submitReg: 'OBTENER LICENCIA', switchReg: '¿No tienes cuenta? Regístrate', switchLogin: '¿Ya tienes cuenta? Entra aquí', reqLogin: 'Debes iniciar sesión para publicar en la comunidad.', forgotPass: '¿Olvidaste tu contraseña?', resetMsg: 'Te hemos enviado un enlace para recuperar tu contraseña.', verifyMsg: '¡Bienvenido a Track Telemetry! Te hemos enviado un enlace. REVISA TU CARPETA DE SPAM O CORREO NO DESEADO para verificar tu cuenta.', enterEmail: 'Introduce tu correo arriba para recuperar la contraseña.', reqVerify: '⛔ ACCESO DENEGADO\n\nPara mantener una comunidad sana y libre de bots, debes verificar tu correo electrónico.\n\nPor favor, REVISA TU BANDEJA DE ENTRADA O LA CARPETA DE SPAM para activar tu cuenta antes de acceder.', verifyCheck: 'ACTUALIZAR ESTADO' },
                 alerts: { valid: 'El archivo seleccionado no es un circuito válido.', github: 'Error al descargar el circuito desde GitHub.', json: 'El archivo no parece ser un circuito válido.', read: 'Error al leer el archivo JSON.', sim: 'No se pudo iniciar la simulación. Comprueba las cookies/almacenamiento.', simMulti: 'El modo simulación 3D está optimizado para 2 carriles y solo mostrará tu trazado principal. Para visualizar circuitos de 4, 6 u 8 carriles al completo, utiliza el botón "CLUBS DE SLOT".', deco: 'No se pudo iniciar la decoración. Comprueba las cookies/almacenamiento.', pieces: '¡Añade pistas antes de generar el informe o publicar!', pdfLib: 'Error: Librería PDF no cargada.', pdfError: 'Error al generar el PDF. Revisa la consola.', decoMulti: 'El modo decoración actual está optimizado para 2 carriles. Solo se exportará tu trazado principal.', replaceMulti: 'Para sustituir pistas en modo Multi-Carril, elimina primero los carriles extra usando Deshacer.', welcomeEngine: '¡Bienvenido al nuevo Motor Absoluto!\n\nAhora puedes coger cualquier pieza, moverla, rotarla con el tirador azul y acercarla a otras pistas para que se peguen mágicamente.\n\nTus circuitos viejos se han migrado automáticamente a este nuevo sistema.' },
-                report: { date: 'FECHA:', generated: 'GENERADO POR SLOT DESIGNER 2D', metrics: 'METRÍCAS DEL CIRCUITO', l1: 'LONGITUD CARRIL 1', l2: 'LONGITUD CARRIL 2', total: 'PIEZAS TOTALES', balance: 'BALANCE', comp: 'COMPENSADO', diff: 'DIF:', pPiece: 'PIEZA / REFERENCIA', pCat: 'CATEGORÍA', pQty: 'CANTIDAD', pTotal: 'TOTAL', page: 'Informe generado por Slot Designer 2D - Página' },
-                trackNames: { 'NINCO ▶ SCX': 'NINCO ▶ SCX', 'SCX ▶ NINCO': 'SCX ▶ NINCO', 'ANALOG ▶ ADV': 'ANALOG ▶ ADV', 'ADV ▶ ANALOG': 'ADV ▶ ANALOG', 'NINCO ▶ SCX UK': 'NINCO ▶ SCX UK', 'SCX UK ▶ NINCO': 'SCX UK ▶ NINCO', 'Recta 40cm': 'Straight 40cm', 'Media 20cm': 'Half 20cm', 'Recta 1C (40)': 'Single Lane (40)', 'Recta 2C (40)': '2 Lanes (40)', 'Curva 1C (R2)': 'Single Lane Curve (R2)', 'Curva 2C (R2)': 'Lane 2 Curve (R2)', 'Curva 1C (R1)': 'Single Lane Curve (R1)', 'Curva 2C (R1)': 'Lane 2 Curve (R1)', 'Media Parrilla': 'Half Grid', 'Cuarto 10cm': 'Quarter 10cm', 'Cierre 5cm': 'Closing 5cm', 'Conexiones': 'Powerbase', 'Conexiones 175': 'Powerbase 175', 'Cruce 40cm': 'Crossing 40cm', 'R1 (Int)': 'R1 (Inner)', 'R1 (22.5°)': 'R1 (22.5°)', 'R2 (Std)': 'R2 (Std)', 'R2 (22.5°)': 'R2 (22.5°)', 'R3 (Ext)': 'R3 (Outer)', 'R4 (Super)': 'R4 (Super)', 'R5 (Ultra)': 'R5 (Ultra)', 'Rotonda Inicio': 'Start Loop', 'Rotonda Final': 'End Loop', 'Centralita': 'Control Unit', 'Cambio X': 'Lane Change X', 'Cambio Der': 'Lane Change Right', 'Cambio Izq': 'Lane Change Left', 'Entrada Pit': 'Pit Entry', 'Zona Fuel': 'Fuel Zone', 'Boxes + Cambio X': 'Pit Box + Change X', 'Recta Pit': 'Pit Straight', 'Salida Pit': 'Pit Exit', 'Recta 360': 'Straight 360', 'Media 180': 'Half 180', 'Recta 1C (360)': 'Single Lane (360)', 'Recta 2C (360)': '2 Lanes (360)', 'Cierre 80': 'Quarter 80', 'Conexión': 'Powerbase', 'Recta Cruce': 'Crossing Straight', 'Entrada Chicane': 'Chicane Entry', 'Recta Chicane': 'Chicane Straight', 'Salida Chicane': 'Chicane Exit', 'Curva Chicane': 'Chicane Curve', 'R2 (Hielo)': 'R2 (Ice)', 'Bluetooth': 'Bluetooth', 'Cambio Recta': 'Straight Lane Change', 'Cambio Curva': 'Curve Lane Change', 'Recta Fuel': 'Fuel Straight', 'Recta 358': 'Straight 358', 'Media 179': 'Half 179', 'Recta 61.4': 'Straight 61.4', 'Cruce 358': 'Crossing 358', 'R1 (45°)': 'R1 (45°)', 'R2 (45°)': 'R2 (45°)', 'R3 (22.5°)': 'R3 (22.5°)', 'R4 (22.5°)': 'R4 (22.5°)', 'R5 (22.5°)': 'R5 (22.5°)', 'Recta Pro 40': 'Pro Straight 40', 'Media 20': 'Half 20', 'Cuarto 10': 'Quarter 10', 'Punto de Bifurcación': 'Punto de Bifurcación', 'Cierre 5': 'Closing 5', 'Ajuste 2.5': 'Adjustment 2.5', 'R3 (45°)': 'R3 (45°)', 'R4 (45°)': 'R4 (45°)', 'R5 (45°)': 'R5 (45°)', 'R6 (45°)': 'R6 (45°)', 'R6 (22.5°)': 'R6 (22.5°)', 'R1 (11.25°)': 'R1 (11.25°)', 'R2 (11.25°)': 'R2 (11.25°)', 'R3 (11.25°)': 'R3 (11.25°)', 'R4 (11.25°)': 'R4 (11.25°)', 'R5 (11.25°)': 'R5 (11.25°)', 'R6 (11.25°)': 'R6 (11.25°)', 'R3 (22.5°)': 'R3 (22.5°)', 'R4 (22.5°)': 'R4 (22.5°)', 'R5 (11.25°)': 'R5 (11.25°)', 'Recta Std 35cm': 'Recta Std 35cm', 'Media 17.5cm': 'Media 17.5cm', 'Cuarto 8.7cm': 'Cuarto 8.7cm', 'Cierre 7.8cm': 'Cierre 7.8cm', 'Conexión Powerbase': 'Conexión Powerbase', 'Entrada Estrechamiento': 'Entrada Estrechamiento', 'Salida Estrechamiento': 'Salida Estrechamiento', 'ARC Pro Powerbase': 'ARC Pro Powerbase', 'ARC One Powerbase': 'ARC One Powerbase', 'ARC Air Powerbase': 'ARC Air Powerbase', 'Cambio X 52.5cm': 'Cambio X 52.5cm', 'Pack 1: Curva Cruce 90°': 'Pack 1: Curva Cruce 90°', 'Pack 2: Salto (Subida)': 'Pack 2: Salto (Subida)', 'Pack 2: Salto (Bajada)': 'Pack 2: Salto (Bajada)', 'Pack 3: Horquilla R1 90°': 'Pack 3: Horquilla R1 90°', 'Recta Std 34.5cm': 'Recta Std 34.5cm', 'Tercio 11.5cm': 'Tercio 11.5cm', 'Cuarto 8.6cm': 'Cuarto 8.6cm', 'Conexión Analog': 'Conexión Analog', 'Cambio X (69)': 'Cambio X (69)', 'Cambio Izq (69)': 'Cambio Izq (69)', 'Cambio Der (69)': 'Cambio Der (69)', 'Entrada Pit Carrera': 'Entrada Pit Carrera', 'Recta Pit 34.5': 'Recta Pit 34.5', 'Salida Pit Carrera': 'Salida Pit Carrera', 'R1 (60°)': 'R1 (60°)', 'R1 (30°)': 'R1 (30°)', 'R2 (30°)': 'R2 (30°)', 'R3 (30°)': 'R3 (30°)', 'R4 (15°)': 'R4 (15°)', 'Curva Super Ext R4': 'Super Outer Curve R4' }
+                'Pack 3: Horquilla R1 90°': 'Pack 3: Horquilla R1 90°', 'Recta Std 34.5cm': 'Recta Std 34.5cm', 'Tercio 11.5cm': 'Tercio 11.5cm', 'Cuarto 8.6cm': 'Cuarto 8.6cm', 'Conexión Analog': 'Conexión Analog', 'Cambio X (69)': 'Cambio X (69)', 'Cambio Izq (69)': 'Cambio Izq (69)', 'Cambio Der (69)': 'Cambio Der (69)', 'Entrada Pit Carrera': 'Entrada Pit Carrera', 'Recta Pit 34.5': 'Recta Pit 34.5', 'Salida Pit Carrera': 'Salida Pit Carrera', 'R1 (60°)': 'R1 (60°)', 'R1 (30°)': 'R1 (30°)', 'R2 (30°)': 'R2 (30°)', 'R3 (30°)': 'R3 (30°)', 'R4 (15°)': 'R4 (15°)', 'Gran Chicane PT74': 'Gran Chicane PT74', 'Chicane In (PT74)': 'Chicane In (PT74)', 'Chicane Med (PT74)': 'Chicane Med (PT74)', 'Chicane Out (PT74)': 'Chicane Out (PT74)', 'Chicane Deslizante': 'Chicane Deslizante', 'Rotonda Inicio': 'Rotonda Inicio', 'Rotonda Final': 'Rotonda Final'
             },
             en: {
-                cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Chicanes': 'Chicanes' },
-                tools: { new: 'NEW', move: 'MOVE BOARD', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
+                cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Cruces': 'Crossings' },
+                tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
                 actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
@@ -1211,8 +1403,7 @@
                 chat: { title: 'RACERS CHAT', placeholder: 'Type a message...', loginReq: 'Log in or verify your email.', empty: 'No messages yet. Be the first to say hi!' },
                 auth: { loginBtn: 'LOGIN', logoutBtn: 'LOGOUT', titleLogin: 'RACER ACCESS', titleReg: 'NEW LICENSE', email: 'Email', pass: 'Password', name: 'Racer Alias', submitLogin: 'ENTER PITLANE', submitReg: 'GET LICENSE', switchReg: 'No account? Register', switchLogin: 'Already have an account? Login', reqLogin: 'You must log in to publish tracks.', forgotPass: 'Forgot your password?', resetMsg: 'We have sent you a password recovery link.', verifyMsg: 'Welcome to Track Telemetry! We sent you a link. PLEASE CHECK YOUR SPAM OR JUNK FOLDER to verify your account.', enterEmail: 'Enter your email above to recover your password.', reqVerify: '⛔ ACCESS DENIED\n\nTo maintain a healthy and bot-free community, you must verify your email.\n\nPlease CHECK YOUR INBOX OR SPAM FOLDER to activate your account before entering.', verifyCheck: 'REFRESH STATUS' },
                 alerts: { valid: 'Selected file is not a valid circuit.', github: 'Error downloading circuit from GitHub.', json: 'File does not appear to be a valid circuit.', read: 'Error reading JSON file.', sim: 'Could not start simulation. Check cookies/storage.', simMulti: 'The 3D simulation mode is optimized for 2 lanes and will only show your main track. To view full 4, 6, or 8 lane circuits, use the "SLOT CLUBS" button.', deco: 'Could not start decoration. Check cookies/storage.', pieces: 'Add tracks before generating report!', pdfLib: 'Error: PDF library not loaded.', pdfError: 'Error generating PDF. Check console.', decoMulti: 'The decoration mode is currently optimized for 2 lanes. Only your main track will be exported.', replaceMulti: 'To replace tracks in Multi-Lane mode, remove the extra lanes first using Undo.', welcomeEngine: '¡Bienvenido al nuevo Motor Absoluto!\n\nAhora puedes coger cualquier pieza, moverla, rotarla con el tirador azul y acercarla a otras pistas para que se peguen mágicamente.\n\nTus circuitos viejos se han migrado automáticamente a este nuevo sistema.' },
-                report: { date: 'DATE:', generated: 'GENERATED BY SLOT DESIGNER 2D', metrics: 'CIRCUIT METRICS', l1: 'LANE 1 LENGTH', l2: 'LANE 2 LENGTH', total: 'TOTAL PIECES', balance: 'BALANCE', comp: 'BALANCED', diff: 'DIFF:', pPiece: 'PIECE / REFERENCE', pCat: 'CATEGORY', pQty: 'QUANTITY', pTotal: 'TOTAL', page: 'Report generated by Slot Designer 2D - Page' },
-                trackNames: { 'NINCO ▶ SCX': 'NINCO ▶ SCX', 'SCX ▶ NINCO': 'SCX ▶ NINCO', 'ANALOG ▶ ADV': 'ANALOG ▶ ADV', 'ADV ▶ ANALOG': 'ADV ▶ ANALOG', 'NINCO ▶ SCX UK': 'NINCO ▶ SCX UK', 'SCX UK ▶ NINCO': 'SCX UK ▶ NINCO', 'Recta 40cm': 'Straight 40cm', 'Media 20cm': 'Half 20cm', 'Recta 1C (40)': 'Single Lane (40)', 'Recta 2C (40)': '2 Lanes (40)', 'Curva 1C (R2)': 'Single Lane Curve (R2)', 'Curva 2C (R2)': 'Lane 2 Curve (R2)', 'Curva 1C (R1)': 'Single Lane Curve (R1)', 'Curva 2C (R1)': 'Lane 2 Curve (R1)', 'Media Parrilla': 'Half Grid', 'Cuarto 10cm': 'Quarter 10cm', 'Cierre 5cm': 'Closing 5cm', 'Conexiones': 'Powerbase', 'Conexiones 175': 'Powerbase 175', 'Cruce 40cm': 'Crossing 40cm', 'R1 (Int)': 'R1 (Inner)', 'R1 (22.5°)': 'R1 (22.5°)', 'R2 (Std)': 'R2 (Std)', 'R2 (22.5°)': 'R2 (22.5°)', 'R3 (Ext)': 'R3 (Outer)', 'R4 (Super)': 'R4 (Super)', 'R5 (Ultra)': 'R5 (Ultra)', 'Rotonda Inicio': 'Start Loop', 'Rotonda Final': 'End Loop', 'Centralita': 'Control Unit', 'Cambio X': 'Lane Change X', 'Cambio Der': 'Lane Change Right', 'Cambio Izq': 'Lane Change Left', 'Entrada Pit': 'Pit Entry', 'Zona Fuel': 'Fuel Zone', 'Boxes + Cambio X': 'Pit Box + Change X', 'Recta Pit': 'Pit Straight', 'Salida Pit': 'Pit Exit', 'Recta 360': 'Straight 360', 'Media 180': 'Half 180', 'Recta 1C (360)': 'Single Lane (360)', 'Recta 2C (360)': '2 Lanes (360)', 'Cierre 80': 'Quarter 80', 'Conexión': 'Powerbase', 'Recta Cruce': 'Crossing Straight', 'Entrada Chicane': 'Chicane Entry', 'Recta Chicane': 'Chicane Straight', 'Salida Chicane': 'Chicane Exit', 'Curva Chicane': 'Chicane Curve', 'R2 (Hielo)': 'R2 (Ice)', 'Bluetooth': 'Bluetooth', 'Cambio Recta': 'Straight Lane Change', 'Cambio Curva': 'Curve Lane Change', 'Recta Fuel': 'Fuel Straight', 'Recta 358': 'Straight 358', 'Media 179': 'Half 179', 'Recta 61.4': 'Straight 61.4', 'Cruce 358': 'Crossing 358', 'R1 (45°)': 'R1 (45°)', 'R2 (45°)': 'R2 (45°)', 'R3 (22.5°)': 'R3 (22.5°)', 'R4 (22.5°)': 'R4 (22.5°)', 'R5 (22.5°)': 'R5 (22.5°)', 'Recta Pro 40': 'Pro Straight 40', 'Media 20': 'Half 20', 'Cuarto 10': 'Quarter 10', 'Punto de Bifurcación': 'Branch Point', 'Cierre 5': 'Closing 5', 'Ajuste 2.5': 'Adjustment 2.5', 'R3 (45°)': 'R3 (45°)', 'R4 (45°)': 'R4 (45°)', 'R5 (45°)': 'R5 (45°)', 'R6 (45°)': 'R6 (45°)', 'R6 (22.5°)': 'R6 (22.5°)', 'R1 (11.25°)': 'R1 (11.25°)', 'R2 (11.25°)': 'R2 (11.25°)', 'R3 (11.25°)': 'R3 (11.25°)', 'R4 (11.25°)': 'R4 (11.25°)', 'R5 (11.25°)': 'R5 (11.25°)', 'R6 (11.25°)': 'R6 (11.25°)', 'Recta Std 35cm': 'Std Straight 35cm', 'Media 17.5cm': 'Half Straight 17.5cm', 'Cuarto 8.7cm': 'Quarter 8.7cm', 'Cierre 7.8cm': 'Short 7.8cm', 'Conexión Powerbase': 'Powerbase Connect', 'Entrada Estrechamiento': 'Sideswipe Entry', 'Salida Estrechamiento': 'Sideswipe Exit', 'ARC Pro Powerbase': 'ARC Pro Powerbase', 'ARC One Powerbase': 'ARC One Powerbase', 'ARC Air Powerbase': 'ARC Air Powerbase', 'Cambio X 52.5cm': 'Straight Lane Change', 'Pack 1: Curva Cruce 90°': 'Pack 1: 90° Crossover Curve', 'Pack 2: Salto (Subida)': 'Pack 2: Leap Ramp (Up)', 'Pack 2: Salto (Bajada)': 'Pack 2: Leap Ramp (Down)', 'Pack 3: Horquilla R1 90°': 'Pack 3: Hairpin Curve R1 90°', 'Recta Std 34.5cm': 'Std Straight 34.5cm', 'Tercio 11.5cm': '1/3 Straight 11.5cm', 'Cuarto 8.6cm': '1/4 Straight 8.6cm', 'Conexión Analog': 'Analog Powerbase', 'Cambio X (69)': 'Lane Change X (69)', 'Cambio Izq (69)': 'Left Lane Change (69)', 'Cambio Der (69)': 'Right Lane Change (69)', 'Entrada Pit Carrera': 'Pit Entry', 'Recta Pit 34.5': 'Pit Straight 34.5', 'Salida Pit Carrera': 'Pit Exit', 'R1 (60°)': 'R1 (60°)', 'R1 (30°)': 'R1 (30°)', 'R2 (30°)': 'R2 (30°)', 'R3 (30°)': 'R3 (30°)', 'R4 (15°)': 'R4 (15°)', 'Cambio Curva In': 'Curve Change In', 'Cambio Curva Out': 'Curve Change Out', 'Recta Cambio In': 'Straight Change In', 'Curva Cambio In': 'Arc Change In', 'Recta Cambio Out': 'Straight Change Out', 'Curva Cambio Out': 'Arc Change Out', 'Recta Std 350': 'Std Straight 350', 'Media 175': 'Half 175', 'Cuarto 87': 'Quarter 87', 'Curva Interior R1': 'Inner Curve R1', 'Curva Standard R2': 'Standard Curve R2', 'Curva Exterior R3': 'Outer Curve R3', 'Curva Super Ext R4': 'Super Outer Curve R4' }
+                'Pack 3: Horquilla R1 90°': 'Pack 3: Hairpin Curve R1 90°', 'Recta Std 34.5cm': 'Std Straight 34.5cm', 'Tercio 11.5cm': '1/3 Straight 11.5cm', 'Cuarto 8.6cm': '1/4 Straight 8.6cm', 'Conexión Analog': 'Analog Powerbase', 'Cambio X (69)': 'Lane Change X (69)', 'Cambio Izq (69)': 'Left Lane Change (69)', 'Cambio Der (69)': 'Right Lane Change (69)', 'Entrada Pit Carrera': 'Pit Entry', 'Recta Pit 34.5': 'Pit Straight 34.5', 'Salida Pit Carrera': 'Pit Exit', 'R1 (60°)': 'R1 (60°)', 'R1 (30°)': 'R1 (30°)', 'R2 (30°)': 'R2 (30°)', 'R3 (30°)': 'R3 (30°)', 'R4 (15°)': 'R4 (15°)', 'Cambio Curva In': 'Curve Change In', 'Cambio Curva Out': 'Curve Change Out', 'Recta Cambio In': 'Straight Change In', 'Curva Cambio In': 'Arc Change In', 'Recta Cambio Out': 'Straight Change Out', 'Curva Cambio Out': 'Arc Change Out', 'Gran Chicane PT74': 'Grand Chicane PT74', 'Chicane In (PT74)': 'Chicane In (PT74)', 'Chicane Med (PT74)': 'Chicane Med (PT74)', 'Chicane Out (PT74)': 'Chicane Out (PT74)', 'Chicane Deslizante': 'Sliding Chicane', 'Rotonda Inicio': 'Start Loop', 'Rotonda Final': 'Turnaround Loop'
             }
         };
 
@@ -1243,31 +1434,12 @@
           const getInitialLang = () => { try { return localStorage.getItem('slot_lang') || 'es'; } catch (e) { return 'es'; } };
           const [lang, setLang] = useState(getInitialLang);
           const handleSetLang = (newLang) => { setLang(newLang); document.documentElement.lang = newLang; try { localStorage.setItem('slot_lang', newLang); } catch (e) {} };
-          const t = I18N[lang]; const tp = (label) => (lang === 'en' && I18N.en.trackNames[label]) ? I18N.en.trackNames[label] : label;
-
-          const initialState = React.useMemo(() => {
-              try {
-                  const saved = localStorage.getItem('slot_editor_state');
-                  if (saved) {
-                      const data = JSON.parse(saved);
-                      const safePieces = data.pieces ? data.pieces.map(p => p.uid ? p : { ...p, uid: Date.now() + Math.random() }) : [];
-                      const migrated = migrateToAbsolute(safePieces);
-                      return {
-                          history: migrated.length > 0 ? [migrated] : [[]],
-                          activeBrand: data.brand || 'NINCO',
-                          boardPoints: data.boardPoints || [],
-                          boardClosed: data.boardClosed || false,
-                          autoBorders: data.autoBorders || false
-                      };
-                  }
-              } catch (e) {}
-              return { history: [[]], activeBrand: 'NINCO', boardPoints: [], boardClosed: false, autoBorders: false };
-          }, []);
+          const t = I18N[lang]; const tp = (label) => (lang === 'en' && I18N.en[label]) ? I18N.en[label] : label;
 
           const canvasRef = useRef(null); 
-          const [activeBrand, setActiveBrand] = useState(initialState.activeBrand); 
+          const [activeBrand, setActiveBrand] = useState('NINCO'); 
           const [activeCategory, setActiveCategory] = useState('Rectas'); 
-          const [history, setHistory] = useState(initialState.history); 
+          const [history, setHistory] = useState([[]]); 
           const [historyStep, setHistoryStep] = useState(0); 
           const pieces = history[historyStep]; 
           
@@ -1308,17 +1480,20 @@
           const [workingElevation, setWorkingElevation] = useState(0);
           const [isPaintElevationMode, setIsPaintElevationMode] = useState(false);
           
-          const [autoBorders, setAutoBorders] = useState(initialState.autoBorders);
+          const [autoBorders, setAutoBorders] = useState(false);
           const [paintBorderMode, setPaintBorderMode] = useState('none'); 
 
-          const [boardPoints, setBoardPoints] = useState(initialState.boardPoints); 
-          const [boardClosed, setBoardClosed] = useState(initialState.boardClosed); 
+          const [boardPoints, setBoardPoints] = useState([]); 
+          const [boardClosed, setBoardClosed] = useState(false); 
           const [boardDim, setBoardDim] = useState({ width: 244, height: 122 }); 
           const [boardStep, setBoardStep] = useState(100);
           
           const [isInputFocused, setIsInputFocused] = useState(false);
           const [boardPanelPos, setBoardPanelPos] = useState(null);
           const boardDragRef = useRef(null);
+
+          const [propPanelPos, setPropPanelPos] = useState(null);
+          const propPanelDragRef = useRef(null);
 
           const activePointers = useRef(new Map()); 
           const prevPinchDist = useRef(null); 
@@ -1354,17 +1529,6 @@
                   localStorage.setItem('slot_absolute_welcome', 'true');
               }
           }, []);
-
-          useEffect(() => {
-              const dataToSave = {
-                  brand: activeBrand,
-                  pieces: pieces,
-                  boardPoints: boardPoints,
-                  boardClosed: boardClosed,
-                  autoBorders: autoBorders
-              };
-              localStorage.setItem('slot_editor_state', JSON.stringify(dataToSave));
-          }, [pieces, activeBrand, boardPoints, boardClosed, autoBorders]);
 
           const handleProtectedAction = async (actionFn) => {
               const auth = window.FirebaseAPI.getAuth();
@@ -1643,7 +1807,7 @@
                   const newGroupId = 'macro_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
                   
                   p.pieces.forEach((subP, index) => {
-                      const newPiece = { ...subP, direction: d, uid: Date.now() + Math.random() + index, groupId: newGroupId, elevation: workingElevation, x: currentX, y: currentY, rot: currentRot, invert: false, cat: p.cat || subP.cat };
+                      const newPiece = { ...subP, brandKey: p.brandKey || activeBrand, direction: d, uid: Date.now() + Math.random() + index, groupId: newGroupId, elevation: workingElevation, x: currentX, y: currentY, rot: currentRot, invert: false, cat: p.cat || subP.cat };
                       newPieces.push(newPiece);
                       addedIds.push(newPiece.uid);
                       
@@ -1701,13 +1865,6 @@
           const saveCircuit = () => { 
               const blob = new Blob([JSON.stringify({ version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders }, null, 2)], { type: "application/json" }); 
               const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `circuito_${activeBrand.toLowerCase()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); 
-          };
-
-          const clearAll = () => {
-              if(window.confirm(lang === 'es' ? '¿Estás seguro de querer borrar todo el circuito para empezar de nuevo?' : 'Are you sure you want to clear the entire circuit to start over?')) {
-                  setHistory([[]]); setHistoryStep(0); setSelectedPieceIds([]);
-                  setBoardPoints([]); setBoardClosed(false); setAutoBorders(false);
-              }
           };
           
           const handleFileSelectForPreview = (e) => {
@@ -1769,6 +1926,31 @@
               window.addEventListener('pointerup', onUp);
           };
 
+          const startPropPanelDrag = (e) => {
+              e.stopPropagation();
+              const panel = e.currentTarget.closest('.prop-panel');
+              if (!panel) return;
+              const rect = panel.getBoundingClientRect();
+              propPanelDragRef.current = {
+                  startX: e.clientX,
+                  startY: e.clientY,
+                  initX: propPanelPos ? propPanelPos.x : rect.left,
+                  initY: propPanelPos ? propPanelPos.y : rect.top
+              };
+              const onMove = (moveEvent) => {
+                  setPropPanelPos({
+                      x: propPanelDragRef.current.initX + (moveEvent.clientX - propPanelDragRef.current.startX),
+                      y: propPanelDragRef.current.initY + (moveEvent.clientY - propPanelDragRef.current.startY)
+                  });
+              };
+              const onUp = () => {
+                  window.removeEventListener('pointermove', onMove);
+                  window.removeEventListener('pointerup', onUp);
+              };
+              window.addEventListener('pointermove', onMove);
+              window.addEventListener('pointerup', onUp);
+          };
+
           const fitToScreen = () => { 
               const canvas = canvasRef.current; const cw = canvas ? canvas.width : window.innerWidth; const ch = canvas ? canvas.height : window.innerHeight;
               if (piecePositions.current.length === 0) { setView({ x: cw/2, y: ch/2, scale: 5.0 }); return; } 
@@ -1807,10 +1989,7 @@
               if (activePointers.current.size === 1) { 
                   lastPointerPos.current = coords; 
                   setIsDragging(true);
-                  if (isCircuitMoveMode) { 
-                      dragMode.current = boardPoints.length > 0 ? 'moveBoard' : 'view'; 
-                      return; 
-                  } 
+                  if (isCircuitMoveMode) { dragMode.current = 'view'; return; } 
 
                   const rawMouse = getRawMouse(coords);
                   
@@ -1905,7 +2084,7 @@
 
           // NUEVA LÓGICA DE SNAPPING UNIVERSAL (SOPORTA GRUPOS Y HISTERESIS ANTITEMBLORES)
           const checkSnapping = (testGeo, skipGroup, wasSnapping = false) => {
-              if (!testGeo) return null;
+              if (!testGeo || !testGeo.outNodes) return null;
               // Histeresis: Cuesta más despegar una pieza imantada (30px) que imantarla inicialmente (12px)
               const threshold = (wasSnapping ? 30 : 12) / view.scale; 
               
@@ -1913,7 +2092,7 @@
               let minSnapDist = threshold;
 
               for (const other of piecePositions.current) {
-                  if (!other) continue;
+                  if (!other || !other.outNodes) continue;
                   
                   if (skipGroup instanceof Map || skipGroup instanceof Set) {
                       if (skipGroup.has(other.uid)) continue;
@@ -1921,22 +2100,37 @@
                       if (other.uid === skipGroup) continue;
                   }
                   
-                  // Test 1: Entrada de la pista que arrastro se acerca a la Salida de otra
-                  const dist1 = Math.hypot(testGeo.inX - other.outX, testGeo.inY - other.outY);
-                  if (dist1 < minSnapDist) {
-                      minSnapDist = dist1;
-                      bestSnap = { snappedX: other.outX, snappedY: other.outY, snappedRot: other.outAngle, dist: dist1 };
-                  }
+                  testGeo.inNodes.forEach(tIn => {
+                      other.outNodes.forEach(oOut => {
+                          const dist = Math.hypot(tIn.x - oOut.x, tIn.y - oOut.y);
+                          if (dist < minSnapDist) {
+                              minSnapDist = dist;
+                              const dRot = oOut.angle - tIn.angle;
+                              const pivotRot = testGeo.inAngle + dRot;
+                              const vecX = testGeo.inX - tIn.x;
+                              const vecY = testGeo.inY - tIn.y;
+                              const rotVecX = vecX * Math.cos(dRot) - vecY * Math.sin(dRot);
+                              const rotVecY = vecX * Math.sin(dRot) + vecY * Math.cos(dRot);
+                              bestSnap = { snappedX: oOut.x + rotVecX, snappedY: oOut.y + rotVecY, snappedRot: pivotRot, dist: dist };
+                          }
+                      });
+                  });
                   
-                  // Test 2: Salida de la pista que arrastro se acerca a la Entrada de otra
-                  const dist2 = Math.hypot(testGeo.outX - other.inX, testGeo.outY - other.inY);
-                  if (dist2 < minSnapDist) {
-                      minSnapDist = dist2;
-                      const newRot = other.inAngle - testGeo.localDa;
-                      const newX = other.inX - (testGeo.localDx * Math.cos(newRot) - testGeo.localDy * Math.sin(newRot));
-                      const newY = other.inY - (testGeo.localDx * Math.sin(newRot) + testGeo.localDy * Math.cos(newRot));
-                      bestSnap = { snappedX: newX, snappedY: newY, snappedRot: newRot, dist: dist2 };
-                  }
+                  testGeo.outNodes.forEach(tOut => {
+                      other.inNodes.forEach(oIn => {
+                          const dist = Math.hypot(tOut.x - oIn.x, tOut.y - oIn.y);
+                          if (dist < minSnapDist) {
+                              minSnapDist = dist;
+                              const dRot = oIn.angle - tOut.angle;
+                              const pivotRot = testGeo.inAngle + dRot;
+                              const vecX = testGeo.inX - tOut.x;
+                              const vecY = testGeo.inY - tOut.y;
+                              const rotVecX = vecX * Math.cos(dRot) - vecY * Math.sin(dRot);
+                              const rotVecY = vecX * Math.sin(dRot) + vecY * Math.cos(dRot);
+                              bestSnap = { snappedX: oIn.x + rotVecX, snappedY: oIn.y + rotVecY, snappedRot: pivotRot, dist: dist };
+                          }
+                      });
+                  });
               }
               
               return bestSnap;
@@ -1956,10 +2150,6 @@
                   if (dragMode.current === 'view' && e.buttons === 1) { 
                       const dx = coords.x - lastPointerPos.current.x; const dy = coords.y - lastPointerPos.current.y;
                       setView(v => ({ ...v, x: v.x + dx, y: v.y + dy })); 
-                  } else if (dragMode.current === 'moveBoard' && e.buttons === 1) {
-                      const dx = (coords.x - lastPointerPos.current.x) / view.scale;
-                      const dy = (coords.y - lastPointerPos.current.y) / view.scale;
-                      setBoardPoints(prev => prev.map(p => ({ x: p.x + dx, y: p.y + dy })));
                   } else if (dragGroup) {
                       const rawMouse = getRawMouse(coords);
                       
@@ -2229,20 +2419,6 @@
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
-          const goTo2DGame = () => {
-              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
-              const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = '2dgame.html'; } catch (e) { alert("Error al transferir circuito"); }
-          };
-
-          const goTo3DGame = () => {
-              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
-              const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = '3dgame.html'; } catch (e) { alert("Error al transferir circuito"); }
-          };
-
           const generateReport = () => { 
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               if (!window.jspdf) { alert(t.alerts.pdfLib); return; }
@@ -2320,20 +2496,41 @@
           const hasAdapterScxAdv = pieces.some(p => p && (p.subtype === 'adapter_scx_adv' || p.subtype === 'adapter_adv_scx'));
           const hasAdapterNincoSuk = pieces.some(p => p && (p.subtype === 'adapter_ninco_suk' || p.subtype === 'adapter_suk_ninco'));
           
+          const SCX_GROUP = ['SCX_CLASSIC', 'SCX_UNIVERSAL', 'SCX_ADVANCE'];
+
           let currentItems = TRACK_DEFINITIONS[activeBrand].pieces.filter(p=>p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
-          
-          if (hasAdapterNincoScx && (activeBrand === 'NINCO' || activeBrand === 'SCX_ANALOG')) {
-              const otherBrand = activeBrand === 'NINCO' ? 'SCX_ANALOG' : 'NINCO';
-              const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
-              currentItems = [...currentItems, ...otherItems];
+
+          // Integración total del grupo SCX
+          if (SCX_GROUP.includes(activeBrand)) {
+              SCX_GROUP.forEach(b => {
+                  if (b !== activeBrand) {
+                      const extraItems = TRACK_DEFINITIONS[b].pieces.filter(p => p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
+                      const existingIds = new Set(currentItems.map(p => p.id));
+                      currentItems = [...currentItems, ...extraItems.filter(p => !existingIds.has(p.id))];
+                  }
+              });
           }
           
-          if (hasAdapterScxAdv && (activeBrand === 'SCX_ANALOG' || activeBrand === 'SCX_ADVANCE')) {
-              const otherBrand = activeBrand === 'SCX_ANALOG' ? 'SCX_ADVANCE' : 'SCX_ANALOG';
+          if (hasAdapterNincoScx && (activeBrand === 'NINCO' || activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL')) {
+              const otherBrand = activeBrand === 'NINCO' ? (pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_UNIVERSAL') : 'NINCO';
               const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
               const existingIds = new Set(currentItems.map(p => p.id));
               const newItems = otherItems.filter(p => !existingIds.has(p.id));
               currentItems = [...currentItems, ...newItems];
+          }
+          
+          if (hasAdapterScxAdv) {
+              if (activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') {
+                  const otherBrand = 'SCX_ADVANCE';
+                  const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
+                  const existingIds = new Set(currentItems.map(p => p.id));
+                  currentItems = [...currentItems, ...otherItems.filter(p => !existingIds.has(p.id))];
+              } else if (activeBrand === 'SCX_ADVANCE') {
+                  const otherBrand = pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_UNIVERSAL';
+                  const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === activeCategory || (activeCategory === 'RALLY' && p.cat === 'RALLY'));
+                  const existingIds = new Set(currentItems.map(p => p.id));
+                  currentItems = [...currentItems, ...otherItems.filter(p => !existingIds.has(p.id))];
+              }
           }
 
           if (hasAdapterNincoSuk && (activeBrand === 'NINCO' || activeBrand === 'SCALEXTRIC_UK')) {
@@ -2344,13 +2541,10 @@
               currentItems = [...currentItems, ...newItems];
           }
 
-          const categories = ['Rectas', 'Curvas']; 
-          if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Digital')) categories.push('Digital');
-          if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Boxes')) categories.push('Boxes');
+          const categories = ['Rectas', 'Curvas', 'Digital', 'Boxes']; 
+          if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Cruces')) categories.push('Cruces');
           if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'RALLY')) categories.push('RALLY'); 
           if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Kits')) categories.push('Kits');
-          if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Chicanes')) categories.push('Chicanes');
-
           const selectedPiece = selectedPieceIds.length > 0 ? pieces.find(p=>p && p.uid===selectedPieceIds[0]) : null;
 
           return (
@@ -2489,85 +2683,44 @@
               )}
 
               <div className="bg-[#0f172a] border-b border-[#1e293b] shadow-lg z-20 flex flex-col shrink-0 relative">
-                  {/* HEADER PRINCIPAL: Título, Login e Idiomas (FIJO SIN SCROLL) */}
-                  <div className="flex items-center justify-between px-4 py-2 bg-[#0f172a] border-b border-[#1e293b] shadow-md z-30 overflow-x-auto hide-scrollbar">
-                      <div className="flex items-center gap-4 shrink-0 pr-4">
-                          <div className="flex flex-col justify-center shrink-0">
-                              <h1 className="text-xl md:text-2xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
-                              <span className="text-[9px] md:text-[10px] text-[#39ff14]/70 font-mono tracking-widest uppercase mt-0.5 animate-pulse">by Albert Closa</span>
+                  <div className="flex items-center justify-between px-4 py-3 overflow-x-auto hide-scrollbar bg-black/50"> 
+                      <div className="flex items-center gap-4">
+                          <div className="flex flex-col justify-center mr-4 shrink-0">
+                              <h1 className="text-xl font-black tracking-tighter leading-none" style={{ color: '#39ff14', textShadow: '0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.5)' }}> TRACK DESIGNER 2D </h1> 
+                              <span className="text-[9px] text-[#39ff14]/70 font-mono tracking-widest uppercase text-right mt-1 animate-pulse">by Albert Closa</span>
                           </div>
-                          
-                          <div className="flex gap-1.5 items-center shrink-0 ml-2 bg-black/30 p-1.5 rounded-xl border border-cyan-500/20 shadow-inner"> 
-                              <button onClick={handleUndo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group ${historyStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]'}`} title={t.actions.undo} disabled={historyStep === 0}> <Undo2 size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.undo}</span> </button> 
-                              <button onClick={handleRedo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group ${historyStep < history.length - 1 ? 'hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]' : 'opacity-50 cursor-not-allowed'}`} title={t.actions.redo} disabled={historyStep === history.length - 1}> <Redo2 size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.redo}</span> </button> 
-                              <button onClick={handleZoomOut} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <ZoomOut size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.zoomOut}</span> </button> 
-                              <button onClick={fitToScreen} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <Crosshair size={16} className="mb-0.5 group-hover:rotate-45 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.center}</span> </button> 
-                              <button onClick={handleZoomIn} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-cyan-500/70 shadow-sm rounded-lg text-cyan-400 hover:bg-cyan-900/80 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <ZoomIn size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.zoomIn}</span> </button> 
-                              <button onClick={() => setIsMultiSelectMode(!isMultiSelectMode)} className={`shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border rounded-lg transition-all group active:scale-95 ${isMultiSelectMode ? 'border-cyan-300 text-white shadow-[0_0_15px_rgba(6,182,212,0.8)] bg-cyan-700/80' : 'border-cyan-500/70 text-cyan-400 shadow-sm hover:bg-cyan-900/80 hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]'}`}> <CheckSquare size={16} className={`mb-0.5 transition-transform ${isMultiSelectMode ? 'scale-110' : 'group-hover:scale-110'}`}/> <span className="text-[8px] font-black tracking-widest uppercase">{t.actions.multiselect}</span> </button>
-                              <button onClick={clearAll} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-red-500/70 shadow-sm rounded-lg text-red-400 hover:bg-red-900/50 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(239,68,68,0.6)]" title={t.tools.new}> <FilePlus size={16} className="mb-0.5 group-hover:scale-110 transition-transform"/> <span className="text-[8px] font-black tracking-widest uppercase">{t.tools.new}</span> </button>
+                          <div className="flex gap-4">{Object.keys(TRACK_DEFINITIONS).map(k => (<button key={k} onClick={()=>{
+                              if (activeBrand === k) return;
                               
-                              <div className="w-px h-8 bg-cyan-500/30 mx-1"></div>
+                              const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && (k === 'SCX_CLASSIC' || k === 'SCX_UNIVERSAL')) || ((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') && k === 'NINCO'));
+                              const isCompatibleScxAdv = hasAdapterScxAdv && (((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && (activeBrand === 'SCX_ADVANCE' && (k === 'SCX_CLASSIC' || k === 'SCX_UNIVERSAL'))));
+                              const isCompatibleNincoSuk = hasAdapterNincoSuk && ((activeBrand === 'NINCO' && k === 'SCALEXTRIC_UK') || (activeBrand === 'SCALEXTRIC_UK' && k === 'NINCO'));
+                              const isCompatibleScxMix = (activeBrand === 'SCX_CLASSIC' && k === 'SCX_UNIVERSAL') || (activeBrand === 'SCX_UNIVERSAL' && k === 'SCX_CLASSIC');
+                              const isCompatible = isCompatibleNincoScx || isCompatibleScxAdv || isCompatibleNincoSuk || isCompatibleScxMix || (SCX_GROUP.includes(activeBrand) && SCX_GROUP.includes(k));
                               
-                              <button onClick={goToSimulation} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-[#39ff14]/70 shadow-sm rounded-lg text-[#39ff14] hover:bg-[#39ff14]/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(57,255,20,0.6)] relative overflow-hidden"> 
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#39ff14]/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Play size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[8px] font-black tracking-widest z-10 text-center uppercase">{t.actions.sim}</span> 
-                              </button> 
-
-                              <button onClick={goToDecoration} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-pink-500/70 shadow-sm rounded-lg text-pink-400 hover:bg-pink-500/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(236,72,153,0.6)] relative overflow-hidden"> 
-                                  <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><ImageIcon size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[8px] font-black tracking-widest z-10 text-center uppercase">{t.actions.deco}</span> 
-                              </button> 
-
-                              <button onClick={goToMulti} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-amber-500/70 shadow-sm rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(245,158,11,0.6)] relative overflow-hidden"> 
-                                  <div className="absolute inset-0 bg-gradient-to-t from-amber-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Flag size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform"/><span className="text-[8px] font-black tracking-widest z-10 text-center uppercase">{t.actions.clubs}</span> 
-                              </button> 
-                              
-                              <div className="w-px h-8 bg-cyan-500/30 mx-1"></div>
-
-                              <button onClick={goTo2DGame} className="shrink-0 flex flex-col items-center justify-center w-20 h-11 bg-gray-900/90 border border-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.4)] rounded-lg text-[#34d399] hover:bg-[#10b981]/20 active:scale-95 transition-all group hover:shadow-[0_0_20px_rgba(16,185,129,0.8)] relative overflow-hidden btn-spectacular-shimmer"> 
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#10b981]/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                  <Activity size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform drop-shadow-[0_0_8px_rgba(16,185,129,1)]"/>
-                                  <span className="text-[8px] font-black tracking-widest z-10 text-center uppercase" style={{textShadow: '0 0 8px rgba(16,185,129,0.9)'}}>2D GAME</span> 
-                              </button> 
-
-                              <button onClick={goTo3DGame} className="shrink-0 flex flex-col items-center justify-center w-24 h-11 rounded-lg active:scale-95 transition-all group relative overflow-hidden btn-super-neon ml-1"> 
-                                  <Zap size={16} className="mb-0.5 z-10 group-hover:scale-110 transition-transform icon-glow"/>
-                                  <span className="text-[8px] font-black tracking-tighter z-10 text-center uppercase text-glow leading-tight mt-0.5">3D SLOT<br/>GAME</span> 
-                              </button> 
+                              if (pieces.length > 0 && !isCompatible) {
+                                  if (!window.confirm("¿Cambiar de marca? Se borrará el circuito actual.")) return;
+                              }
+                              setActiveBrand(k); 
+                              if (!isCompatible) {
+                                  setHistory([[]]); setHistoryStep(0); setSelectedPieceIds([]); 
+                              }
+                          }} className={`text-sm font-bold px-4 py-2 rounded-full uppercase tracking-widest transition-all shrink-0 border ${activeBrand === k ? TRACK_DEFINITIONS[k].activeClass : 'bg-transparent border-[#334155] text-gray-500 hover:text-gray-300 hover:border-gray-400'}`}>{TRACK_DEFINITIONS[k].name}</button>))}</div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                          <div className="border-l border-white/10 pl-4 mr-1">
+                              {user && !user.isAnonymous ? (
+                                  <div className="flex items-center gap-2">
+                                      <div className="flex flex-col items-end"><span className="text-[10px] text-gray-500 uppercase tracking-widest leading-none">Piloto</span><span className="text-xs font-bold text-[#39ff14]">{user.displayName || (user.email ? user.email.split('@')[0] : 'Piloto')}</span></div>
+                                      <button onClick={handleSignOut} title={t.auth.logoutBtn} className="w-8 h-8 flex items-center justify-center rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition"><X size={14} /></button>
+                                  </div>
+                              ) : (<button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded bg-gray-800 border border-gray-600 text-gray-300 hover:text-white hover:border-[#39ff14] transition text-xs font-bold uppercase tracking-wider"><User size={14} className="text-[#39ff14]"/> {t.auth.loginBtn}</button>)}
+                          </div>
+                          <div className="flex gap-2 border-l border-[#334155] pl-4 shrink-0">
+                              <button onClick={() => handleSetLang('es')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'es' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="Español"><svg viewBox="0 0 3 2" className="w-6 h-4 block"><rect width="3" height="2" fill="#c60b1e"/><rect width="3" height="1" y="0.5" fill="#ffc400"/></svg></button>
+                              <button onClick={() => handleSetLang('en')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'en' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="English"><svg viewBox="0 0 60 30" className="w-6 h-4 block"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" strokeWidth="4"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#C8102E" strokeWidth="6"/></svg></button>
                           </div>
                       </div>
-                      
-                      <div className="flex items-center gap-3 shrink-0 ml-4">
-                          {user && !user.isAnonymous ? (
-                              <div className="flex items-center gap-2">
-                                  <div className="hidden md:flex flex-col items-end"><span className="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Piloto</span><span className="text-[10px] font-bold text-[#39ff14]">{user.displayName || (user.email ? user.email.split('@')[0] : 'Piloto')}</span></div>
-                                  <button onClick={handleSignOut} title={t.auth.logoutBtn} className="w-7 h-7 flex items-center justify-center rounded bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white transition"><X size={14} /></button>
-                              </div>
-                          ) : (<button onClick={() => setShowAuthModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded bg-gray-800 border border-gray-600 text-gray-300 hover:text-white hover:border-[#39ff14] transition text-[10px] font-bold uppercase tracking-wider"><User size={14} className="text-[#39ff14]"/> <span className="hidden md:inline">{t.auth.loginBtn}</span><span className="md:hidden">LOGIN</span></button>)}
-                          <div className="h-6 w-px bg-[#334155] mx-1 shrink-0"></div>
-                          <div className="flex gap-2 shrink-0">
-                              <button onClick={() => handleSetLang('es')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'es' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="Español"><svg viewBox="0 0 3 2" className="w-5 h-3 block"><rect width="3" height="2" fill="#c60b1e"/><rect width="3" height="1" y="0.5" fill="#ffc400"/></svg></button>
-                              <button onClick={() => handleSetLang('en')} className={`transition-all rounded-[2px] border border-white/10 ${lang === 'en' ? 'opacity-100 scale-110 shadow-[0_0_10px_rgba(255,255,255,0.3)]' : 'opacity-40 hover:opacity-100'}`} title="English"><svg viewBox="0 0 60 30" className="w-5 h-3 block"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" strokeWidth="4"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/><path d="M30,0 L30,30 M0,15 L60,15" stroke="#C8102E" strokeWidth="6"/></svg></button>
-                          </div>
-                      </div>
-                  </div>
-
-                  {/* BARRA DE MARCAS DE PISTAS (CON SCROLL HORIZONTAL) */}
-                  <div className="flex items-center px-4 py-2 overflow-x-auto hide-scrollbar bg-black/50 gap-3"> 
-                      {Object.keys(TRACK_DEFINITIONS).map(k => (<button key={k} onClick={()=>{
-                          if (activeBrand === k) return;
-                          
-                          const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && k === 'SCX_ANALOG') || (activeBrand === 'SCX_ANALOG' && k === 'NINCO'));
-                          const isCompatibleScxAdv = hasAdapterScxAdv && ((activeBrand === 'SCX_ANALOG' && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && k === 'SCX_ANALOG'));
-                          const isCompatibleNincoSuk = hasAdapterNincoSuk && ((activeBrand === 'NINCO' && k === 'SCALEXTRIC_UK') || (activeBrand === 'SCALEXTRIC_UK' && k === 'NINCO'));
-                          const isCompatible = isCompatibleNincoScx || isCompatibleScxAdv || isCompatibleNincoSuk;
-                          
-                          if (pieces.length > 0 && !isCompatible) {
-                              if (!window.confirm("¿Cambiar de marca? Se borrará el circuito actual.")) return;
-                          }
-                          setActiveBrand(k); 
-                          if (!isCompatible) {
-                              setHistory([[]]); setHistoryStep(0); setSelectedPieceIds([]); 
-                          }
-                      }} className={`text-sm font-bold px-4 py-2 rounded-full uppercase tracking-widest transition-all shrink-0 border ${activeBrand === k ? TRACK_DEFINITIONS[k].activeClass : 'bg-transparent border-[#334155] text-gray-500 hover:text-gray-300 hover:border-gray-400'}`}>{TRACK_DEFINITIONS[k].name}</button>))}
                   </div>
                   <div className="flex items-center overflow-x-auto hide-scrollbar px-4 py-2 gap-2 bg-[#1e293b] shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)]"> 
                       {categories.map(cat => ( <button key={cat} onClick={() => setActiveCategory(cat)} className="px-6 py-2 text-xs font-bold rounded-lg uppercase shrink-0 transition-all duration-300 border backdrop-blur-sm" style={{ borderColor: activeCategory === cat ? currentBrand.neonColor : '#334155', color: activeCategory === cat ? '#ffffff' : '#64748b', backgroundColor: activeCategory === cat ? `${currentBrand.neonColor}20` : 'transparent', boxShadow: activeCategory === cat ? `0 0 15px ${currentBrand.neonColor}60, inset 0 0 10px ${currentBrand.neonColor}20` : 'none', textShadow: activeCategory === cat ? `0 0 10px ${currentBrand.neonColor}` : 'none' }}> {t.cat[cat] || cat} </button> ))} 
@@ -2781,16 +2934,39 @@
                       </div>
                   )}
 
+                  <div className="absolute bottom-6 left-0 w-full flex justify-center md:justify-start md:left-6 px-4 md:px-0 pointer-events-none z-30"> 
+                      <div onPointerDown={(e)=>e.stopPropagation()} className="flex gap-3 pointer-events-auto bg-black/40 p-3 rounded-xl backdrop-blur-sm border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.2)] relative overflow-x-auto hide-scrollbar max-w-full"> 
+                          <button onClick={handleUndo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group ${historyStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]'}`} title={t.actions.undo} disabled={historyStep === 0}> <Undo2 size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.undo}</span> </button> 
+                          <button onClick={handleRedo} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group ${historyStep < history.length - 1 ? 'hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]' : 'opacity-50 cursor-not-allowed'}`} title={t.actions.redo} disabled={historyStep === history.length - 1}> <Redo2 size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.redo}</span> </button> 
+                          <button onClick={handleZoomOut} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <ZoomOut size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.zoomOut}</span> </button> 
+                          <button onClick={fitToScreen} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <Crosshair size={24} className="mb-1 group-hover:rotate-45 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.center}</span> </button> 
+                          <button onClick={handleZoomIn} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]"> <ZoomIn size={24} className="mb-1 group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest">{t.actions.zoomIn}</span> </button> 
+                          <button onClick={() => setIsMultiSelectMode(!isMultiSelectMode)} className={`shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border rounded-lg transition-all group active:scale-95 ${isMultiSelectMode ? 'border-cyan-300 text-white shadow-[0_0_25px_rgba(6,182,212,0.8)] bg-cyan-800/80' : 'border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:bg-cyan-950/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.6)]'}`}> <CheckSquare size={24} className={`mb-1 transition-transform ${isMultiSelectMode ? 'scale-110' : 'group-hover:scale-110'}`}/> <span className="text-[9px] font-black tracking-widest">{t.actions.multiselect}</span> </button>
+                          
+                          <button onClick={goToSimulation} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-[#39ff14] shadow-[0_0_15px_rgba(57,255,20,0.4)] rounded-lg text-[#39ff14] hover:bg-[#39ff14]/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(57,255,20,0.6)] relative overflow-hidden"> 
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#39ff14]/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Play size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.sim}</span> 
+                          </button> 
+
+                          <button onClick={goToDecoration} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)] rounded-lg text-pink-400 hover:bg-pink-500/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(236,72,153,0.6)] relative overflow-hidden"> 
+                              <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><ImageIcon size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.deco}</span> 
+                          </button> 
+
+                          <button onClick={goToMulti} className="shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-gray-900/90 border border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)] rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 active:shadow-none transition-all group hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] relative overflow-hidden"> 
+                              <div className="absolute inset-0 bg-gradient-to-t from-amber-500/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div><Flag size={24} className="mb-1 z-10 group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest z-10 text-center">{t.actions.clubs}</span> 
+                          </button> 
+                      </div> 
+                  </div>
+                  
                   {(() => {
                       const selectedPieces = selectedPieceIds.map(id => pieces.find(p=>p && p.uid===id)).filter(Boolean);
                       if (selectedPieces.length === 0) return null;
                       
                       if (selectedPieces.length > 1) {
                           return (
-                              <div className={`absolute top-6 right-6 z-[100] bg-[#0f172a]/90 p-5 rounded-2xl shadow-2xl border w-72 backdrop-blur-md ${neonClass}`}> 
-                                  <div className="flex justify-between items-start mb-4 border-b border-white/10 pb-3">
-                                      <div><h3 className="text-lg font-black text-white">{selectedPieces.length} PIEZAS</h3></div>
-                                      <button onClick={()=>setSelectedPieceIds([])} className="hover:text-white text-gray-500 transition"><X size={20}/></button>
+                              <div onPointerDown={(e)=>e.stopPropagation()} style={propPanelPos ? { left: `${propPanelPos.x}px`, top: `${propPanelPos.y}px`, right: 'auto', bottom: 'auto', transform: 'none' } : {}} className={`prop-panel fixed z-[100] top-[240px] right-6 bg-[#0f172a]/90 p-5 rounded-2xl shadow-2xl border w-72 backdrop-blur-md ${neonClass}`}> 
+                                  <div onPointerDown={startPropPanelDrag} className="flex justify-between items-start mb-4 border-b border-white/10 pb-3 cursor-move group" title="Arrastrar Panel">
+                                      <div><h3 className="text-lg font-black text-white pointer-events-none">{selectedPieces.length} PIEZAS</h3></div>
+                                      <button onPointerDown={(e)=>e.stopPropagation()} onClick={()=>{setSelectedPieceIds([]); setPropPanelPos(null);}} className="hover:text-white text-gray-500 transition"><X size={20}/></button>
                                   </div> 
                                   
                                   <div className="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 shadow-inner text-center">
@@ -2826,10 +3002,10 @@
 
                       const selectedPiece = selectedPieces[0];
                       return ( 
-                          <div className={`absolute top-6 right-6 z-[100] bg-[#0f172a]/90 p-5 rounded-2xl shadow-2xl border w-72 backdrop-blur-md ${neonClass}`}> 
-                              <div className="flex justify-between items-start mb-4 border-b border-white/10 pb-3">
-                                  <div><h3 className="text-lg font-black text-white">{tp(selectedPiece.label)}</h3></div>
-                                  <button onClick={()=>setSelectedPieceIds([])} className="hover:text-white text-gray-500 transition"><X size={20}/></button>
+                          <div onPointerDown={(e)=>e.stopPropagation()} style={propPanelPos ? { left: `${propPanelPos.x}px`, top: `${propPanelPos.y}px`, right: 'auto', bottom: 'auto', transform: 'none' } : {}} className={`prop-panel fixed z-[100] top-[240px] right-6 bg-[#0f172a]/90 p-5 rounded-2xl shadow-2xl border w-72 backdrop-blur-md ${neonClass}`}> 
+                              <div onPointerDown={startPropPanelDrag} className="flex justify-between items-start mb-4 border-b border-white/10 pb-3 cursor-move group" title="Arrastrar Panel">
+                                  <div><h3 className="text-lg font-black text-white pointer-events-none">{tp(selectedPiece.label)}</h3></div>
+                                  <button onPointerDown={(e)=>e.stopPropagation()} onClick={()=>{setSelectedPieceIds([]); setPropPanelPos(null);}} className="hover:text-white text-gray-500 transition"><X size={20}/></button>
                               </div> 
                               
                               <div className="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 shadow-inner text-center">
@@ -2874,4 +3050,3 @@
     </script>
 </body>
 </html>
->
