@@ -487,8 +487,18 @@
 
         // Redirección para compatibilidad con circuitos antiguos en la nube
         const getResolvedBrand = (brandStr) => {
-            if (brandStr === 'SCX_UNIVERSAL_GRISES' || brandStr === 'SCX_ORIGINAL') return 'SCX_UNIVERSAL';
+            if (!brandStr) return 'NINCO';
             if (TRACK_DEFINITIONS[brandStr]) return brandStr;
+            
+            const upperStr = brandStr.toUpperCase();
+            if (upperStr === 'SCX_UNIVERSAL_GRISES') return 'SCX_UNIVERSAL';
+            if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX' || upperStr === 'SCX_ORIGINAL' || upperStr === 'SCX_CLASSIC' || upperStr === 'SCX CLÁSICO (NEGRO)' || upperStr === 'SCX_CLASSIC_NEGRAS') return 'SCX_CLASSIC';
+            if (upperStr === 'SCALEXTRIC UK' || upperStr === 'SUPER_SLOT') return 'SCALEXTRIC_UK';
+            if (upperStr === 'SCX_ADVANCE' || upperStr === 'SCX ADVANCE') return 'SCX_ADVANCE';
+            
+            const foundKey = Object.keys(TRACK_DEFINITIONS).find(k => TRACK_DEFINITIONS[k].name.toUpperCase() === upperStr);
+            if (foundKey) return foundKey;
+
             return 'NINCO'; 
         };
 
