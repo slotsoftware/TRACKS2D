@@ -3142,7 +3142,7 @@
               if (pieces.length === 0) { alert(t.alerts.emptyGame); return; }
               const compiledPieces = compileCircuitFor3D(pieces);
               const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.open('slot-3d-game.html', '_blank'); } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
           const generateReport = () => { 
