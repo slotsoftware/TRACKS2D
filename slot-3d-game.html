@@ -1104,7 +1104,7 @@
         };
         
         /* --- VISOR 3D --- */
-        const Telemetry3DViewer = ({ circuitData, carSettings, customCarAssets, onCarAssetUpdate, onClose, lang, setLang, t, multiplayerSession, peerConn, networkData, startHost, startJoin, myPeerID, joinID, setJoinID, audioEnabled, toggleAudio, musicEnabled, toggleMusic, qualityMode, toggleQuality }) => {
+        const Telemetry3DViewer = ({ circuitData, carSettings, customCarAssets, onCarAssetUpdate, onClose, lang, setLang, t, multiplayerSession, peerConn, networkData, startHost, startJoin, myPeerID, joinID, setJoinID, onGoTo2D, audioEnabled, toggleAudio, musicEnabled, toggleMusic, qualityMode, toggleQuality }) => {
             const containerRef = useRef(null);
             const throttleFillRef = useRef(null);
             const throttleTextRef = useRef(null);
@@ -3786,9 +3786,9 @@
                                 {audioEnabled ? <Volume2 size={14}/> : <VolumeX size={14}/>}
                                 {t.btnVoice}
                             </button>
-                            <a href="https://slotsoftware.github.io/Telemetria/circuitos.html" target="_blank" rel="noopener noreferrer" title={t.btn2d} className="px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-2 transform skew-x-6 cursor-pointer">
+                            <button onClick={onGoTo2D} title={t.btn2d} className="px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-2 transform skew-x-6">
                                 <Layers size={14}/> 2D
-                            </a>
+                            </button>
                             <button onClick={toggleFullscreen} title={t.btnFullscreen} className="px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-2 transform skew-x-6">
                                 {isFullscreen ? <Minimize size={14}/> : <Maximize size={14}/>}
                                 <span>{t.screen}</span>
@@ -4603,6 +4603,15 @@
               return true;
           };
 
+          const handleGoTo2D = () => {
+              try {
+                  window.location.href = 'circuitos.html';
+              } catch (e) {
+                  setToastMsg(lang === 'es' ? 'Error al navegar: Bloqueado por seguridad del entorno.' : 'Navigation error: Blocked by environment security.');
+                  setTimeout(() => setToastMsg(''), 5000);
+              }
+          };
+
           useEffect(() => {
               const fetchCloudAssets = async () => {
                   setIsFetchingList(true);
@@ -5128,7 +5137,7 @@
                 )}
 
                 {circuitData ? (
-                    <Telemetry3DViewer circuitData={circuitData} carSettings={carSettings} customCarAssets={customCarAssets} onCarAssetUpdate={handleCarAssetUpdate} onClose={() => { setCircuitData(null); setSession(null); if(peerConn) peerConn.close(); try { setHasSavedCircuit(!!localStorage.getItem('slot_last_circuit')); } catch(e){} }} lang={lang} setLang={setLang} t={t} multiplayerSession={session} peerConn={peerConn} networkData={networkData} startHost={startHost} startJoin={startJoin} myPeerID={myPeerID} joinID={joinID} setJoinID={setJoinID} audioEnabled={audioEnabled} toggleAudio={toggleAudio} musicEnabled={musicEnabled} toggleMusic={toggleMusic} qualityMode={qualityMode} toggleQuality={toggleQuality} />
+                    <Telemetry3DViewer circuitData={circuitData} carSettings={carSettings} customCarAssets={customCarAssets} onCarAssetUpdate={handleCarAssetUpdate} onClose={() => { setCircuitData(null); setSession(null); if(peerConn) peerConn.close(); try { setHasSavedCircuit(!!localStorage.getItem('slot_last_circuit')); } catch(e){} }} lang={lang} setLang={setLang} t={t} multiplayerSession={session} peerConn={peerConn} networkData={networkData} startHost={startHost} startJoin={startJoin} myPeerID={myPeerID} joinID={joinID} setJoinID={setJoinID} onGoTo2D={handleGoTo2D} audioEnabled={audioEnabled} toggleAudio={toggleAudio} musicEnabled={musicEnabled} toggleMusic={toggleMusic} qualityMode={qualityMode} toggleQuality={toggleQuality} />
                 ) : (
                     <div className="flex h-[100dvh] w-full bg-gradient-to-br from-blue-950 via-blue-900 to-cyan-900 overflow-hidden font-sans select-none text-gray-200 relative">
                         <Garage3DBackground carUrl={customCarAssets[editingCarId]?.glb} carRotation={customCarAssets[editingCarId]?.rotation} carOffset={customCarAssets[editingCarId]?.offset} qualityMode={qualityMode} />
@@ -5496,10 +5505,10 @@
                                         <input type="file" accept=".json" onChange={loadCircuit} className="hidden" />
                                     </label>
 
-                                    <a href="https://slotsoftware.github.io/Telemetria/circuitos.html" target="_blank" rel="noopener noreferrer" className="flex-1 relative bg-cyan-900/20 hover:bg-cyan-600 text-cyan-400 hover:text-white border-2 border-cyan-500 hover:border-cyan-400 font-black py-3 rounded-xl text-[10px] uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] active:scale-95 flex flex-col items-center justify-center gap-2 group overflow-hidden cursor-pointer">
+                                    <button onClick={handleGoTo2D} className="flex-1 relative bg-cyan-900/20 hover:bg-cyan-600 text-cyan-400 hover:text-white border-2 border-cyan-500 hover:border-cyan-400 font-black py-3 rounded-xl text-[10px] uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.6)] active:scale-95 flex flex-col items-center justify-center gap-2 group overflow-hidden">
                                         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9InRyYW5zcGFyZW50Ii8+PGxpbmUgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjQiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=')] opacity-20 pointer-events-none group-hover:opacity-40"></div>
                                         <PenTool size={20} className="group-hover:scale-110 transition-transform z-10"/> <span className="z-10">{t.btn2d}</span>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
