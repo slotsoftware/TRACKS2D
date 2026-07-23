@@ -195,27 +195,31 @@
               { id: 'c_pt63', label: 'Curva R4 (PT63)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' } 
             ] 
           },
-          SCX_UNIVERSAL: { name: 'Scalextric', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-500 text-black shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
+          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-500 text-black shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
             pieces: [ 
-              { id: 'u_360', label: 'Recta Std 360', type: 'straight', length: 36.0, cat: 'Rectas' }, 
-              { id: 'u_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, 
-              { id: 'u_90', label: 'Cuarto 90', type: 'straight', length: 9.0, cat: 'Rectas' }, 
-              { id: 'u_connect', label: 'Conexión 360', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, 
-              { id: 'u_cross', label: 'Recta Cruce 360', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Cruces' }, 
-              { id: 'u_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
-              { id: 'u_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
-              { id: 'u_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
-              { id: 'u_r1', label: 'R1 (Interior)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
-              { id: 'u_r2', label: 'R2 (Standard)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
-              { id: 'u_r3', label: 'R3 (Exterior)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, 
-              { id: 'u_r4', label: 'R4 (Sup.Ext)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' },
-              { id: 'u_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' },
-              { id: 'u_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' },
-              { id: 'u_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' },
-              { id: 'u_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' },
-              { id: 'u_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' },
-              { id: 'u_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' },
-              { id: 'u_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' }
+              { id: 's_360', label: 'Recta 360', type: 'straight', length: 36.0, cat: 'Rectas' }, 
+              { id: 's_180', label: 'Media 180', type: 'straight', length: 18.0, cat: 'Rectas' }, 
+              { id: 's_sl_1', label: 'Recta 1C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_1', cat: 'RALLY' }, 
+              { id: 's_sl_2', label: 'Recta 2C (360)', type: 'straight', length: 36.0, subtype: 'single_lane_2', cat: 'RALLY' }, 
+              { id: 's_cr2_sl1', label: 'Curva 1C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, 
+              { id: 's_cr2_sl2', label: 'Curva 2C (R2)', type: 'curve', radius: 30.6, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, 
+              { id: 's_cr1_sl1', label: 'Curva 1C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_1', cat: 'RALLY' }, 
+              { id: 's_cr1_sl2', label: 'Curva 2C (R1)', type: 'curve', radius: 15.0, angle: 45, subtype: 'single_lane_2', cat: 'RALLY' }, 
+              { id: 's_grid', label: 'Media Parrilla', type: 'straight', length: 18.0, subtype: 'starting_grid', cat: 'Rectas' }, 
+              { id: 's_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, 
+              { id: 's_connect', label: 'Conexión', type: 'straight', length: 36.0, subtype: 'analog_connect', cat: 'Rectas' }, 
+              { id: 's_cross', label: 'Recta Cruce', type: 'straight', length: 36.0, subtype: 'crossing', cat: 'Cruces' }, 
+              { id: 's_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
+              { id: 's_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
+              { id: 's_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
+              { id: 's_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, 
+              { id: 's_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
+              { id: 's_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
+              { id: 's_r2_ice', label: 'R2 (Hielo)', type: 'curve', radius: 30.6, angle: 45, subtype: 'ice', cat: 'Curvas' }, 
+              { id: 's_r3', label: 'R3 (Ext)', type: 'curve', radius: 46.2, angle: 22.5, cat: 'Curvas' }, 
+              { id: 's_r4', label: 'R4 (Super)', type: 'curve', radius: 61.8, angle: 22.5, cat: 'Curvas' }, 
+              { id: 's_rotonda_ini', label: 'Rotonda Inicio', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda_connect', cat: 'RALLY' }, 
+              { id: 's_rotonda_fin', label: 'Rotonda Final', type: 'rotonda', radius: 15.0, angle: 180, subtype: 'rotonda', cat: 'RALLY' } 
             ] 
           },
           SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff',
@@ -496,7 +500,7 @@
                 if (!bStr || bStr === 'undefined' || bStr === 'null') {
                     const firstId = firstP.id || '';
                     if (firstId.startsWith('c_')) bStr = 'SCX_CLASSIC';
-                    else if (firstId.startsWith('u_')) bStr = 'SCX_UNIVERSAL';
+                    else if (firstId.startsWith('s_')) bStr = 'SCX_ANALOG';
                     else if (firstId.startsWith('adv_')) bStr = 'SCX_ADVANCE';
                     else if (firstId.startsWith('n_')) bStr = 'NINCO';
                     else if (firstId.startsWith('sca_')) bStr = 'SCALEAUTO';
@@ -510,9 +514,9 @@
             if (TRACK_DEFINITIONS[bStr]) return bStr;
             
             const upperStr = String(bStr).toUpperCase();
-            if (upperStr.includes('UNIVERSAL') || upperStr === 'SCX_UNIVERSAL_GRISES') return 'SCX_UNIVERSAL';
-            // Si el circuito se etiquetó como "SCALEXTRIC" genérico (sin matizar clásico), asume Universal (Scalextric Gris)
-            if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX') return 'SCX_UNIVERSAL'; 
+            if (upperStr.includes('UNIVERSAL') || upperStr === 'SCX_UNIVERSAL_GRISES' || upperStr === 'SCX_ANALOG') return 'SCX_ANALOG';
+            // Si el circuito se etiquetó como "SCALEXTRIC" genérico (sin matizar clásico), asume SCX_ANALOG (Scalextric Gris)
+            if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX') return 'SCX_ANALOG'; 
             if (upperStr === 'SCX_ORIGINAL' || upperStr === 'SCX_CLASSIC' || upperStr === 'SCX CLÁSICO (NEGRO)' || upperStr === 'SCX_CLASSIC_NEGRAS') return 'SCX_CLASSIC';
             if (upperStr.includes('UK') || upperStr === 'SUPER_SLOT') return 'SCALEXTRIC_UK';
             if (upperStr.includes('ADVANCE')) return 'SCX_ADVANCE';
@@ -2550,7 +2554,7 @@
           const hasAdapterScxAdv = pieces.some(p => p && (p.subtype === 'adapter_scx_adv' || p.subtype === 'adapter_adv_scx'));
           const hasAdapterNincoSuk = pieces.some(p => p && (p.subtype === 'adapter_ninco_suk' || p.subtype === 'adapter_suk_ninco'));
           
-          const SCX_GROUP = ['SCX_CLASSIC', 'SCX_UNIVERSAL', 'SCX_ADVANCE'];
+          const SCX_GROUP = ['SCX_CLASSIC', 'SCX_ANALOG', 'SCX_ADVANCE'];
 
           const categories = ['Rectas', 'Curvas']; 
           if (TRACK_DEFINITIONS[activeBrand].pieces.some(p => p.cat === 'Digital')) categories.push('Digital');
@@ -2577,8 +2581,8 @@
               });
           }
           
-          if (hasAdapterNincoScx && (activeBrand === 'NINCO' || activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL')) {
-              const otherBrand = activeBrand === 'NINCO' ? (pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_UNIVERSAL') : 'NINCO';
+          if (hasAdapterNincoScx && (activeBrand === 'NINCO' || activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_ANALOG')) {
+              const otherBrand = activeBrand === 'NINCO' ? (pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_ANALOG') : 'NINCO';
               const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === safeActiveCategory || (safeActiveCategory === 'RALLY' && p.cat === 'RALLY'));
               const existingIds = new Set(currentItems.map(p => p.id));
               const newItems = otherItems.filter(p => !existingIds.has(p.id));
@@ -2586,13 +2590,13 @@
           }
           
           if (hasAdapterScxAdv) {
-              if (activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') {
+              if (activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_ANALOG') {
                   const otherBrand = 'SCX_ADVANCE';
                   const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === safeActiveCategory || (safeActiveCategory === 'RALLY' && p.cat === 'RALLY'));
                   const existingIds = new Set(currentItems.map(p => p.id));
                   currentItems = [...currentItems, ...otherItems.filter(p => !existingIds.has(p.id))];
               } else if (activeBrand === 'SCX_ADVANCE') {
-                  const otherBrand = pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_UNIVERSAL';
+                  const otherBrand = pieces.some(p => p.brandKey === 'SCX_CLASSIC') ? 'SCX_CLASSIC' : 'SCX_ANALOG';
                   const otherItems = TRACK_DEFINITIONS[otherBrand].pieces.filter(p=>p.cat === safeActiveCategory || (safeActiveCategory === 'RALLY' && p.cat === 'RALLY'));
                   const existingIds = new Set(currentItems.map(p => p.id));
                   currentItems = [...currentItems, ...otherItems.filter(p => !existingIds.has(p.id))];
@@ -2763,10 +2767,10 @@
                           <div className="flex gap-4">{Object.keys(TRACK_DEFINITIONS).map(k => (<button key={k} onClick={()=>{
                               if (activeBrand === k) return;
                               
-                              const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && (k === 'SCX_CLASSIC' || k === 'SCX_UNIVERSAL')) || ((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') && k === 'NINCO'));
-                              const isCompatibleScxAdv = hasAdapterScxAdv && (((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_UNIVERSAL') && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && (activeBrand === 'SCX_ADVANCE' && (k === 'SCX_CLASSIC' || k === 'SCX_UNIVERSAL'))));
+                              const isCompatibleNincoScx = hasAdapterNincoScx && ((activeBrand === 'NINCO' && (k === 'SCX_CLASSIC' || k === 'SCX_ANALOG')) || ((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_ANALOG') && k === 'NINCO'));
+                              const isCompatibleScxAdv = hasAdapterScxAdv && (((activeBrand === 'SCX_CLASSIC' || activeBrand === 'SCX_ANALOG') && k === 'SCX_ADVANCE') || (activeBrand === 'SCX_ADVANCE' && (k === 'SCX_CLASSIC' || k === 'SCX_ANALOG')));
                               const isCompatibleNincoSuk = hasAdapterNincoSuk && ((activeBrand === 'NINCO' && k === 'SCALEXTRIC_UK') || (activeBrand === 'SCALEXTRIC_UK' && k === 'NINCO'));
-                              const isCompatibleScxMix = (activeBrand === 'SCX_CLASSIC' && k === 'SCX_UNIVERSAL') || (activeBrand === 'SCX_UNIVERSAL' && k === 'SCX_CLASSIC');
+                              const isCompatibleScxMix = (activeBrand === 'SCX_CLASSIC' && k === 'SCX_ANALOG') || (activeBrand === 'SCX_ANALOG' && k === 'SCX_CLASSIC');
                               const isCompatible = isCompatibleNincoScx || isCompatibleScxAdv || isCompatibleNincoSuk || isCompatibleScxMix || (SCX_GROUP.includes(activeBrand) && SCX_GROUP.includes(k));
                               
                               if (pieces.length > 0 && !isCompatible) {
