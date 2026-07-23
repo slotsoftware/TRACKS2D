@@ -649,11 +649,11 @@
         };
 
         const TRACK_DEFINITIONS = {
-          NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444' },
-          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400', trackColor: '#4d4d4d', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af' },
-          POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400', trackColor: '#1a1a1a', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 9.0, connectionBoxColor: '#333' }
+          NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff' },
+          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff' },
+          SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444', borderWidth: 4.5, borderColor1: '#ef4444', borderColor2: '#ffffff' },
+          SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#4d4d4d', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af', borderWidth: 5.0, borderColor1: '#ef4444', borderColor2: '#ffffff' },
+          POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-500 font-bold', trackColor: '#1a1a1a', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 8.95, connectionBoxColor: '#333', borderWidth: 6.0, borderColor1: '#ef4444', borderColor2: '#ffffff' }
         };
 
         const IconWrapper = ({ name, size = 24, className, ...props }) => {
@@ -669,63 +669,94 @@
         const { Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, RotateCcw, X: XIcon, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Trophy, Timer, Gauge, Maximize, Minimize, User, Users, ChevronDown, Mic, MicOff, Move3d, LayoutTemplate, TreePine, Cone, Fence, Grip, Video, Eye, Gamepad2, Copy, Car, Volume2, VolumeX, Moon, Sun } = icons;
 
         const getPieceGeometry = (p) => {
-            if (!p || p.type === 'set_origin' || p.type === 'goto') return null;
+            if (!p || p.type === 'set_origin' || p.type === 'goto') return null; // FIX: Protección
             let dx = 0, dy = 0, da = 0;
-            
-            const isCurve = p.type === 'curve';
-            const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
-
-            if (isStraight) { 
+            if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { 
                 dx = p.length || 0; 
-            } else if (isCurve) {
+            } else if (p.type === 'curve') {
                 const r = Math.abs(p.radius || 0);
                 const aRad = ((p.angle || 0) * Math.PI) / 180;
-                if (p.direction === 'left') { dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); da = -aRad; } 
-                else { dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); da = aRad; }
-            } else if (isRotonda) {
-                da = Math.PI; 
+                if (p.direction === 'left') { 
+                    dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); da = -aRad; 
+                } else { 
+                    dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); da = aRad; 
+                }
+            } else if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+                da = Math.PI; // Da la vuelta entera, vuelve al mismo punto pero girado
             }
-            
+
             const rot = p.rot || 0;
             const exitX = (p.x || 0) + dx * Math.cos(rot) - dy * Math.sin(rot);
             const exitY = (p.y || 0) + dx * Math.sin(rot) + dy * Math.cos(rot);
             const exitAngle = rot + da;
-            return { inX: p.x || 0, inY: p.y || 0, inAngle: rot, outX: exitX, outY: exitY, outAngle: exitAngle, localDx: dx, localDy: dy, localDa: da };
+
+            // Calcular el centro visual para el Hit Test y el Gizmo
+            let midX = ((p.x || 0) + exitX) / 2;
+            let midY = ((p.y || 0) + exitY) / 2;
+            let hitRadius = p.type === 'straight' ? (p.length || 0) / 2 : Math.abs(p.radius || 20);
+
+            if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+                const straightLen = 1.0;
+                midX = (p.x || 0) + (straightLen + (p.radius || 15)) * Math.cos(rot);
+                midY = (p.y || 0) + (straightLen + (p.radius || 15)) * Math.sin(rot);
+                hitRadius = (p.radius || 15) + straightLen;
+            }
+
+            return {
+                inX: p.x || 0, inY: p.y || 0, inAngle: rot,
+                outX: exitX, outY: exitY, outAngle: exitAngle,
+                localDx: dx, localDy: dy, localDa: da,
+                midX, midY, hitRadius
+            };
         };
 
         const migrateToAbsolute = (piecesList, circuitOrigin = {x:0, y:0}) => {
             let cx = circuitOrigin.x || 0, cy = circuitOrigin.y || 0, currentAngle = 0;
             const endPos = {};
-            return piecesList.map((p, index) => {
-                if (!p) return null; 
-                if (p.type === 'set_origin') { cx = circuitOrigin.x + (p.x || 0); cy = circuitOrigin.y + (p.y || 0); currentAngle = p.angle || 0; endPos[p.uid] = { cx, cy, currentAngle }; return { ...p, x: cx, y: cy, rot: currentAngle }; }
-                if (p.type === 'goto') { if (endPos[p.targetUid]) { cx = endPos[p.targetUid].cx; cy = endPos[p.targetUid].cy; currentAngle = endPos[p.targetUid].currentAngle; } endPos[p.uid] = { cx, cy, currentAngle }; return { ...p, x: cx, y: cy, rot: currentAngle }; }
-                
-                // Forzamos el recálculo siempre para que coincida exactamente con el 3D y evite NaNs
-                let pX = cx, pY = cy, pRot = currentAngle;
-                
-                let dx = 0, dy = 0, dAngle = 0;
-                const isCurve = p.type === 'curve';
-                const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
 
-                if (isRotonda) { dAngle = Math.PI; }
-                else if (isStraight) { dx = p.length || 0; }
-                else if (isCurve) { 
-                    const r = Math.abs(p.radius || 0); 
-                    const aRad = ((p.angle || 0) * Math.PI) / 180; 
-                    if (p.direction === 'left') { dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); dAngle = -aRad; } 
-                    else { dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); dAngle = aRad; } 
+            return piecesList.map((p, index) => {
+                if (!p) return null; // FIX: Saltar nulos
+                
+                if (p.type === 'set_origin') {
+                    cx = circuitOrigin.x + (p.x || 0);
+                    cy = circuitOrigin.y + (p.y || 0);
+                    currentAngle = p.angle || 0;
+                    endPos[p.uid] = { cx, cy, currentAngle };
+                    return { ...p, x: cx, y: cy, rot: currentAngle };
                 }
+
+                if (p.type === 'goto') {
+                    if (endPos[p.targetUid]) {
+                        cx = endPos[p.targetUid].cx;
+                        cy = endPos[p.targetUid].cy;
+                        currentAngle = endPos[p.targetUid].currentAngle;
+                    }
+                    endPos[p.uid] = { cx, cy, currentAngle };
+                    return { ...p, x: cx, y: cy, rot: currentAngle };
+                }
+
+                if (p.x !== undefined && p.rot !== undefined) return p; 
                 
-                if (p.invert && !isRotonda) { dx = -dx; dy = -dy; pRot += Math.PI; }
-                
-                cx += dx * Math.cos(currentAngle) - dy * Math.sin(currentAngle); 
-                cy += dx * Math.sin(currentAngle) + dy * Math.cos(currentAngle); 
+                let pX = cx, pY = cy, pRot = currentAngle;
+                if (p.invert && p.subtype !== 'rotonda') pRot += Math.PI;
+
+                let dx = 0, dy = 0, dAngle = 0;
+                if (p.type === 'rotonda' || p.subtype === 'rotonda') { dAngle = Math.PI; }
+                else if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { dx = p.length || 0; }
+                else if (p.type === 'curve') {
+                    const r = Math.abs(p.radius || 0);
+                    const aRad = ((p.angle || 0) * Math.PI) / 180;
+                    if (p.direction === 'left') { dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); dAngle = -aRad; }
+                    else { dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); dAngle = aRad; }
+                }
+                if (p.invert && p.subtype !== 'rotonda') { dx = -dx; dy = -dy; }
+
+                cx += dx * Math.cos(currentAngle) - dy * Math.sin(currentAngle);
+                cy += dx * Math.sin(currentAngle) + dy * Math.cos(currentAngle);
                 currentAngle += dAngle;
-                
+
                 endPos[p.uid] = { cx, cy, currentAngle };
+
                 return { ...p, x: pX, y: pY, rot: pRot, invert: false }; 
             }).filter(p => p && p.type !== 'goto' && p.type !== 'set_origin'); 
         };
@@ -735,57 +766,226 @@
                 ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -off); ctx.lineTo(l, -off); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, off); ctx.lineTo(l, off); ctx.stroke();
                 ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -off); ctx.lineTo(l, -off); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, off); ctx.lineTo(l, off); ctx.stroke();
             },
-            renderTrack: (ctx, pieces, view, activeBrand, selectedPieceId, dragState, imageCache, boardPoints, boardClosed, options = {}) => {
-                const brand = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS.NINCO;
+            drawDigitalWedge: (ctx, l, startLaneY, directionY, s) => {
+               ctx.fillStyle = '#d1d5db'; ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1; ctx.beginPath(); const xStart = l * 0.15, xEnd = l * 0.40, indent = 3 * (s/5), yStraight = startLaneY + (directionY * 1.5), wedgeW = 12 * (s/5); 
+               ctx.moveTo(xStart, yStraight); ctx.lineTo(xEnd, yStraight); ctx.lineTo(xEnd - indent, (yStraight + yStraight + directionY*wedgeW)/2); ctx.lineTo(xEnd, yStraight + directionY*wedgeW); ctx.quadraticCurveTo(xStart + (xEnd-xStart)*0.5, yStraight + (directionY * wedgeW * 0.3), xStart, yStraight); ctx.fill(); ctx.stroke();
+            },
+            drawHazardZone: (ctx, pathFn, s, color = '#facc15') => { ctx.save(); ctx.beginPath(); pathFn(ctx); ctx.clip(); ctx.strokeStyle = color; ctx.lineWidth = 2; const diagSpace = 8 * (s/5); for(let dx = -1000; dx < 1000; dx += diagSpace) { ctx.beginPath(); ctx.moveTo(dx, -500); ctx.lineTo(dx - 500, 500); ctx.stroke(); } ctx.restore(); },
+            drawBorder: (ctx, p, l, trueR, startA, sweep, hw, bWidth, isRightSide, s, brand) => {
+                const isLeft = p.direction === 'left';
+                if (p.type.includes('pit') || p.type === 'rotonda' || p.subtype === 'rotonda') return; 
+                ctx.beginPath();
+                if (p.type === 'straight') {
+                    const y = isRightSide ? hw + bWidth/2 : -hw - bWidth/2;
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(l, y);
+                } else if (p.type === 'curve') {
+                    let rBorder;
+                    if (isLeft) { rBorder = isRightSide ? trueR + hw + bWidth/2 : trueR - hw - bWidth/2; } 
+                    else { rBorder = isRightSide ? trueR - hw - bWidth/2 : trueR + hw + bWidth/2; }
+                    if (rBorder <= 0) return;
+                    ctx.arc(0, isLeft ? -trueR : trueR, rBorder, startA, startA + sweep, isLeft);
+                } else { return; }
+
+                ctx.strokeStyle = '#222'; ctx.lineWidth = bWidth + 2; ctx.stroke();
+                ctx.strokeStyle = brand.borderColor1 || '#ef4444'; ctx.lineWidth = bWidth; ctx.stroke();
+                ctx.strokeStyle = brand.borderColor2 || '#ffffff'; ctx.setLineDash([15 * (s/5), 15 * (s/5)]); ctx.stroke();
+                ctx.setLineDash([]);
+            },
+            renderTrack: (ctx, pieces, view, activeBrand, selectedPieceIds, dragGroup, imageCache, boardPoints, boardClosed, options = {}) => {
+                const brand = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
                 const pieceExtents = []; 
+
+                if (boardPoints && boardPoints.length > 0) {
+                    ctx.save(); ctx.translate(view.x, view.y); ctx.scale(view.scale, view.scale);
+                    if (boardPoints.length > 1) {
+                        ctx.beginPath(); ctx.moveTo(boardPoints[0].x, boardPoints[0].y); for(let i=1; i<boardPoints.length; i++) { ctx.lineTo(boardPoints[i].x, boardPoints[i].y); }
+                        if (boardClosed) { ctx.closePath(); ctx.fillStyle = 'rgba(34, 197, 94, 0.5)'; ctx.fill(); } 
+                        ctx.lineWidth = 3 / view.scale; ctx.strokeStyle = '#4ade80'; ctx.stroke();
+                        if (boardClosed) { ctx.shadowColor = '#4ade80'; ctx.shadowBlur = 15; ctx.stroke(); ctx.shadowBlur = 0; }
+                    }
+                    boardPoints.forEach((p, i) => { 
+                        ctx.beginPath(); 
+                        if (i === boardPoints.length - 1 && !boardClosed) { ctx.fillStyle = '#ef4444'; const r = (6 + ((Date.now() % 500)/500) * 3) / view.scale; ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `bold ${12/view.scale}px Arial`; ctx.fillText("FIN", p.x + 10/view.scale, p.y);
+                        } else { ctx.fillStyle = '#ffffff'; ctx.arc(p.x, p.y, 4 / view.scale, 0, Math.PI*2); ctx.fill(); } 
+                    }); 
+                    ctx.restore();
+                }
+
                 pieces.forEach((basePiece) => {
-                    if (!basePiece) return;
-                    const p = basePiece;
-                    if (p.x === undefined) return;
-                    const geo = getPieceGeometry(p);
-                    if (!geo) return;
-                    pieceExtents.push({ uid: p.uid, ...geo });
+                    if (!basePiece) return; 
+                    const p = (dragGroup && dragGroup.has(basePiece.uid)) ? dragGroup.get(basePiece.uid) : basePiece;
+                    if (!p || p.x === undefined) return; 
                     
+                    const geo = getPieceGeometry(p);
+                    if (!geo) return; 
+                    pieceExtents.push({ uid: p.uid, ...geo });
+
                     ctx.save(); 
                     ctx.translate(view.x + p.x * view.scale, view.y + p.y * view.scale);
-                    ctx.rotate(p.rot || 0);
+                    ctx.rotate(p.rot);
                     
-                    const s = view.scale, w = brand.width * s, hw = w / 2, laneOff = (brand.laneSpacing / 2) * s;
-                    
-                    const isCurve = p.type === 'curve';
-                    const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
-
-                    ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
-                    if (isStraight) {
-                        const l = (p.length || 0) * s;
-                        ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
-                        ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
-                        DrawEngine2D.drawRails(ctx, l, laneOff, brand);
-                    } else if (isCurve) {
-                        const trueR = Math.max(0.1, Math.abs((p.radius || 0) * s));
-                        const isLeft = p.direction === 'left';
-                        const startA = isLeft ? Math.PI/2 : -Math.PI/2;
-                        const sweep = (((p.angle || 0) * Math.PI) / 180) * (isLeft ? -1 : 1);
-                        
-                        ctx.strokeStyle = brand.trackColor; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, trueR, startA, startA + sweep, isLeft); ctx.stroke(); 
-                        ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR - hw), startA, startA + sweep, isLeft); ctx.stroke(); ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, trueR + hw, startA, startA + sweep, isLeft); ctx.stroke(); 
-                        const radiusLane1 = isLeft ? trueR - laneOff : trueR + laneOff;
-                        const radiusLane2 = isLeft ? trueR + laneOff : trueR - laneOff;
-                        ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke();
-                        ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke();
-                    } else if (isRotonda) {
-                        const r = (p.radius || 15) * s; const straightLen = 10.0 * s; const loopRadius = r; const loopCenterX = r * 1.3; const singleTrackWidth = (brand.width / 2) * s; 
-                        ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, straightLen, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, straightLen, w);
-                        DrawEngine2D.drawRails(ctx, straightLen, laneOff, brand); 
-                        ctx.save(); ctx.translate(straightLen, 0);
-                        const defineLoopPath = (ctx) => { ctx.beginPath(); ctx.moveTo(0, -laneOff); const controlX = loopCenterX * 0.4; ctx.bezierCurveTo(controlX, -laneOff, controlX, -loopRadius, loopCenterX, -loopRadius); ctx.arc(loopCenterX, 0, loopRadius, -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(controlX, loopRadius, controlX, laneOff, 0, laneOff); };
-                        ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#222'; ctx.lineWidth = singleTrackWidth + (2 * s); defineLoopPath(ctx); ctx.stroke();
-                        ctx.strokeStyle = brand.trackColor; ctx.lineWidth = singleTrackWidth; defineLoopPath(ctx); ctx.stroke();
-                        ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; defineLoopPath(ctx); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; defineLoopPath(ctx); ctx.stroke(); ctx.restore(); 
+                    const isSelected = selectedPieceIds && selectedPieceIds.includes(p.uid);
+                    if (isSelected) { ctx.shadowColor = brand.neonColor; ctx.shadowBlur = 30; 
+                    } else if (p.elevation !== undefined && p.elevation !== 0) {
+                        const el = p.elevation;
+                        if (el > 0) { ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 10 + (10 * el); ctx.shadowOffsetY = 10 * el; } 
+                        else { ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = -5 * Math.abs(el); }
                     }
+
+                    const s = view.scale, w = brand.width * s, hw = w / 2, l = (p.length || 0) * s, laneOff = (brand.laneSpacing / 2) * s, laneSpacing = brand.laneSpacing * s;
+                    const bWidth = (brand.borderWidth || 5) * s;
+                    const trueR = p.type === 'curve' ? Math.abs((p.radius || 0) * s) : 0;
+                    const isLeft = p.direction === 'left';
+                    const startA = isLeft ? Math.PI/2 : -Math.PI/2;
+                    const sweep = p.type === 'curve' ? (((p.angle || 0) * Math.PI / 180) * (isLeft ? -1 : 1)) : 0;
+
+                    let renderBorderL = p.borderLeft;
+                    let renderBorderR = p.borderRight;
+                    if (options.autoBorders) {
+                        if (renderBorderL === undefined && p.type === 'curve' && p.direction === 'right') renderBorderL = true;
+                        if (renderBorderR === undefined && p.type === 'curve' && p.direction === 'left') renderBorderR = true;
+                    }
+
+                    if (renderBorderL && !p.hideLeftWall) DrawEngine2D.drawBorder(ctx, p, l, trueR, startA, sweep, hw, bWidth, false, s, brand);
+                    if (renderBorderR && !p.hideRightWall) DrawEngine2D.drawBorder(ctx, p, l, trueR, startA, sweep, hw, bWidth, true, s, brand);
+
+                    if (p.customImage && imageCache && imageCache.current && imageCache.current.get(p.uid)) { const img = imageCache.current.get(p.uid); if (p.type === 'straight' || (p.type && p.type.includes('pit'))) ctx.drawImage(img, 0, -hw, l, w); else { const r = p.radius * s; ctx.translate(0, p.direction==='left'?-r:-r); ctx.drawImage(img, 0, p.direction==='left'?0:-r, r, r); } } 
+                    else {
+                       ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+                       if (p.type === 'straight') {
+                            if (['digital_x', 'change_right', 'change_left'].includes(p.subtype)) {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 2.5; ctx.beginPath();
+                                if (p.subtype !== 'change_left') { ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); } if (p.subtype !== 'change_right') { ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); } ctx.stroke();
+                                if (p.subtype !== 'change_left') DrawEngine2D.drawDigitalWedge(ctx, l, -laneOff, 1, s); if (p.subtype !== 'change_right') DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, -1, s);
+                            } else if (p.subtype && p.subtype.includes('single_lane')) {
+                                const isLane1 = p.subtype === 'single_lane_1'; const yStart = isLane1 ? -hw : 0; const yEnd = isLane1 ? 0 : hw; const railY = isLane1 ? -laneOff : laneOff;
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, yStart, l, hw); ctx.strokeStyle = '#222'; ctx.strokeRect(0, yStart, l, hw);
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, railY); ctx.lineTo(l, railY); ctx.stroke();
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, railY); ctx.lineTo(l, railY); ctx.stroke();
+                            } else if (p.subtype && p.subtype.includes('pit_parallel')) {
+                                const pitW = w/2 + 2*s; const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.fillRect(0, pitY - pitW/2, l, pitW); ctx.strokeStyle = '#222'; ctx.strokeRect(0, -hw, l, w); ctx.strokeRect(0, pitY - pitW/2, l, pitW);
+                                if (p.subtype === 'pit_parallel' || p.subtype === 'pit_parallel_double_x') { const boxMargin = 4 * (s/5); DrawEngine2D.drawHazardZone(ctx, (c) => { c.rect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); }, s); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); ctx.strokeStyle = '#facc15'; ctx.strokeRect(boxMargin, pitY - pitW/2 + boxMargin, l - boxMargin*2, pitW - boxMargin*2); ctx.fillStyle = '#fff'; ctx.font = `bold ${10 * (s/5)}px Arial`; ctx.textAlign = "center"; ctx.fillText("BOXES", l/2, pitY); }
+                                if (p.subtype === 'pit_parallel_double_x') { ctx.strokeStyle = brand.railColor; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke(); DrawEngine2D.drawDigitalWedge(ctx, l, -laneOff, 1, s); DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, -1, s); }
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.lineTo(l, pitY); ctx.stroke();
+                            } else if (p.subtype === 'starting_grid') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5; const boxLen = 14 * (s/5); const boxWid = laneOff * 1.2; 
+                                const p1X = l * 0.7; const p1Y = -laneOff; ctx.beginPath(); ctx.moveTo(p1X - boxLen, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y - boxWid/2); ctx.lineTo(p1X, p1Y + boxWid/2); ctx.lineTo(p1X - boxLen, p1Y + boxWid/2); ctx.stroke();
+                                const p2X = l * 0.3; const p2Y = laneOff; ctx.beginPath(); ctx.moveTo(p2X - boxLen, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y - boxWid/2); ctx.lineTo(p2X, p2Y + boxWid/2); ctx.lineTo(p2X - boxLen, p2Y + boxWid/2); ctx.stroke();
+                            } else if (p.subtype === 'digital_console') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); DrawEngine2D.drawRails(ctx, l, laneOff, brand); const consoleH = w * 0.65; const consoleY = hw; ctx.fillStyle = '#b91c1c'; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(l*0.1, consoleY, l*0.8, consoleH, 15 * (s/5)); } else { ctx.rect(l*0.1, consoleY, l*0.8, consoleH); } ctx.fill(); ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = '#000'; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(l*0.2, consoleY + 8*(s/5), l*0.6, consoleH*0.55, 4*(s/5)); } else { ctx.rect(l*0.2, consoleY + 8*(s/5), l*0.6, consoleH*0.55); } ctx.fill(); ctx.fillStyle = '#4ade80'; ctx.font = `bold ${9*(s/5)}px monospace`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("00:00", l/2, consoleY + consoleH*0.35); ctx.fillStyle = '#ffcccc'; ctx.font = `bold ${6*(s/5)}px Arial`; ctx.fillText("NINCO", l/2, consoleY + consoleH*0.8);
+                            } else if (p.subtype === 'crossing') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke();
+                            } else if (p.subtype === 'chicane_entry') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.5, -laneOff, l*0.5, -narrowLane, l, -narrowLane); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.5, laneOff, l*0.5, narrowLane, l, narrowLane); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.5, -laneOff, l*0.5, -narrowLane, l, -narrowLane); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.5, laneOff, l*0.5, narrowLane, l, narrowLane); ctx.stroke();
+                            } else if (p.subtype === 'chicane_middle') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; DrawEngine2D.drawRails(ctx, l, narrowLane, brand);
+                            } else if (p.subtype === 'chicane_exit') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke();
+                            } else {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); if (p.subtype === 'analog_connect') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.3; const boxH = w * 0.3; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#222'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#ffffff'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand.name, l/2, boxY + boxH/2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(l/2, -hw); ctx.lineTo(l/2, hw); ctx.stroke(); ctx.setLineDash([]); } else if (p.subtype === 'connection') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.25; const boxH = w * 0.4; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = '#111'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#333'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(l/2, boxY + boxH/2, boxH*0.3, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; const cx = l/2, cy = boxY + boxH/2, r = boxH*0.15; ctx.beginPath(); ctx.moveTo(cx-r/2, cy-r); ctx.lineTo(cx+r/2, cy); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx+r/2, cy-r); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx, cy-r*1.2); ctx.lineTo(cx, cy+r*1.2); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `bold ${6 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.fillText("CONEXIÓN", l/2, boxY + boxH * 0.85); } else { DrawEngine2D.drawRails(ctx, l, laneOff, brand); }
+                            }
+                       } else if (p.type === 'pit_entry') {
+                            const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(l, pitY + (w/2 * 0.6)); ctx.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(l, hw); c.lineTo(l, pitY + (w/2 * 0.6)); c.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.fillStyle = '#333'; ctx.beginPath(); ctx.moveTo(l*0.2, laneOff); ctx.lineTo(l*0.25, laneOff+5); ctx.lineTo(l*0.25, laneOff-5); ctx.fill();
+                       } else if (p.type === 'pit_exit') {
+                            const pitY = laneOff + laneSpacing; const pitBottom = pitY + (w/2 * 0.6); ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.bezierCurveTo(l*0.7, hw, l*0.5, pitY, 0, pitBottom); ctx.lineTo(0, -hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(0, hw); c.lineTo(l, hw); c.bezierCurveTo(l*0.7, hw, l*0.5, pitY, 0, pitBottom); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.7, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.7, laneOff, l, laneOff); ctx.stroke();
+                       } else if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+                               const r = (p.radius || 15) * s; const straightLen = 1.0 * s; const loopRadius = r; const loopCenterX = r * 1.3; const singleTrackWidth = (brand.width / 2) * s; 
+                               ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, straightLen, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, straightLen, w);
+                               DrawEngine2D.drawRails(ctx, straightLen, laneOff, brand); 
+                               
+                               if (p.subtype === 'rotonda_connect') {
+                                   ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(0, hw, straightLen, w * 0.2);
+                               }
+
+                               ctx.save(); ctx.translate(straightLen, 0); ctx.save();
+                               const innerRadius = loopRadius - (singleTrackWidth / 2) - (1 * s); 
+                               ctx.beginPath(); ctx.moveTo(0, 0); const innerCtrl = loopCenterX * 0.35; ctx.bezierCurveTo(innerCtrl, 0, innerCtrl, -innerRadius, loopCenterX, -innerRadius); ctx.arc(loopCenterX, 0, innerRadius, -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(innerCtrl, innerRadius, innerCtrl, 0, 0, 0); ctx.closePath(); ctx.clip();
+                               ctx.fillStyle = '#64748b'; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
+                               const defineLoopPath = (ctx) => { ctx.beginPath(); ctx.moveTo(0, -laneOff); const controlX = loopCenterX * 0.4; ctx.bezierCurveTo(controlX, -laneOff, controlX, -loopRadius, loopCenterX, -loopRadius); ctx.arc(loopCenterX, 0, loopRadius, -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(controlX, loopRadius, controlX, laneOff, 0, laneOff); };
+                               ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#222'; ctx.lineWidth = singleTrackWidth + (2 * s); defineLoopPath(ctx); ctx.stroke();
+                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = singleTrackWidth; defineLoopPath(ctx); ctx.stroke();
+                               ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `bold ${5 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("RALLY", loopCenterX, 0); ctx.restore();
+                               ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.setLineDash([]); defineLoopPath(ctx); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; defineLoopPath(ctx); ctx.stroke(); ctx.restore(); 
+                       } else if (p.type === 'curve') {
+                           const isSingle1 = p.subtype === 'single_lane_1';
+                           const isSingle2 = p.subtype === 'single_lane_2';
+                           const isSingle = isSingle1 || isSingle2;
+
+                           if (isSingle) {
+                               const bgRadius = isSingle1 ? (isLeft ? trueR - hw/2 : trueR + hw/2) : (isLeft ? trueR + hw/2 : trueR - hw/2);
+                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = hw; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, bgRadius), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+                               const rInnerEdge = isSingle1 ? (isLeft ? trueR - hw : trueR + hw) : (isLeft ? trueR : trueR);
+                               const rOuterEdge = isSingle1 ? (isLeft ? trueR : trueR) : (isLeft ? trueR + hw : trueR - hw);
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, rInnerEdge), startA, startA + sweep, isLeft); ctx.stroke();
+                               ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, rOuterEdge), startA, startA + sweep, isLeft); ctx.stroke();
+                           } else {
+                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR), startA, startA + sweep, isLeft); ctx.stroke(); 
+                               if (p.subtype === 'ice') { ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = w; ctx.stroke(); } 
+                               ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR - hw), startA, startA + sweep, isLeft); ctx.stroke(); ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, trueR + hw), startA, startA + sweep, isLeft); ctx.stroke(); 
+                           }
+                           
+                           const currentLaneOff = (p.subtype === 'chicane_curve') ? laneOff * 0.2 : laneOff;
+                           const drawSlot1 = !isSingle2; const drawSlot2 = !isSingle1; 
+                           const radiusLane1 = isLeft ? trueR - currentLaneOff : trueR + currentLaneOff;
+                           const radiusLane2 = isLeft ? trueR + currentLaneOff : trueR - currentLaneOff;
+
+                           ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; 
+                           if (drawSlot1) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); }
+                           if (drawSlot2) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke(); }
+                           
+                           ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
+                           if (drawSlot1) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane1), startA, startA + sweep, isLeft); ctx.stroke(); }
+                           if (drawSlot2) { ctx.beginPath(); ctx.arc(0, isLeft ? -trueR : trueR, Math.max(0.1, radiusLane2), startA, startA + sweep, isLeft); ctx.stroke(); }
+                       }
+                    }
+                    
+                    if (p.elevation !== undefined && p.elevation !== 0) {
+                        ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; const isUp = p.elevation > 0; const text = (isUp ? "+" : "") + p.elevation; ctx.fillStyle = isUp ? '#22d3ee' : '#a855f7'; 
+                        let txtX = 0, txtY = 0;
+                        if (p.type === 'straight' || (p.type && p.type.includes('pit'))) { txtX = l / 2; txtY = 0; } else if (p.type === 'curve') { const r = (p.radius || 0) * s; const a = ((p.angle || 0) / 2) * Math.PI / 180; txtX = r * Math.sin(a); txtY = p.direction === 'left' ? -r * (1 - Math.cos(a)) : r * (1 - Math.cos(a)); }
+                        const fSize = 6 * (s/5); ctx.font = `bold ${fSize}px Arial`; const tW = ctx.measureText(text).width; const padX = 4 * (s/5); const padY = 2 * (s/5);
+                        ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(txtX - tW/2 - padX, txtY - fSize/2 - padY, tW + padX*2, fSize + padY*2, 3*(s/5)); } else { ctx.rect(txtX - tW/2 - padX, txtY - fSize/2 - padY, tW + padX*2, fSize + padY*2); } ctx.fill();
+                        ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, txtX, txtY + (s*0.1));
+                    }
+                    ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
                     ctx.restore();
+
+                    // DIBUJAR GIZMO DE ROTACIÓN SI ESTÁ SELECCIONADA (EN ESPACIO MUNDO)
+                    if (isSelected && selectedPieceIds.length === 1) {
+                        ctx.save();
+                        // Caja blanca semi-transparente como en la foto
+                        const midWorldX = view.x + geo.midX * view.scale;
+                        const midWorldY = view.y + geo.midY * view.scale;
+                        
+                        ctx.translate(midWorldX, midWorldY);
+                        ctx.rotate(p.rot);
+                        
+                        // Dibujar tirador de rotación
+                        const handleDist = geo.hitRadius * view.scale + 20;
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(handleDist, 0); ctx.stroke();
+                        
+                        ctx.fillStyle = '#0ea5e9'; ctx.beginPath(); ctx.arc(handleDist, 0, 8, 0, Math.PI*2); ctx.fill();
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.stroke();
+                        
+                        // Icono de flecha giratoria
+                        ctx.fillStyle = '#fff'; ctx.font = "10px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("↻", handleDist, 0);
+                        
+                        ctx.restore();
+                    }
+
+                    // INDICADOR DE SNAPPING SI ESTÁ ARRASTRANDO Y HACE CLIC
+                    if (dragGroup && dragGroup.has(p.uid) && dragGroup.get(p.uid).isSnapping) {
+                        ctx.save();
+                        ctx.translate(view.x + p.x * view.scale, view.y + p.y * view.scale);
+                        ctx.fillStyle = '#facc15'; ctx.shadowColor = '#facc15'; ctx.shadowBlur = 15;
+                        ctx.beginPath(); ctx.arc(0, 0, 6 * view.scale, 0, Math.PI*2); ctx.fill();
+                        ctx.restore();
+                    }
                 });
+                
                 return pieceExtents;
             }
         };
@@ -795,12 +995,10 @@
             useEffect(() => {
                 if (!canvasRef.current || !circuit || !circuit.pieces) return;
                 const ctx = canvasRef.current.getContext('2d'); const width = canvasRef.current.width; const height = canvasRef.current.height;
-                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; const brandName = circuit.brand || 'NINCO';
-                
+                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; const brandName = TRACK_DEFINITIONS[circuit.brand] ? circuit.brand : 'NINCO';
                 ctx.save(); ctx.globalAlpha = 0; 
                 const absPieces = migrateToAbsolute(circuit.pieces);
-                const positions = DrawEngine2D.renderTrack(ctx, absPieces, tempView, brandName, null, null, null, circuit.boardPoints, circuit.boardClosed); 
-                ctx.restore();
+                const positions = DrawEngine2D.renderTrack(ctx, absPieces, tempView, brandName, [], null, {current: new Map()}, circuit.boardPoints, circuit.boardClosed); ctx.restore();
                 
                 if (!positions || positions.length === 0) return;
                 
@@ -824,10 +1022,11 @@
                 });
                 
                 if (!valid) return;
-
+                if (circuit.boardPoints && circuit.boardPoints.length > 0) { circuit.boardPoints.forEach(p => { if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; }); }
+                
                 const contentW = Math.max(maxX - minX, 10); 
                 const contentH = Math.max(maxY - minY, 10); 
-                const padding = 20;
+                const padding = 15;
                 
                 const scaleX = (width - padding * 2) / contentW; 
                 const scaleY = (height - padding * 2) / contentH; 
@@ -840,7 +1039,7 @@
                 const finalOffsetY = (height / 2) - (contentCY * fitScale);
                 const finalView = { x: finalOffsetX, y: finalOffsetY, scale: fitScale };
                 
-                DrawEngine2D.renderTrack( ctx, absPieces, finalView, brandName, null, null, null, circuit.boardPoints, circuit.boardClosed, { autoBorders: circuit.autoBorders || false } );
+                DrawEngine2D.renderTrack( ctx, absPieces, finalView, brandName, [], null, {current: new Map()}, circuit.boardPoints, circuit.boardClosed, { autoBorders: circuit.autoBorders || false } );
             }, [circuit]);
             return <canvas ref={canvasRef} width={400} height={200} className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity" />;
         };
