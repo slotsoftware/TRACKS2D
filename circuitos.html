@@ -3107,7 +3107,7 @@
               }
               
               const compiledPieces = compileCircuitFor3D(piecesToSend);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
           };
           const goToDecoration = () => {
@@ -3122,7 +3122,7 @@
               }
               
               const compiledPieces = compileCircuitFor3D(piecesToSend);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'deco.html'; } catch (e) { alert(t.alerts.deco); }
           };
           const goToMulti = () => {
@@ -3130,7 +3130,7 @@
               
               // Multi-lane sí envía todas las piezas (sin filtrar)
               const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
@@ -3141,7 +3141,7 @@
           const goTo3DGame = () => {
               if (pieces.length === 0) { alert(t.alerts.emptyGame); return; }
               const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.open('https://slotsoftware.github.io/Game3d/slot-3d-game.html', '_blank'); } catch (e) { alert(t.alerts.sim); }
           };
 
