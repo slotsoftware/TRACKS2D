@@ -485,16 +485,37 @@
             return diff;
         };
 
-        // Redirección para compatibilidad con circuitos antiguos en la nube
-        const getResolvedBrand = (brandStr) => {
-            if (!brandStr) return 'NINCO';
-            if (TRACK_DEFINITIONS[brandStr]) return brandStr;
+        // Redirección súper inteligente para circuitos antiguos o con marca dañada
+        const getResolvedBrand = (brandStr, pieces = []) => {
+            let bStr = brandStr;
             
-            const upperStr = brandStr.toUpperCase();
-            if (upperStr === 'SCX_UNIVERSAL_GRISES') return 'SCX_UNIVERSAL';
-            if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX' || upperStr === 'SCX_ORIGINAL' || upperStr === 'SCX_CLASSIC' || upperStr === 'SCX CLÁSICO (NEGRO)' || upperStr === 'SCX_CLASSIC_NEGRAS') return 'SCX_CLASSIC';
-            if (upperStr === 'SCALEXTRIC UK' || upperStr === 'SUPER_SLOT') return 'SCALEXTRIC_UK';
-            if (upperStr === 'SCX_ADVANCE' || upperStr === 'SCX ADVANCE') return 'SCX_ADVANCE';
+            // Si falta la marca, intentamos adivinarla mirando el código de la primera pieza
+            if ((!bStr || bStr === 'undefined' || bStr === 'null') && pieces && pieces.length > 0) {
+                const firstP = pieces.find(p => p && p.brandKey) || pieces[0];
+                bStr = firstP.brandKey;
+                if (!bStr || bStr === 'undefined' || bStr === 'null') {
+                    const firstId = firstP.id || '';
+                    if (firstId.startsWith('c_')) bStr = 'SCX_CLASSIC';
+                    else if (firstId.startsWith('u_')) bStr = 'SCX_UNIVERSAL';
+                    else if (firstId.startsWith('adv_')) bStr = 'SCX_ADVANCE';
+                    else if (firstId.startsWith('n_')) bStr = 'NINCO';
+                    else if (firstId.startsWith('sca_')) bStr = 'SCALEAUTO';
+                    else if (firstId.startsWith('pol_')) bStr = 'POLICAR';
+                    else if (firstId.startsWith('suk_')) bStr = 'SCALEXTRIC_UK';
+                    else if (firstId.startsWith('car_')) bStr = 'CARRERA';
+                }
+            }
+
+            if (!bStr || bStr === 'undefined' || bStr === 'null') return 'NINCO';
+            if (TRACK_DEFINITIONS[bStr]) return bStr;
+            
+            const upperStr = String(bStr).toUpperCase();
+            if (upperStr.includes('UNIVERSAL') || upperStr === 'SCX_UNIVERSAL_GRISES') return 'SCX_UNIVERSAL';
+            // Si el circuito se etiquetó como "SCALEXTRIC" genérico (sin matizar clásico), asume Universal (Scalextric Gris)
+            if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX') return 'SCX_UNIVERSAL'; 
+            if (upperStr === 'SCX_ORIGINAL' || upperStr === 'SCX_CLASSIC' || upperStr === 'SCX CLÁSICO (NEGRO)' || upperStr === 'SCX_CLASSIC_NEGRAS') return 'SCX_CLASSIC';
+            if (upperStr.includes('UK') || upperStr === 'SUPER_SLOT') return 'SCALEXTRIC_UK';
+            if (upperStr.includes('ADVANCE')) return 'SCX_ADVANCE';
             
             const foundKey = Object.keys(TRACK_DEFINITIONS).find(k => TRACK_DEFINITIONS[k].name.toUpperCase() === upperStr);
             if (foundKey) return foundKey;
@@ -1428,9 +1449,12 @@
             useEffect(() => {
                 if (!canvasRef.current || !circuit || !circuit.pieces) return;
                 const ctx = canvasRef.current.getContext('2d'); const width = canvasRef.current.width; const height = canvasRef.current.height;
-                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; const brandName = getResolvedBrand(circuit.brand);
+                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; 
+                const brandName = getResolvedBrand(circuit.brand, circuit.pieces);
                 ctx.save(); ctx.globalAlpha = 0; 
                 const absPieces = migrateToAbsolute(circuit.pieces);
+                // Fuerzo que las piezas dentro de la vista previa usen la marca correcta detectada
+                absPieces.forEach(p => p.brandKey = getResolvedBrand(p.brandKey || circuit.brand, [p]));
                 const positions = DrawEngine2D.renderTrack(ctx, absPieces, tempView, brandName, [], null, {current: new Map()}, circuit.boardPoints, circuit.boardClosed); ctx.restore();
                 if (positions.length === 0) return;
                 let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -1651,9 +1675,14 @@
           };
 
           const loadCommunityCircuit = (circuit) => {
-              setActiveBrand(getResolvedBrand(circuit.brand));
+              const resolvedBrand = getResolvedBrand(circuit.brand, circuit.pieces);
+              setActiveBrand(resolvedBrand);
               if (circuit.pieces) { 
-                  const safePieces = circuit.pieces.map(p => p.uid ? p : { ...p, uid: Date.now() + Math.random() }); 
+                  const safePieces = circuit.pieces.map(p => ({ 
+                      ...p, 
+                      uid: p.uid || Date.now() + Math.random(),
+                      brandKey: getResolvedBrand(p.brandKey || circuit.brand, [p])
+                  })); 
                   setHistory([migrateToAbsolute(safePieces)]); setHistoryStep(0); 
               }
               if (circuit.boardPoints) setBoardPoints(circuit.boardPoints);
@@ -1893,9 +1922,14 @@
 
           const confirmLoadCircuit = () => {
               if (previewData) {
-                  if (previewData.brand) setActiveBrand(getResolvedBrand(previewData.brand)); else setActiveBrand('NINCO');
+                  const resolvedBrand = getResolvedBrand(previewData.brand, previewData.pieces);
+                  setActiveBrand(resolvedBrand);
                   if (previewData.pieces) { 
-                      const safePieces = previewData.pieces.map(p => p.uid ? p : { ...p, uid: Date.now() + Math.random() }); 
+                      const safePieces = previewData.pieces.map(p => ({ 
+                          ...p, 
+                          uid: p.uid || Date.now() + Math.random(),
+                          brandKey: getResolvedBrand(p.brandKey || previewData.brand, [p])
+                      })); 
                       setHistory([migrateToAbsolute(safePieces)]); setHistoryStep(0); 
                   }
                   if (previewData.boardPoints) setBoardPoints(previewData.boardPoints);
@@ -2624,7 +2658,14 @@
                                       <div className={`p-1.5 rounded border ${loadMode === 'cloud' ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-[#39ff14]/10 border-[#39ff14]/30'}`}><FileJson size={16} className={loadMode === 'cloud' ? 'text-cyan-400' : 'text-[#39ff14]'}/></div>
                                       <div><h3 className="text-sm font-bold text-white leading-none mb-0.5">{previewData ? previewData.fileName : t.modal.none}</h3><span className="text-[10px] text-gray-500 font-mono flex gap-2">{previewData ? `${(new Blob([JSON.stringify(previewData)]).size / 1024).toFixed(1)} KB` : '---'} {previewData?.source === 'cloud' && <span className="text-cyan-500 font-bold bg-cyan-950 px-1 rounded">[GITHUB]</span>}</span></div>
                                   </div>
-                                  {previewData && (<div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[getResolvedBrand(previewData.brand)]?.uiClass || 'border-gray-600 text-gray-400'}`}>{TRACK_DEFINITIONS[getResolvedBrand(previewData.brand)]?.name || previewData.brand || 'DESCONOCIDO'}</div>)}
+                                  {previewData && (() => {
+                                      const safePreviewBrand = getResolvedBrand(previewData.brand, previewData.pieces);
+                                      return (
+                                          <div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[safePreviewBrand]?.uiClass || 'border-gray-600 text-gray-400'}`}>
+                                              {TRACK_DEFINITIONS[safePreviewBrand]?.name || previewData.brand || 'DESCONOCIDO'}
+                                          </div>
+                                      );
+                                  })()}
                               </div>
                               <div className="flex-1 relative overflow-hidden flex items-center justify-center bg-black/50">
                                   {previewLoading && (<div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/80"><div className={`w-8 h-8 border-2 ${loadMode==='cloud'?'border-cyan-500':'border-[#39ff14]'} border-t-transparent rounded-full animate-spin mb-2`}></div><span className={`text-xs ${loadMode==='cloud'?'text-cyan-500':'text-[#39ff14]'} font-bold tracking-widest`}>{loadMode === 'cloud' ? t.modal.dl : t.modal.analyzing}</span></div>)}
@@ -2685,7 +2726,7 @@
                               ) : (
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                       {communityCircuits.map(circuit => {
-                                          const safeBrand = getResolvedBrand(circuit.brand);
+                                          const safeBrand = getResolvedBrand(circuit.brand, circuit.pieces);
                                           return (
                                           <div key={circuit.id} className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all group flex flex-col">
                                               <div className="p-3 border-b border-white/5 flex justify-between items-start bg-black/30">
