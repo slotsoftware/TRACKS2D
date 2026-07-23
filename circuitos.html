@@ -332,6 +332,591 @@
         const icons = ['Trash2','Image','Fuel','Move','Zap','Bluetooth','RotateCw','X','Repeat','PenTool','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Square','FolderOpen','Save','FileText','Activity','Play','Pause','Flag','GitCommit','ZoomIn','ZoomOut','Crosshair','Undo2','Redo2','Layers','Clock','Hash','Plus','Minus','AlertTriangle', 'Cloud', 'CloudUpload', 'CloudDownload', 'Settings', 'Battery', 'Scale', 'Maximize', 'Minimize', 'User', 'Users', 'ChevronDown', 'Upload', 'FileJson', 'Eye', 'CheckCircle2', 'Github', 'Shield', 'MessageSquare', 'CheckSquare'].reduce((acc, name) => { acc[name] = (p) => <IconWrapper name={name} {...p} />; return acc; }, {});
         const { Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, X, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Maximize, Minimize, User, Users, ChevronDown, Upload, FileJson, Eye, CheckCircle2, Github, Shield, MessageSquare, CheckSquare } = icons;
 
+        const MotorSVG = ({ type, color, label }) => {
+            return (
+                <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-lg filter transition-transform duration-500 hover:scale-105">
+                    <defs>
+                        <linearGradient id={`motor-body-${label}`} x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#e2e8f0" /><stop offset="50%" stopColor="#94a3b8" /><stop offset="100%" stopColor="#64748b" /></linearGradient>
+                        <linearGradient id={`label-grad-${label}`} x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor={color} /><stop offset="100%" stopColor="#000" stopOpacity="0.5" /></linearGradient>
+                        <pattern id="copper-coil" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0,4 L4,0 M-1,1 L1,-1 M3,5 L5,3" stroke="#b45309" strokeWidth="1" /></pattern>
+                    </defs>
+                    <rect x="2" y="28" width="12" height="4" fill="#cbd5e1" stroke="#64748b" strokeWidth="0.5" />
+                    <path d="M4,26 L8,26 L9,24 L11,24 L12,26 L12,34 L11,36 L9,36 L8,34 L4,34 Z" fill="#fbbf24" stroke="#b45309" strokeWidth="0.5" />
+                    {type === 'Long Can' && (<g><rect x="14" y="15" width="76" height="30" rx="2" fill={`url(#motor-body-${label})`} stroke="#475569" strokeWidth="1" /><rect x="22" y="18" width="60" height="24" rx="1" fill={`url(#label-grad-${label})`} /><path d="M28,20 L38,20 L38,23 L28,23 Z" fill="url(#copper-coil)" stroke="#000" strokeWidth="0.5" /><path d="M48,20 L58,20 L58,23 L48,23 Z" fill="url(#copper-coil)" stroke="#000" strokeWidth="0.5" /><path d="M68,20 L78,20 L78,23 L68,23 Z" fill="url(#copper-coil)" stroke="#000" strokeWidth="0.5" /></g>)}
+                    {type === 'Short Can' && (<g><rect x="20" y="12" width="56" height="36" rx="6" fill={`url(#motor-body-${label})`} stroke="#475569" strokeWidth="1" /><ellipse cx="48" cy="30" rx="22" ry="14" fill={`url(#label-grad-${label})`} stroke="rgba(255,255,255,0.2)" strokeWidth="1" /><circle cx="30" cy="30" r="1.5" fill="#1e293b" /><circle cx="66" cy="30" r="1.5" fill="#1e293b" /></g>)}
+                    {type === 'Flat' && (<g><rect x="14" y="20" width="76" height="20" rx="1" fill={`url(#motor-body-${label})`} stroke="#475569" strokeWidth="1" /><rect x="24" y="22" width="56" height="16" rx="2" fill="#111" stroke="#333" strokeWidth="0.5" /><rect x="26" y="24" width="52" height="12" rx="1" fill="url(#copper-coil)" /><path d="M20,20 L40,20 L35,40 L20,40 Z" fill={color} opacity="0.9" /></g>)}
+                    <text x="50" y="33" fontSize="7" fontWeight="900" fill="white" textAnchor="middle" style={{textShadow: '0 1px 2px black'}} fontFamily="Arial, sans-serif" letterSpacing="0.5px">{label}</text>
+                    <path d="M90,24 L94,24 L94,18 L96,18 L96,26 L90,26 Z" fill="#fbbf24" stroke="#b45309" strokeWidth="0.5" /> <path d="M90,36 L94,36 L94,42 L96,42 L96,34 L90,34 Z" fill="#fbbf24" stroke="#b45309" strokeWidth="0.5" />
+                </svg>
+            );
+        };
+
+        const TireSVG = ({ type, color, label, grip }) => {
+            return (
+                <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-lg filter transition-transform duration-500 hover:scale-105">
+                    <defs>
+                        <linearGradient id={`tire-body-${label}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#262626" />
+                            <stop offset="20%" stopColor="#111" />
+                            <stop offset="50%" stopColor="#333" />
+                            <stop offset="80%" stopColor="#111" />
+                            <stop offset="100%" stopColor="#0a0a0a" />
+                        </linearGradient>
+                        <linearGradient id={`rim-${label}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#cbd5e1" />
+                            <stop offset="100%" stopColor="#475569" />
+                        </linearGradient>
+                        <pattern id="tread-pattern" width="6" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+                            <path d="M0,6 L6,0 M0,12 L6,6" stroke="#000" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                        </pattern>
+                        <pattern id="sponge-pattern" width="3" height="3" patternUnits="userSpaceOnUse">
+                            <rect width="3" height="3" fill="#1f2937" />
+                            <circle cx="1.5" cy="1.5" r="1" fill="#0f172a" opacity="0.8"/>
+                        </pattern>
+                    </defs>
+                    <ellipse cx="70" cy="30" rx="14" ry="24" fill="#0a0a0a" stroke="#000" strokeWidth="1" />
+                    <path d="M 30 6 L 70 6 A 14 24 0 0 1 70 54 L 30 54 A 14 24 0 0 1 30 6 Z" fill={type === 'Sponge' ? 'url(#sponge-pattern)' : `url(#tire-body-${label})`} stroke="#000" strokeWidth="1" />
+                    {type === 'Treaded' && (<path d="M 30 6 L 70 6 A 14 24 0 0 1 70 54 L 30 54 A 14 24 0 0 1 30 6 Z" fill="url(#tread-pattern)" />)}
+                    <ellipse cx="30" cy="30" rx="14" ry="24" fill={type === 'Sponge' ? 'url(#sponge-pattern)' : `url(#tire-body-${label})`} stroke="#000" strokeWidth="1.5" />
+                    <ellipse cx="30" cy="30" rx="9" ry="16" fill={`url(#rim-${label})`} stroke="#1e293b" strokeWidth="1" />
+                    <circle cx="30" cy="30" r="2" fill="#0f172a" />
+                    <path d="M 30 14 L 30 46 M 21 30 L 39 30 M 24 20 L 36 40 M 24 40 L 36 20" stroke="#334155" strokeWidth="1.5" opacity="0.5"/>
+                    <rect x="46" y="26" width="16" height="8" fill={color} opacity="0.9" rx="2" />
+                    <text x="54" y="31.5" fontSize="5.5" fontWeight="900" fill="#000" textAnchor="middle" fontFamily="Arial, sans-serif">{grip}</text>
+                </svg>
+            );
+        };
+
+        const GearSVG = ({ teeth, color, material }) => (
+            <svg viewBox="0 0 60 60" className="w-full h-full transform transition-transform hover:rotate-90 duration-500 drop-shadow-md">
+                <path d="M30,2 L32,6 L36,6 L38,2 L42,4 L42,8 L46,10 L48,6 L52,9 L50,14 L54,16 L58,14 L58,19 L54,22 L56,26 L60,28 L58,32 L54,34 L56,38 L58,41 L54,44 L50,42 L48,46 L52,50 L48,54 L44,52 L42,56 L38,58 L36,54 L32,54 L30,58 L26,56 L24,52 L20,54 L16,50 L20,46 L18,42 L14,44 L10,41 L12,37 L8,34 L4,32 L2,28 L6,26 L8,22 L4,19 L4,14 L8,16 L12,14 L10,9 L14,6 L16,10 L20,8 L20,4 L24,2 L26,6 L30,6 Z" fill={color} stroke="#000" strokeWidth="0.5"/>
+                <circle cx="30" cy="30" r="10" fill={material==='Bronce'?'#92400e':(material==='Dural'?'#94a3b8':'#e2e8f0')} stroke="#000" strokeWidth="1"/>
+                <circle cx="30" cy="30" r="3" fill="#000"/>
+            </svg>
+        );
+
+        const PinionSVG = ({ teeth, material, diameter }) => (
+            <svg viewBox="0 0 40 40" className="w-full h-full transform transition-transform hover:rotate-180 duration-500 drop-shadow-md">
+                <circle cx="20" cy="20" r="18" fill="none" stroke="#666" strokeWidth="2" strokeDasharray="3,1"/>
+                <path d="M20,2 L23,5 L28,5 L30,8 L35,10 L35,15 L32,18 L35,22 L35,28 L30,32 L25,32 L22,35 L18,35 L15,32 L10,32 L5,28 L5,22 L8,18 L5,15 L5,10 L10,8 L12,5 L17,5 Z" fill={material==='Latón'?'#fbbf24':(material==='Nylon'?'#fff':'#94a3b8')} stroke="#000" strokeWidth="0.5"/>
+                <circle cx="20" cy="20" r="4" fill="#000"/>
+            </svg>
+        );
+
+        const MotorShowcase = ({ selectedCarId, currentConfig, onUpdate, t }) => {
+            if (!currentConfig) return null;
+            const defaultMotors = {
+                "SLOT.IT (V12/BOXER)": [{ label: "V12/4", rpm: "23.000", torque: "170", type: "Short Can", color: "#fca5a5", name: "V12/4 23k" },{ label: "BOXER 2", rpm: "21.500", torque: "340", type: "Long Can", color: "#fdba74", name: "Boxer 21.5k" },{ label: "FLAT-6", rpm: "20.500", torque: "200", type: "Flat", color: "#fde047", name: "Flat-6 20.5k" }],
+                "NSR (KING/SHARK)": [{ label: "KING 21", rpm: "21.400", torque: "350", type: "Long Can", color: "#bef264", name: "King 21 Evo" },{ label: "SHARK 25", rpm: "25.000", torque: "176", type: "Short Can", color: "#67e8f9", name: "Shark 25k" },{ label: "BABY K", rpm: "17.000", torque: "245", type: "Long Can", color: "#d8b4fe", name: "Baby King" }],
+                "SCALEAUTO (TECH)": [{ label: "SC-11", rpm: "20.000", torque: "260", type: "Long Can", color: "#fca5a5", name: "SC-11b" },{ label: "SC-25", rpm: "21.000", torque: "320", type: "Long Can", color: "#cbd5e1", name: "Sprinter" }],
+                "NINCO (NC)": [{ label: "NC-5", rpm: "20.000", torque: "290", type: "Long Can", color: "#f87171", name: "Speeder" },{ label: "NC-6", rpm: "23.500", torque: "350", type: "Long Can", color: "#fbbf24", name: "Crusher" }],
+                "SCALEXTRIC (RX/RK)": [{ label: "RX-41", rpm: "18.000", torque: "210", type: "Short Can", color: "#94a3b8", name: "RX-41" },{ label: "PRO SPEED", rpm: "22.000", torque: "310", type: "Long Can", color: "#fb923c", name: "Pro Speed" }]
+            }; 
+            
+            const [motors, setMotors] = useState(() => {
+                const saved = localStorage.getItem('slot_custom_motors');
+                return saved ? { ...defaultMotors, "CUSTOM (USER)": JSON.parse(saved) } : defaultMotors;
+            });
+            const [isAdding, setIsAdding] = useState(false);
+            const [newForm, setNewForm] = useState({ name: 'Custom M', rpm: 25000, torque: 250, type: 'Long Can' });
+
+            const handleAdd = () => {
+                const updated = { ...motors };
+                if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
+                const newItem = { label: newForm.name.substring(0, 7).toUpperCase(), name: newForm.name, rpm: newForm.rpm.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."), torque: newForm.torque.toString(), type: newForm.type, color: "#f97316" };
+                updated["CUSTOM (USER)"].push(newItem);
+                setMotors(updated);
+                localStorage.setItem('slot_custom_motors', JSON.stringify(updated["CUSTOM (USER)"]));
+                setIsAdding(false);
+            };
+
+            const handleDelete = (idx) => {
+                const updated = { ...motors };
+                updated["CUSTOM (USER)"].splice(idx, 1);
+                if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
+                setMotors(updated);
+                localStorage.setItem('slot_custom_motors', JSON.stringify(updated["CUSTOM (USER)"] || []));
+            };
+
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white">
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <Zap className="text-orange-400" size={16} /> 
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.motorPower || 'MOTOR & POTENCIA'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[9px] font-black tracking-widest"><Plus size={10}/> NUEVO</button>
+                            <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div><span className="text-[10px] text-orange-400/70 font-mono">C{selectedCarId}</span></div>
+                        </div>
+                    </div>
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
+                            <div className="bg-[#0a0a0a] border-2 border-orange-500 rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(249,115,22,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-orange-400 uppercase mb-4 border-b border-orange-500/30 pb-2 tracking-widest">NUEVO MOTOR</h3>
+                                <div className="space-y-4">
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">NOMBRE</label><input type="text" maxLength="15" value={newForm.name} onChange={e=>setNewForm({...newForm, name: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">RPM</label><input type="number" step="1000" value={newForm.rpm} onChange={e=>setNewForm({...newForm, rpm: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">TORQUE (g/cm)</label><input type="number" step="10" value={newForm.torque} onChange={e=>setNewForm({...newForm, torque: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">TIPO</label><select value={newForm.type} onChange={e=>setNewForm({...newForm, type: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1"><option>Long Can</option><option>Short Can</option><option>Flat</option></select></div>
+                                </div>
+                                <div className="flex gap-3 mt-6 pt-4 border-t border-gray-800">
+                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-orange-500 text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                    <div className="flex-1 overflow-y-auto p-3 space-y-4 hide-scrollbar">
+                        {Object.entries(motors).map(([brand, list]) => (
+                            <div key={brand}>
+                                <div className="flex items-center gap-2 mb-2 pl-1"><div className="h-px w-3 bg-orange-500/50"></div><h3 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-orange-500/30 to-transparent"></div></div>
+                                <div className="space-y-1.5">{list.map((motor, idx) => { 
+                                    const isSelected = currentConfig.motorName === motor.name || currentConfig.motorName === motor.label; 
+                                    return (
+                                        <div key={idx} onClick={() => onUpdate('motor', motor)} className={`rounded-lg p-2 flex gap-3 transition-all group/item items-center cursor-pointer border relative ${isSelected ? 'bg-orange-500/20 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' : 'bg-black/40 border-orange-500/10 hover:bg-orange-500/10 hover:border-orange-500/40'}`}>
+                                            <div className="w-12 h-8 shrink-0"><MotorSVG type={motor.type} color={motor.color} label={motor.label} /></div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-baseline"><h4 className={`font-bold text-xs truncate transition-colors pr-4 ${isSelected ? 'text-white' : 'text-gray-300 group-hover/item:text-white'}`}>{motor.name || motor.label}</h4></div>
+                                                <div className="flex justify-between text-[9px] text-gray-400 mt-1"><span className="text-orange-400">{motor.rpm} rpm</span><span>{motor.torque} g/cm</span></div>
+                                            </div>
+                                            {brand === 'CUSTOM (USER)' && (<button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-1 transition-all"><X size={12}/></button>)}
+                                        </div>
+                                    ); 
+                                })}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ); 
+        };
+
+        const TireShowcase = ({ selectedCarId, currentConfig, onUpdate, t }) => {
+            if (!currentConfig) return null;
+            const defaultTires = {
+                "SLICK (ASFALTO/PISTA)": [
+                    { label: "Zero Grip", grip: 40, type: "Slick", color: "#d8b4fe", name: "Front Zero Grip" },
+                    { label: "Standard", grip: 80, type: "Slick", color: "#cbd5e1", name: "Slick Std" },
+                    { label: "P6", grip: 85, type: "Slick", color: "#fef08a", name: "Slot.it P6" },
+                    { label: "N22", grip: 88, type: "Slick", color: "#fde047", name: "Slot.it N22" },
+                    { label: "Spirits", grip: 89, type: "Slick", color: "#93c5fd", name: "Scaleauto Spirits" },
+                    { label: "S.Grip", grip: 90, type: "Slick", color: "#fca5a5", name: "NSR SuperGrip" },
+                    { label: "AS25", grip: 91, type: "Slick", color: "#60a5fa", name: "Scaleauto AS25" },
+                    { label: "F22", grip: 92, type: "Slick", color: "#facc15", name: "Slot.it F22" },
+                    { label: "U.Grip", grip: 95, type: "Slick", color: "#f87171", name: "NSR UltraGrip" },
+                    { label: "Extreme", grip: 98, type: "Slick", color: "#ef4444", name: "NSR Extreme" }
+                ],
+                "RAYADO (RALLY/SUCIO)": [
+                    { label: "Taco Nieve", grip: 60, type: "Treaded", color: "#a3e635", name: "SCX Nieve" },
+                    { label: "Rally Pro", grip: 70, type: "Treaded", color: "#fb923c", name: "Ninco Rally Pro" },
+                    { label: "PKS", grip: 75, type: "Treaded", color: "#f87171", name: "PKS Rayado" },
+                    { label: "Mitoos", grip: 80, type: "Treaded", color: "#c084fc", name: "Mitoos Tacón" },
+                    { label: "NSR Rally", grip: 82, type: "Treaded", color: "#fca5a5", name: "NSR Rayado" }
+                ],
+                "ESPUMA (MADERA)": [
+                    { label: "Procomp 1", grip: 92, type: "Sponge", color: "#93c5fd", name: "Scaleauto PC1" },
+                    { label: "Procomp 2", grip: 95, type: "Sponge", color: "#60a5fa", name: "Scaleauto PC2" },
+                    { label: "Procomp 3", grip: 98, type: "Sponge", color: "#3b82f6", name: "Scaleauto PC3" },
+                    { label: "B. Magic", grip: 100, type: "Sponge", color: "#fde047", name: "Black Magic" }
+                ]
+            }; 
+            
+            const [tires, setTires] = useState(() => {
+                const saved = localStorage.getItem('slot_custom_tires');
+                return saved ? { ...defaultTires, "CUSTOM (USER)": JSON.parse(saved) } : defaultTires;
+            });
+            const [isAdding, setIsAdding] = useState(false);
+            const [newForm, setNewForm] = useState({ name: 'Custom Tire', grip: 85, type: 'Slick' });
+
+            const handleAdd = () => {
+                const updated = { ...tires };
+                if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
+                const newItem = { label: newForm.name.substring(0, 8).toUpperCase(), name: newForm.name, grip: parseInt(newForm.grip), type: newForm.type, color: "#f97316" };
+                updated["CUSTOM (USER)"].push(newItem);
+                setTires(updated);
+                localStorage.setItem('slot_custom_tires', JSON.stringify(updated["CUSTOM (USER)"]));
+                setIsAdding(false);
+            };
+
+            const handleDelete = (idx) => {
+                const updated = { ...tires };
+                updated["CUSTOM (USER)"].splice(idx, 1);
+                if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
+                setTires(updated);
+                localStorage.setItem('slot_custom_tires', JSON.stringify(updated["CUSTOM (USER)"] || []));
+            };
+
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white">
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-400">
+                                <circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="22"></line><line x1="2" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="22" y2="12"></line>
+                            </svg>
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.tires || 'NEUMÁTICOS & AGARRE'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[9px] font-black tracking-widest"><Plus size={10}/> NUEVO</button>
+                        </div>
+                    </div>
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
+                            <div className="bg-[#0a0a0a] border-2 border-orange-500 rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(249,115,22,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-orange-400 uppercase mb-4 border-b border-orange-500/30 pb-2 tracking-widest">NUEVO NEUMÁTICO</h3>
+                                <div className="space-y-4">
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">NOMBRE</label><input type="text" maxLength="15" value={newForm.name} onChange={e=>setNewForm({...newForm, name: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">AGARRE (0-100)</label><input type="number" min="0" max="100" value={newForm.grip} onChange={e=>setNewForm({...newForm, grip: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">TIPO DE GOMA</label><select value={newForm.type} onChange={e=>setNewForm({...newForm, type: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none mt-1"><option>Slick</option><option>Treaded</option><option>Sponge</option></select></div>
+                                </div>
+                                <div className="flex gap-3 mt-6 pt-4 border-t border-gray-800">
+                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-orange-500 text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                    <div className="flex-1 overflow-y-auto p-3 space-y-4 hide-scrollbar">
+                        {Object.entries(tires).map(([brand, list]) => (
+                            <div key={brand}>
+                                <div className="flex items-center gap-2 mb-2 pl-1"><div className="h-px w-3 bg-orange-500/50"></div><h3 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-orange-500/30 to-transparent"></div></div>
+                                <div className="grid grid-cols-2 gap-2">{list.map((tire, idx) => { 
+                                    const isSelected = currentConfig.tireName === tire.name || currentConfig.tireName === tire.label; 
+                                    return (
+                                        <div key={idx} onClick={() => onUpdate('tire', tire)} className={`rounded-lg p-2 flex flex-col gap-2 transition-all group/item cursor-pointer border relative ${isSelected ? 'bg-orange-500/20 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' : 'bg-black/40 border-orange-500/10 hover:bg-orange-500/10 hover:border-orange-500/40'}`}>
+                                            <div className="w-full h-12 shrink-0 flex justify-center"><TireSVG type={tire.type} color={tire.color} label={tire.label} grip={tire.grip} /></div>
+                                            <div className="w-full text-center">
+                                                <h4 className={`font-bold text-[10px] truncate transition-colors ${isSelected ? 'text-white' : 'text-gray-300 group-hover/item:text-white'}`}>{tire.name || tire.label}</h4>
+                                                <div className="text-[9px] text-orange-400 mt-0.5">GRIP: {tire.grip}</div>
+                                            </div>
+                                            {brand === 'CUSTOM (USER)' && (<button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute top-1 right-1 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-1 transition-all"><X size={10}/></button>)}
+                                        </div>
+                                    ); 
+                                })}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ); 
+        };
+
+        const GearShowcase = ({ selectedCarId, currentConfig, onUpdate, t }) => {
+            if (!currentConfig) return null;
+            const defaultGears = {
+                "SLOT.IT (EN LÍNEA)": [{ teeth: "24z", color: "#22c55e", type: "Aluminio", label: "GRN" },{ teeth: "25z", color: "#78350f", type: "Bronce", label: "BRN" },{ teeth: "26z", color: "#3b82f6", type: "Bronce", label: "BLU" },{ teeth: "27z", color: "#eab308", type: "Aluminio", label: "YEL" },{ teeth: "28z", color: "#f97316", type: "Aluminio", label: "ORG" }],
+                "NSR (ANGLEWINDER)": [{ teeth: "29z", color: "#ec4899", type: "Aluminio", label: "PNK" },{ teeth: "30z", color: "#ef4444", type: "Aluminio", label: "RED" },{ teeth: "31z", color: "#111111", type: "Aluminio", label: "BLK" },{ teeth: "32z", color: "#a855f7", type: "Aluminio", label: "PUR" }],
+                "SLOTING PLUS (DURAL)": [{ teeth: "28z", color: "#dc2626", type: "Dural", label: "RED" },{ teeth: "30z", color: "#9333ea", type: "Dural", label: "PUR" },{ teeth: "32z", color: "#2563eb", type: "Dural", label: "BLU" },{ teeth: "34z", color: "#eab308", type: "Dural", label: "GLD" }]
+            }; 
+            
+            const [gears, setGears] = useState(() => {
+                const saved = localStorage.getItem('slot_custom_gears');
+                return saved ? { ...defaultGears, "CUSTOM (USER)": JSON.parse(saved) } : defaultGears;
+            });
+            const [isAdding, setIsAdding] = useState(false);
+            const [newForm, setNewForm] = useState({ teeth: 27 });
+
+            const handleAdd = () => {
+                const updated = { ...gears };
+                if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
+                updated["CUSTOM (USER)"].push({ teeth: `${newForm.teeth}z`, color: "#f97316", type: "Custom", label: "CST" });
+                setGears(updated);
+                localStorage.setItem('slot_custom_gears', JSON.stringify(updated["CUSTOM (USER)"]));
+                setIsAdding(false);
+            };
+
+            const handleDelete = (idx) => {
+                const updated = { ...gears };
+                updated["CUSTOM (USER)"].splice(idx, 1);
+                if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
+                setGears(updated);
+                localStorage.setItem('slot_custom_gears', JSON.stringify(updated["CUSTOM (USER)"] || []));
+            };
+
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white">
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <Settings className="text-orange-400" size={16} /> 
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.gears || 'CORONAS'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[9px] font-black tracking-widest"><Plus size={10}/> NUEVA</button>
+                        </div>
+                    </div>
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
+                            <div className="bg-[#0a0a0a] border-2 border-orange-500 rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(249,115,22,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-orange-400 uppercase mb-4 border-b border-orange-500/30 pb-2 tracking-widest">NUEVA CORONA</h3>
+                                <div className="flex-1 flex flex-col justify-center gap-6 mt-4">
+                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
+                                    <div className="flex items-center justify-center gap-5">
+                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.max(10, newForm.teeth - 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
+                                        <span className="font-digital text-5xl text-orange-400 w-20 text-center drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">{newForm.teeth}</span>
+                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.min(50, newForm.teeth + 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
+                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-orange-500 text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                    <div className="flex-1 overflow-y-auto p-3 space-y-4 hide-scrollbar">
+                        {Object.entries(gears).map(([brand, list]) => (
+                            <div key={brand}>
+                                <div className="flex items-center gap-2 mb-2 pl-1"><div className="h-px w-3 bg-orange-500/50"></div><h3 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-orange-500/30 to-transparent"></div></div>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {list.map((gear, idx) => { 
+                                        const isSelected = currentConfig.gearTeeth === parseInt(gear.teeth); 
+                                        return (
+                                            <div key={idx} onClick={() => onUpdate('gear', gear)} className={`flex flex-col items-center gap-1 group/gear cursor-pointer p-2 rounded-lg transition-all border relative ${isSelected ? 'bg-orange-500/20 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' : 'border-transparent hover:bg-orange-500/10 hover:border-orange-500/40'}`} title={`${gear.teeth} - ${gear.type}`}>
+                                                <div className="w-12 h-12 transition-transform duration-300 group-hover/gear:scale-110"><GearSVG teeth={gear.teeth} color={gear.color} material={gear.type} /></div>
+                                                <div className={`text-[10px] font-mono transition-colors ${isSelected ? 'text-white font-bold' : 'text-gray-400 group-hover/gear:text-white'}`}>{gear.teeth}</div>
+                                                {brand === 'CUSTOM (USER)' && (<button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute -top-1 -right-1 opacity-0 group-hover/gear:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-1 transition-all"><X size={10}/></button>)}
+                                            </div>
+                                        ); 
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ); 
+        };
+
+        const PinionShowcase = ({ selectedCarId, currentConfig, onUpdate, t }) => {
+            if (!currentConfig) return null;
+            const defaultPinions = {
+                "SLOT.IT (5.5mm / 6.5mm)": [{ teeth: "9z", type: "Latón", diameter: "5.5" },{ teeth: "10z", type: "Latón", diameter: "5.5" },{ teeth: "11z", type: "Bronce", diameter: "6.5" },{ teeth: "12z", type: "Bronce", diameter: "6.5" }],
+                "NSR (RACING)": [{ teeth: "10z", type: "Acero", diameter: "5.5" },{ teeth: "11z", type: "Acero", diameter: "6.5" },{ teeth: "12z", type: "Acero", diameter: "7.5" },{ teeth: "13z", type: "Acero", diameter: "7.5" }],
+                "SLOTING PLUS (MODULAR)": [{ teeth: "10z", type: "Nylon", diameter: "6.5" },{ teeth: "11z", type: "Nylon", diameter: "6.5" },{ teeth: "12z", type: "Acero", diameter: "6.5" },{ teeth: "13z", type: "Latón", diameter: "6.5" }],
+                "SCALEAUTO (ACERO)": [{ teeth: "8z", type: "Acero", diameter: "5.0" },{ teeth: "9z", type: "Acero", diameter: "5.5" },{ teeth: "10z", type: "Acero", diameter: "6.0" }]
+            }; 
+            
+            const [pinions, setPinions] = useState(() => {
+                const saved = localStorage.getItem('slot_custom_pinions');
+                return saved ? { ...defaultPinions, "CUSTOM (USER)": JSON.parse(saved) } : defaultPinions;
+            });
+            const [isAdding, setIsAdding] = useState(false);
+            const [newForm, setNewForm] = useState({ teeth: 9 });
+
+            const handleAdd = () => {
+                const updated = { ...pinions };
+                if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
+                updated["CUSTOM (USER)"].push({ teeth: `${newForm.teeth}z`, type: "Custom", diameter: "6.0" });
+                setPinions(updated);
+                localStorage.setItem('slot_custom_pinions', JSON.stringify(updated["CUSTOM (USER)"]));
+                setIsAdding(false);
+            };
+
+            const handleDelete = (idx) => {
+                const updated = { ...pinions };
+                updated["CUSTOM (USER)"].splice(idx, 1);
+                if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
+                setPinions(updated);
+                localStorage.setItem('slot_custom_pinions', JSON.stringify(updated["CUSTOM (USER)"] || []));
+            };
+
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white">
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <Settings className="text-orange-400" size={16} /> 
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.pinions || 'PIÑONES'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500 text-orange-400 hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[9px] font-black tracking-widest"><Plus size={10}/> NUEVO</button>
+                        </div>
+                    </div>
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
+                            <div className="bg-[#0a0a0a] border-2 border-orange-500 rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(249,115,22,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-orange-400 uppercase mb-4 border-b border-orange-500/30 pb-2 tracking-widest">NUEVO PIÑÓN</h3>
+                                <div className="flex-1 flex flex-col justify-center gap-6 mt-4">
+                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
+                                    <div className="flex items-center justify-center gap-5">
+                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.max(5, newForm.teeth - 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
+                                        <span className="font-digital text-5xl text-orange-400 w-20 text-center drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">{newForm.teeth}</span>
+                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.min(20, newForm.teeth + 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
+                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-orange-500 text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                    <div className="flex-1 overflow-y-auto p-3 space-y-4 hide-scrollbar">
+                        {Object.entries(pinions).map(([brand, list]) => (
+                            <div key={brand}>
+                                <div className="flex items-center gap-2 mb-2 pl-1"><div className="h-px w-3 bg-orange-500/50"></div><h3 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-orange-500/30 to-transparent"></div></div>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {list.map((pinion, idx) => { 
+                                        const isSelected = currentConfig.pinionTeeth === parseInt(pinion.teeth); 
+                                        return (
+                                            <div key={idx} onClick={() => onUpdate('pinion', pinion)} className={`flex flex-col items-center gap-1 group/pinion cursor-pointer p-2 rounded-lg transition-all border relative ${isSelected ? 'bg-orange-500/20 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.4)]' : 'border-transparent hover:bg-orange-500/10 hover:border-orange-500/40'}`} title={`${pinion.teeth} - ${pinion.type}`}>
+                                                <div className="w-10 h-10 transition-transform duration-300 group-hover/pinion:scale-110"><PinionSVG teeth={pinion.teeth} material={pinion.type} diameter={pinion.diameter} /></div>
+                                                <div className={`text-[10px] font-mono transition-colors ${isSelected ? 'text-white font-bold' : 'text-gray-400 group-hover/pinion:text-white'}`}>{pinion.teeth}</div>
+                                                {brand === 'CUSTOM (USER)' && (<button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute -top-1 -right-1 opacity-0 group-hover/pinion:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-1 transition-all"><X size={10}/></button>)}
+                                            </div>
+                                        ); 
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ); 
+        };
+
+        const WeightShowcase = ({ selectedCarId, currentConfig, onUpdate, t }) => {
+            if (!currentConfig) return null;
+            const defaultWeights = { body: 24.5, chassis: 16.2, trans: 12.8, wheels: 8.4, cockpit: 2.1 };
+            const currentWeights = currentConfig.weights || defaultWeights;
+            const totalWeight = Object.values(currentWeights).reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            const weightLabels = { body: "CARROCERÍA", chassis: "CHASIS 3D", trans: "EJES/TRANS", wheels: "LLANTAS", cockpit: "COCKPIT" };
+            
+            const handleWeightChange = (id, value) => {
+                const newWeights = { ...currentWeights, [id]: parseFloat(value) || 0 };
+                onUpdate('weights', newWeights);
+            };
+
+            const adjustWeight = (id, delta) => {
+                const currentVal = parseFloat(currentWeights[id]) || 0;
+                let newVal = currentVal + delta;
+                if (newVal < 0) newVal = 0;
+                newVal = Math.round(newVal * 10) / 10;
+                const newWeights = { ...currentWeights, [id]: newVal };
+                onUpdate('weights', newWeights);
+            };
+
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white" title="Modifica los pesos para ajustar la física">
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <Scale className="text-orange-400" size={16} /> 
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.digitalScale || 'BÁSCULA DIGITAL'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
+                            <span className="text-[10px] text-orange-400/70 font-mono">C{selectedCarId}</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-row flex-1 p-4 gap-4 overflow-hidden items-center">
+                        <div className="flex-1 flex flex-col justify-center h-full pr-4 border-r border-orange-500/20 gap-2">
+                            {Object.entries(weightLabels).map(([id, label], i) => (
+                                <div key={i} className="flex items-center justify-between group/row">
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter group-hover/row:text-white transition-colors">{label}</span>
+                                    <div className="flex items-center gap-1">
+                                        <button onClick={() => adjustWeight(id, -0.5)} className="w-6 h-6 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-orange-500 text-gray-400 hover:text-orange-400 rounded transition-all active:scale-90"><Minus size={12}/></button>
+                                        <input type="number" step="0.1" min="0" value={currentWeights[id] === 0 ? '' : currentWeights[id]} onChange={(e) => handleWeightChange(id, e.target.value)} className="w-12 bg-transparent border-none text-center text-xs font-mono text-orange-400 outline-none px-0 hide-scrollbar transition-colors" />
+                                        <button onClick={() => adjustWeight(id, 0.5)} className="w-6 h-6 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-orange-500 text-gray-400 hover:text-orange-400 rounded transition-all active:scale-90"><Plus size={12}/></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="w-[100px] flex flex-col justify-center items-end pb-2">
+                            <div className="text-right w-full mb-4">
+                                <span className="text-[9px] text-orange-400/60 font-bold tracking-widest uppercase block mb-1.5 text-center">PESO TOTAL</span>
+                                <div className="relative bg-black/40 px-2 py-3 rounded-lg border border-orange-500/20 shadow-[inset_0_0_10px_rgba(0,0,0,1)] flex justify-center items-baseline">
+                                    <span className="font-digital text-3xl font-black text-white drop-shadow-[0_0_10px_rgba(249,115,22,0.8)] leading-none">{totalWeight.toFixed(1)}</span>
+                                    <span className="text-xs font-bold text-orange-400 ml-1">g</span>
+                                </div>
+                            </div>
+                            <div className="w-full flex items-end gap-[4px] h-16 opacity-80 justify-center">
+                                {Object.entries(weightLabels).map(([id, label], i) => {
+                                    const val = parseFloat(currentWeights[id]) || 0;
+                                    return (
+                                        <div key={i} className="flex-1 bg-orange-500/20 rounded-sm relative group/bar hover:bg-orange-500/40 transition-colors" title={`${label}: ${val}g`}>
+                                            <div className="absolute bottom-0 w-full bg-orange-500 rounded-sm transition-all duration-500 shadow-[0_0_5px_#f97316]" style={{height: `${Math.min(100, (val / 30) * 100)}%`}}></div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ); 
+        };
+
+        const VoltageShowcase = ({ voltage, setVoltage, t }) => { 
+            const [amps, setAmps] = useState(1.2); 
+            const [history, setHistory] = useState(new Array(24).fill(0.2)); 
+            
+            useEffect(() => { 
+                const interval = setInterval(() => { 
+                    const baseAmps = (voltage / 12) * 1.5; 
+                    const noise = (Math.random() - 0.5) * 0.15; 
+                    const newAmps = Math.max(0, baseAmps + noise); 
+                    setAmps(newAmps); 
+                    setHistory(prev => { 
+                        const barHeight = Math.min(1, Math.max(0.1, newAmps / 3)); 
+                        return [...prev.slice(1), barHeight]; 
+                    }); 
+                }, 100); 
+                return () => clearInterval(interval); 
+            }, [voltage]); 
+            
+            return (
+                <div className="w-full h-full flex flex-col relative z-10 text-white" title="Fuente de alimentación estabilizada">
+                    <svg className="absolute top-0 left-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M1 1 L10 1 L10 2 L2 2 L2 10 L1 10 Z" fill="#f97316"/></svg>
+                    <svg className="absolute top-0 right-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M31 1 L22 1 L22 2 L30 2 L30 10 L31 10 Z" fill="#f97316"/></svg>
+                    <svg className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M1 31 L10 31 L10 30 L2 30 L2 22 L1 22 Z" fill="#f97316"/></svg>
+                    <svg className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M31 31 L22 31 L22 30 L30 30 L30 22 L31 22 Z" fill="#f97316"/></svg>
+                    
+                    <div className="p-3 border-b border-orange-500/20 bg-orange-500/10 flex justify-between items-center shrink-0">
+                        <div className="flex items-center gap-2"> 
+                            <Battery className="text-orange-400" size={16} /> 
+                            <h2 className="text-xs font-black text-white tracking-[0.2em] uppercase">{t.garage?.powerSupply || 'FUENTE DS-3'}</h2> 
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_5px_red]"></div>
+                            <span className="text-[10px] text-orange-400/70 font-mono">ON AIR</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col p-4 gap-3 h-full relative overflow-hidden">
+                        <div className="grid grid-cols-2 gap-3 h-20">
+                            <div className="bg-black border border-orange-500/30 rounded-lg relative flex flex-col items-center justify-center shadow-[inset_0_0_15px_rgba(0,0,0,1)]">
+                                <span className="absolute top-1 left-1.5 text-[8px] text-orange-400/60 font-bold tracking-wider">VOLTAJE</span>
+                                <div className="flex items-baseline gap-0.5 mt-2">
+                                    <span className="font-digital text-3xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] tracking-widest leading-none">{voltage.toFixed(1)}</span>
+                                    <span className="text-[12px] font-bold text-orange-400 ml-1">V</span>
+                                </div>
+                            </div>
+                            <div className="bg-black border border-orange-500/30 rounded-lg relative flex flex-col items-center justify-center shadow-[inset_0_0_15px_rgba(0,0,0,1)]">
+                                <span className="absolute top-1 left-1.5 text-[8px] text-orange-400/60 font-bold tracking-wider">CORRIENTE</span>
+                                <div className="flex items-baseline gap-0.5 mt-2">
+                                    <span className="font-digital text-3xl font-black text-orange-400 drop-shadow-[0_0_8px_#f97316] tracking-widest leading-none">{amps.toFixed(2)}</span>
+                                    <span className="text-[12px] font-bold text-orange-400 ml-1">A</span>
+                                </div>
+                                <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_5px_red]"></div>
+                            </div>
+                        </div>
+                        <div className="flex-1 bg-black/50 border border-orange-500/20 rounded-lg flex items-end px-1 gap-[2px] relative overflow-hidden mt-1">
+                            <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'linear-gradient(transparent 3px, #f97316 3px)', backgroundSize: '100% 4px'}}></div>
+                            {history.map((h, i) => (
+                                <div key={i} className="flex-1 bg-orange-500/60 shadow-[0_0_5px_#f97316] rounded-t-sm" style={{height: `${h * 100}%`, transition: 'height 0.1s ease'}}></div>
+                            ))}
+                            <span className="absolute top-1 right-1.5 text-[8px] text-orange-400/50 font-mono font-bold">LOAD MONITOR</span>
+                        </div>
+                        <div className="flex items-center gap-3 mt-2">
+                            <button onClick={() => setVoltage(Math.max(10, voltage - 0.5))} className="w-10 h-8 rounded bg-gray-900 border border-gray-700 hover:border-orange-500 hover:bg-orange-500/20 text-gray-400 hover:text-orange-400 flex items-center justify-center transition-all active:scale-95"><Minus size={14}/></button>
+                            <div className="flex-1 h-2 bg-gray-900 rounded-full overflow-hidden border border-gray-700 relative group-hover:border-orange-500/30 transition-colors">
+                                <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-orange-500/40 to-orange-500 shadow-[0_0_10px_#f97316] transition-all duration-300" style={{width: `${((voltage - 10) / 10) * 100}%`}}></div>
+                            </div>
+                            <button onClick={() => setVoltage(Math.min(20, voltage + 0.5))} className="w-10 h-8 rounded bg-gray-900 border border-gray-700 hover:border-orange-500 hover:bg-orange-500/20 text-gray-400 hover:text-orange-400 flex items-center justify-center transition-all active:scale-95"><Plus size={14}/></button>
+                        </div>
+                    </div>
+                </div>
+            ); 
+        };
+
         // GEOMETRÍA ABSOLUTA
         const getPieceGeometry = (p) => {
             if (!p || p.type === 'set_origin' || p.type === 'goto') return null;
@@ -1416,8 +2001,9 @@
         const I18N = {
             es: {
                 cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
+                garage: { motorPower: 'MOTOR & POTENCIA', tires: 'NEUMÁTICOS & AGARRE', transmission: 'TRANSMISIÓN & DESARROLLO', gears: 'CORONAS', pinions: 'PIÑONES', digitalScale: 'BÁSCULA DIGITAL', powerSupply: 'FUENTE DS-3' },
                 tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
-                actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL', game2d: '2D GAME', game3d: '3D GAME' },
+                actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL', game2d: 'GARAJE 3D', game3d: '3D GAME' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
                 bridges: { title: 'PUENTES Y NIVELES', workLevel: 'NIVEL DE NUEVAS PISTAS', workLevelDesc: 'Afecta a las próximas pistas que añadas', paintMode: 'MODO PINTAR (Click en pista)', paintActive: 'PINTANDO...', current: 'PISTA SELECCIONADA', apply: 'APLICAR AL SELECCIONADO', ground: 'SUELO', level: 'NIVEL', close: 'CERRAR PANEL' },
@@ -1432,8 +2018,9 @@
             },
             en: {
                 cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Cruces': 'Crossings' },
+                garage: { motorPower: 'MOTOR & POWER', tires: 'TIRES & GRIP', transmission: 'TRANSMISSION & GEARING', gears: 'CROWN GEARS', pinions: 'PINIONS', digitalScale: 'DIGITAL SCALE', powerSupply: 'POWER SUPPLY' },
                 tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
-                actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL', game2d: '2D GAME', game3d: '3D GAME' },
+                actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL', game2d: '3D GARAGE', game3d: '3D GAME' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
                 bridges: { title: 'BRIDGES & LEVELS', workLevel: 'NEW TRACKS LEVEL', workLevelDesc: 'Affects the next tracks you add', paintMode: 'PAINT MODE (Click track)', paintActive: 'PAINTING...', current: 'SELECTED TRACK', apply: 'APPLY TO SELECTED', ground: 'GROUND', level: 'LEVEL', close: 'CLOSE PANEL' },
@@ -1585,6 +2172,44 @@
           const dbRef = useRef(null);
           const appIdRef = useRef('slot-designer-app');
           
+          const [showGarageModal, setShowGarageModal] = useState(false);
+          const [selectedCarId, setSelectedCarId] = useState(1);
+          const [trackVoltage, setTrackVoltage] = useState(12.0);
+          
+          const [carSetups, setCarSetups] = useState(() => {
+              const saved = localStorage.getItem('slot_car_setups');
+              if (saved) return JSON.parse(saved);
+              
+              const initialSetups = {};
+              for(let i=1; i<=8; i++) {
+                  initialSetups[i] = { 
+                      motorRPM: 20000, motorTorque: 240, motorName: 'Standard 20k', 
+                      tireGrip: 80, tireName: 'Slick Std', 
+                      gearTeeth: 27, pinionTeeth: 9, gearRatio: 3.0, 
+                      weight: 64.0, 
+                      weights: { body: 24.5, chassis: 16.2, trans: 12.8, wheels: 8.4, cockpit: 2.1 },
+                      name: `PILOTO ${i}`, 
+                      color: ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#ec4899', '#f97316', '#64748b'][i-1]
+                  };
+              }
+              return initialSetups;
+          });
+
+          const handleUpdateConfig = (type, value, specificCarId) => {
+              setCarSetups(prev => {
+                  const targetId = specificCarId || selectedCarId;
+                  const newSetup = { ...prev[targetId] };
+                  if (type === 'name') { newSetup.name = value; }
+                  else if (type === 'motor') { newSetup.motorRPM = parseInt(value.rpm.replace('.','')); newSetup.motorTorque = parseInt(value.torque); newSetup.motorName = value.label; }
+                  else if (type === 'tire') { newSetup.tireGrip = parseInt(value.grip); newSetup.tireName = value.label; }
+                  else if (type === 'transmission') { newSetup.pinionTeeth = parseInt(value.pinion); newSetup.gearTeeth = parseInt(value.crown); newSetup.gearRatio = parseFloat((value.crown / value.pinion).toFixed(2)); }
+                  else if (type === 'gear') { newSetup.gearTeeth = parseInt(value.teeth); newSetup.gearRatio = parseFloat((newSetup.gearTeeth / Math.max(1, newSetup.pinionTeeth)).toFixed(2)); }
+                  else if (type === 'pinion') { newSetup.pinionTeeth = parseInt(value.teeth); newSetup.gearRatio = parseFloat((newSetup.gearTeeth / Math.max(1, newSetup.pinionTeeth)).toFixed(2)); }
+                  else if (type === 'weights') { newSetup.weights = value; newSetup.weight = Object.values(value).reduce((a, b) => a + (parseFloat(b) || 0), 0); }
+                  return { ...prev, [targetId]: newSetup };
+              });
+          };
+
           const [showAuthModal, setShowAuthModal] = useState(false);
           const [authMode, setAuthMode] = useState('login'); 
           const [authEmail, setAuthEmail] = useState('');
@@ -2510,10 +3135,7 @@
           };
 
           const goTo2DGame = () => {
-              if (pieces.length === 0) { alert(t.alerts.emptyGame); return; }
-              const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.open('https://slotsoftware.github.io/Game3d/circuitos.html', '_blank'); } catch (e) { alert(t.alerts.sim); }
+              setShowGarageModal(true);
           };
 
           const goTo3DGame = () => {
@@ -2798,6 +3420,85 @@
                                       )})}
                                   </div>
                               )}
+                          </div>
+                      </div>
+                  </div>
+              )}
+
+              {showGarageModal && (
+                  <div className="absolute inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center animate-in" onClick={() => setShowGarageModal(false)}>
+                      <div className="bg-[#0a0500] w-[90%] h-[90%] rounded-2xl border-2 border-orange-500 shadow-[0_0_80px_rgba(249,115,22,0.5)] flex flex-col overflow-hidden relative" onClick={e => e.stopPropagation()}>
+                          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-transparent"></div>
+                          <div className="h-20 border-b border-orange-500/50 flex items-center justify-between px-8 bg-black/80 shrink-0 shadow-[0_4px_20px_rgba(249,115,22,0.3)] z-10 relative">
+                              <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center shadow-[0_0_20px_#f97316]"><Settings className="text-black w-7 h-7" style={{animation: 'spin 4s linear infinite'}}/></div>
+                                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-[0.2em] drop-shadow-[0_0_15px_rgba(249,115,22,0.8)]">MI GARAJE</h2>
+                              </div>
+                              <div className="flex items-center gap-6">
+                                  <div className="flex items-center gap-2 bg-orange-950/60 border border-orange-500/50 rounded-lg px-4 py-2 shadow-[inset_0_0_10px_rgba(249,115,22,0.3)]">
+                                      <User className="text-orange-400 w-5 h-5 drop-shadow-[0_0_5px_#f97316]" />
+                                      <input 
+                                          type="text" 
+                                          value={carSetups[selectedCarId]?.name || ''} 
+                                          onChange={(e) => handleUpdateConfig('name', e.target.value)}
+                                          className="bg-transparent border-none text-white text-sm font-black w-32 outline-none uppercase tracking-wider placeholder-orange-700/50"
+                                          placeholder="PILOTO"
+                                          maxLength="15"
+                                      />
+                                  </div>
+                                  <button 
+                                      onClick={(e) => {
+                                          localStorage.setItem('slot_car_setups', JSON.stringify(carSetups));
+                                          const btn = e.currentTarget;
+                                          const originalHTML = btn.innerHTML;
+                                          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-2 inline-block"><polyline points="20 6 9 17 4 12"></polyline></svg> ¡GUARDADO!'; 
+                                          btn.classList.add('bg-white', 'text-orange-600', 'border-white', 'shadow-[0_0_30px_#fff]'); 
+                                          setTimeout(() => { 
+                                              btn.innerHTML = originalHTML; 
+                                              btn.classList.remove('bg-white', 'text-orange-600', 'border-white', 'shadow-[0_0_30px_#fff]'); 
+                                          }, 2000);
+                                      }} 
+                                      className="px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(249,115,22,0.6)] hover:shadow-[0_0_25px_rgba(249,115,22,1)] border border-orange-400 tracking-widest text-xs flex items-center justify-center active:scale-95 min-w-[170px]"
+                                  >
+                                      <Save size={14} className="mr-2"/> GUARDAR DATOS
+                                  </button>
+                                  <button onClick={() => setShowGarageModal(false)} className="text-orange-500 hover:text-white transition drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"><X size={32}/></button>
+                              </div>
+                          </div>
+                          <div className="flex-1 p-6 bg-[#0a0a0a] overflow-hidden flex flex-col z-10 relative">
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+                                  {/* Panel Izquierdo: 2 divisiones */}
+                                  <div className="grid grid-rows-2 gap-6 min-h-0">
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <MotorShowcase selectedCarId={selectedCarId} currentConfig={carSetups[selectedCarId]} onUpdate={handleUpdateConfig} t={t} />
+                                      </div>
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <TireShowcase selectedCarId={selectedCarId} currentConfig={carSetups[selectedCarId]} onUpdate={handleUpdateConfig} t={t} />
+                                      </div>
+                                  </div>
+                                  {/* Panel Derecho: 4 divisiones */}
+                                  <div className="grid grid-cols-2 grid-rows-2 gap-6 min-h-0">
+                                      {/* División Der 1: Coronas */}
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <GearShowcase selectedCarId={selectedCarId} currentConfig={carSetups[selectedCarId]} onUpdate={handleUpdateConfig} t={t} />
+                                      </div>
+
+                                      {/* División Der 2: Piñones */}
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <PinionShowcase selectedCarId={selectedCarId} currentConfig={carSetups[selectedCarId]} onUpdate={handleUpdateConfig} t={t} />
+                                      </div>
+                                      
+                                      {/* División Der 3: Báscula Digital */}
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <WeightShowcase selectedCarId={selectedCarId} currentConfig={carSetups[selectedCarId]} onUpdate={handleUpdateConfig} t={t} />
+                                      </div>
+
+                                      {/* División Der 4: Fuente de Alimentación */}
+                                      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-orange-500/50 hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] transition-all group relative flex flex-col min-h-0">
+                                          <VoltageShowcase voltage={trackVoltage} setVoltage={setTrackVoltage} t={t} />
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
