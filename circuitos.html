@@ -1,4 +1,4 @@
-<!-- El archivo se ha limpiado. Por favor, vuelve a pegar tu código original aquí. --><<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -840,7 +840,7 @@
                 ctx.setLineDash([]);
             },
             renderTrack: (ctx, pieces, view, activeBrand, selectedPieceIds, dragGroup, imageCache, boardPoints, boardClosed, options = {}) => {
-                const outerBrand = TRACK_DEFINITIONS[activeBrand];
+                const outerBrand = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
                 const pieceExtents = []; 
 
                 if (boardPoints && boardPoints.length > 0) {
@@ -1412,7 +1412,7 @@
             useEffect(() => {
                 if (!canvasRef.current || !circuit || !circuit.pieces) return;
                 const ctx = canvasRef.current.getContext('2d'); const width = canvasRef.current.width; const height = canvasRef.current.height;
-                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; const brandName = circuit.brand || 'NINCO';
+                ctx.clearRect(0, 0, width, height); const tempView = { x: 0, y: 0, scale: 1.0 }; const brandName = TRACK_DEFINITIONS[circuit.brand] ? circuit.brand : 'NINCO';
                 ctx.save(); ctx.globalAlpha = 0; 
                 const absPieces = migrateToAbsolute(circuit.pieces);
                 const positions = DrawEngine2D.renderTrack(ctx, absPieces, tempView, brandName, [], null, {current: new Map()}, circuit.boardPoints, circuit.boardClosed); ctx.restore();
@@ -1635,7 +1635,7 @@
           };
 
           const loadCommunityCircuit = (circuit) => {
-              setActiveBrand(circuit.brand || 'NINCO');
+              setActiveBrand(TRACK_DEFINITIONS[circuit.brand] ? circuit.brand : 'NINCO');
               if (circuit.pieces) { 
                   const safePieces = circuit.pieces.map(p => p.uid ? p : { ...p, uid: Date.now() + Math.random() }); 
                   setHistory([migrateToAbsolute(safePieces)]); setHistoryStep(0); 
@@ -1733,7 +1733,7 @@
               ctx.stroke();
 
               const tempView = { x: 0, y: 0, scale: 1.0 }; ctx.save(); ctx.globalAlpha = 0; 
-              const brandName = previewData.brand || 'NINCO';
+              const brandName = TRACK_DEFINITIONS[previewData.brand] ? previewData.brand : 'NINCO';
               const absPieces = migrateToAbsolute(previewData.pieces || []);
               
               const positions = DrawEngine2D.renderTrack(ctx, absPieces, tempView, brandName, [], null, {current: new Map()}, previewData.boardPoints, previewData.boardClosed);
@@ -1877,7 +1877,7 @@
 
           const confirmLoadCircuit = () => {
               if (previewData) {
-                  if (previewData.brand) setActiveBrand(previewData.brand);
+                  if (previewData.brand && TRACK_DEFINITIONS[previewData.brand]) setActiveBrand(previewData.brand); else setActiveBrand('NINCO');
                   if (previewData.pieces) { 
                       const safePieces = previewData.pieces.map(p => p.uid ? p : { ...p, uid: Date.now() + Math.random() }); 
                       setHistory([migrateToAbsolute(safePieces)]); setHistoryStep(0); 
@@ -2608,7 +2608,7 @@
                                       <div className={`p-1.5 rounded border ${loadMode === 'cloud' ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-[#39ff14]/10 border-[#39ff14]/30'}`}><FileJson size={16} className={loadMode === 'cloud' ? 'text-cyan-400' : 'text-[#39ff14]'}/></div>
                                       <div><h3 className="text-sm font-bold text-white leading-none mb-0.5">{previewData ? previewData.fileName : t.modal.none}</h3><span className="text-[10px] text-gray-500 font-mono flex gap-2">{previewData ? `${(new Blob([JSON.stringify(previewData)]).size / 1024).toFixed(1)} KB` : '---'} {previewData?.source === 'cloud' && <span className="text-cyan-500 font-bold bg-cyan-950 px-1 rounded">[GITHUB]</span>}</span></div>
                                   </div>
-                                  {previewData && (<div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[previewData.brand]?.uiClass || 'border-gray-600 text-gray-400'}`}>{previewData.brand || 'DESCONOCIDO'}</div>)}
+                                  {previewData && (<div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[previewData.brand]?.uiClass || 'border-gray-600 text-gray-400'}`}>{TRACK_DEFINITIONS[previewData.brand]?.name || previewData.brand || 'DESCONOCIDO'}</div>)}
                               </div>
                               <div className="flex-1 relative overflow-hidden flex items-center justify-center bg-black/50">
                                   {previewLoading && (<div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/80"><div className={`w-8 h-8 border-2 ${loadMode==='cloud'?'border-cyan-500':'border-[#39ff14]'} border-t-transparent rounded-full animate-spin mb-2`}></div><span className={`text-xs ${loadMode==='cloud'?'text-cyan-500':'text-[#39ff14]'} font-bold tracking-widest`}>{loadMode === 'cloud' ? t.modal.dl : t.modal.analyzing}</span></div>)}
@@ -2672,7 +2672,7 @@
                                           <div key={circuit.id} className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all group flex flex-col">
                                               <div className="p-3 border-b border-white/5 flex justify-between items-start bg-black/30">
                                                   <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">{t.communityModal.author}</div><div className="text-xs font-mono text-[#39ff14] truncate w-32 font-bold">{circuit.authorName || circuit.authorId.substring(0, 8)}</div></div>
-                                                  <div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[circuit.brand]?.uiClass || 'border-gray-600 text-gray-400'}`}>{circuit.brand}</div>
+                                                  <div className={`px-2 py-1 rounded text-[9px] font-bold border ${TRACK_DEFINITIONS[circuit.brand]?.uiClass || 'border-gray-600 text-gray-400'}`}>{TRACK_DEFINITIONS[circuit.brand]?.name || circuit.brand || 'DESCONOCIDO'}</div>
                                               </div>
                                               <div className="h-32 w-full bg-black/60 relative overflow-hidden flex items-center justify-center border-b border-white/5">
                                                   <MiniTrackPreview circuit={circuit} />
