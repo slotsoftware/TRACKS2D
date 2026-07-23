@@ -1417,7 +1417,7 @@
             es: {
                 cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
                 tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
-                actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL' },
+                actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL', game2d: '2D GAME', game3d: '3D GAME' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
                 bridges: { title: 'PUENTES Y NIVELES', workLevel: 'NIVEL DE NUEVAS PISTAS', workLevelDesc: 'Afecta a las próximas pistas que añadas', paintMode: 'MODO PINTAR (Click en pista)', paintActive: 'PINTANDO...', current: 'PISTA SELECCIONADA', apply: 'APLICAR AL SELECCIONADO', ground: 'SUELO', level: 'NIVEL', close: 'CERRAR PANEL' },
@@ -1433,7 +1433,7 @@
             en: {
                 cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Cruces': 'Crossings' },
                 tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
-                actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL' },
+                actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL', game2d: '2D GAME', game3d: '3D GAME' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
                 bridges: { title: 'BRIDGES & LEVELS', workLevel: 'NEW TRACKS LEVEL', workLevelDesc: 'Affects the next tracks you add', paintMode: 'PAINT MODE (Click track)', paintActive: 'PAINTING...', current: 'SELECTED TRACK', apply: 'APPLY TO SELECTED', ground: 'GROUND', level: 'LEVEL', close: 'CLOSE PANEL' },
@@ -2477,6 +2477,20 @@
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
+          const goTo2DGame = () => {
+              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
+              const compiledPieces = compileCircuitFor3D(pieces);
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'https://github.com/slotsoftware/Game3d/blob/main/circuitos.html'; } catch (e) { alert(t.alerts.sim); }
+          };
+
+          const goTo3DGame = () => {
+              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
+              const compiledPieces = compileCircuitFor3D(pieces);
+              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders };
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'https://github.com/slotsoftware/Game3d/blob/main/slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
+          };
+
           const generateReport = () => { 
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               if (!window.jspdf) { alert(t.alerts.pdfLib); return; }
@@ -2784,6 +2798,19 @@
                                   </button> 
                                   <button onClick={goToMulti} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)] rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all group hover:shadow-[0_0_20px_rgba(245,158,11,0.6)]"> 
                                       <Flag size={16} className="group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest uppercase">{t.actions.clubs}</span> 
+                                  </button> 
+
+                                  <div className="w-px h-8 bg-white/10 shrink-0 mx-2 hidden md:block"></div>
+
+                                  <button onClick={goTo2DGame} className="relative shrink-0 flex items-center justify-center gap-2 px-6 h-10 bg-gradient-to-r from-cyan-600 to-blue-600 border-2 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.8)] rounded-lg text-white hover:scale-105 active:scale-95 transition-all group overflow-hidden"> 
+                                      <div className="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-out"></div>
+                                      <Play size={18} className="group-hover:rotate-12 transition-transform drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"/>
+                                      <span className="text-[11px] font-black tracking-[0.2em] uppercase drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">{t.actions.game2d}</span> 
+                                  </button> 
+
+                                  <button onClick={goTo3DGame} className="relative shrink-0 flex items-center justify-center gap-2 px-6 h-10 btn-super-neon rounded-lg hover:scale-105 active:scale-95 transition-all group overflow-hidden"> 
+                                      <Zap size={18} className="icon-glow group-hover:scale-125 transition-transform"/>
+                                      <span className="text-[11px] font-black tracking-[0.2em] uppercase text-glow">{t.actions.game3d}</span> 
                                   </button> 
                               </div>
                           </div>
