@@ -4228,9 +4228,23 @@
 
                             let railX = curX;
                             let railZ = curZ;
-                            if (p.subtype === 'chicane3_middle') {
-                                // Aplicar offset lateral en forma de S solo a los raíles, manteniendo el asfalto recto
-                                const sShapeOffset = Math.sin(t * Math.PI * 2) * Math.sin(t * Math.PI) * (currentLaneSpacing * 0.7);
+                            let sShapeOffset = 0;
+
+                            if (p.subtype === 'chicane3_entry') {
+                                // Fase 1: Empieza a curvar suavemente hacia un lado (0 a 90 grados)
+                                const phase = t * (Math.PI / 2);
+                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                            } else if (p.subtype === 'chicane3_middle') {
+                                // Fase 2: Cruza fluidamente hacia el otro lado (90 a 270 grados)
+                                const phase = (Math.PI / 2) + (t * Math.PI);
+                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                            } else if (p.subtype === 'chicane3_exit') {
+                                // Fase 3: Retorna suavemente al centro (270 a 360 grados)
+                                const phase = (Math.PI * 1.5) + (t * (Math.PI / 2));
+                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                            }
+
+                            if (sShapeOffset !== 0) {
                                 const px = Math.cos(curAngle + Math.PI/2);
                                 const pz = Math.sin(curAngle + Math.PI/2);
                                 railX += px * sShapeOffset;
