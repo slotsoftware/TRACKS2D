@@ -146,6 +146,7 @@
         const TRACK_DEFINITIONS = {
           NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#050505', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444' },
           SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#050505', railColor: '#d0d0d0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
+          SCX_CLASSIC: { name: 'SCX CLASSIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#050505', railColor: '#b0b0b0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
           SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#666666', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
           POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-500 font-bold', trackColor: '#050505', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 9.0, connectionBoxColor: '#333' },
           SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#6b6b6b', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af' },
@@ -4144,11 +4145,27 @@
                         const isCrossing = p.subtype === 'crossing';
                         const isPitEntry = p.type === 'pit_entry' || p.subtype === 'pit_entry';
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
-                        const isChicaneEntry = p.subtype === 'chicane_entry';
-                        const isChicaneExit = p.subtype === 'chicane_exit';
+                        const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle';
+                        const isChicaneExit = p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit';
                         const pitSide = p.invert ? 'left' : 'right';
                         const pitDir = pitSide === 'right' ? 1 : -1;
                         
+                        // Generare offset-uri locale standard
+                        let stdOffsetsLocal = [];
+                        if (hasGroups) {
+                            for (let i = 0; i < numLanes; i++) {
+                                const pairIndex = Math.floor(i / 2);
+                                const isRightLane = i % 2 === 1;
+                                const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
+                                stdOffsetsLocal.push(localOffset + (pairIndex * currentTrackWidth));
+                            }
+                        } else {
+                            for(let i=0; i<numLanes; i++) {
+                                stdOffsetsLocal.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
+                            }
+                        }
+
                         let sL = [...currentOffsets];
                         let tL = [...currentOffsets];
                         let startHalfL = stdHalfL, startHalfR = stdHalfR;
@@ -4207,29 +4224,35 @@
                             currentOffsets = [...tL];
                         }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
-                        else if (isChicaneEntry) { tL = sL.map(off => off * 0.2); currentOffsets = [...tL]; } 
-                        else if (isChicaneExit) { 
-                            let standardOffsets = [];
-                            if (hasGroups) {
-                                for (let i = 0; i < numLanes; i++) {
-                                    const pairIndex = Math.floor(i / 2);
-                                    const isRightLane = i % 2 === 1;
-                                    const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
-                                    standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
-                                }
-                            } else {
-                                for(let i=0; i<numLanes; i++) {
-                                    standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
-                                }
-                            }
-                            
-                            // FIX: Mantener la polaridad actual para evitar que los carriles se crucen en la salida
-                            tL = sL.map((val, i) => {
-                                const magnitude = Math.abs(standardOffsets[i]);
-                                return val === 0 ? 0 : Math.sign(val) * magnitude;
-                            });
-                            
+                        else if (isChicaneEntry) { 
+                            const shift = (p.subtype === 'chicane3_entry') ? -4.0 : 0.0;
+                            tL = stdOffsetsLocal.map(off => (off * 0.22) + shift); 
+                            currentOffsets = [...tL]; 
+                            const narrowHalf = stdHalfL * 0.55;
+                            endHalfL = narrowHalf - shift; 
+                            endHalfR = narrowHalf + shift;
+                        }
+                        else if (isChicaneMiddle) {
+                            const startShift = (p.subtype === 'chicane3_middle') ? -4.0 : 0.0;
+                            const endShift = (p.subtype === 'chicane3_middle') ? 4.0 : 0.0;
+                            tL = stdOffsetsLocal.map(off => (off * 0.22) + endShift);
                             currentOffsets = [...tL];
+                            const narrowHalf = stdHalfL * 0.55;
+                            startHalfL = narrowHalf - startShift; 
+                            startHalfR = narrowHalf + startShift;
+                            endHalfL = narrowHalf - endShift; 
+                            endHalfR = narrowHalf + endShift;
+                        }
+                        else if (isChicaneExit) { 
+                            const startShift = (p.subtype === 'chicane3_exit') ? 4.0 : 0.0;
+                            tL = [...stdOffsetsLocal];
+                            currentOffsets = [...tL];
+                            
+                            const narrowHalf = stdHalfL * 0.55;
+                            startHalfL = narrowHalf - startShift; 
+                            startHalfR = narrowHalf + startShift;
+                            endHalfL = stdHalfL; 
+                            endHalfR = stdHalfR;
                         }
                         
                         const d12 = [], d21 = [];
@@ -4249,7 +4272,17 @@
 
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps; if (p.type === 'curve') { const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2; curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle; } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
-                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
+                            
+                            // Setari curba S pentru chicane SCX (Smoothstep / Smootherstep)
+                            let mixT = t;
+                            if (isCrossing || (p.subtype && p.subtype.includes('adapter'))) {
+                                mixT = easeSine(t);
+                            } else if (isChicaneMiddle) {
+                                // Smootherstep: Mantiene los extremos rectos y cruza más bruscamente por el centro
+                                mixT = t * t * t * (t * (t * 6 - 15) + 10);
+                            } else if (isChicaneEntry || isChicaneExit) {
+                                mixT = t * t * (3 - 2 * t); 
+                            }
                             
                             let cL = [];
                             for(let j=0; j<numLanes; j++) {
@@ -4421,7 +4454,7 @@
 
                             const flatZones = [];
                             pieceMapRef.current.forEach(p => {
-                                const isSpecial = [ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'rotonda' ].includes(p.subtype) || ['pit_entry', 'pit_exit'].includes(p.type);
+                                const isSpecial = [ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'rotonda' ].includes(p.subtype) || ['pit_entry', 'pit_exit'].includes(p.type);
                                 if (isSpecial) {
                                     // Ampliamos el "escudo" de protección +15cm antes y después de la pieza especial
                                     flatZones.push({ start: p.distStart - 15.0, end: p.distEnd + 15.0 });
@@ -4483,11 +4516,11 @@
 
                             for(let i=0; i<testPoints.length; i++) {
                                 const tp1 = testPoints[i];
-                                const isSpecial1 = tp1.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp1.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp1.piece.type));
+                                const isSpecial1 = tp1.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp1.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp1.piece.type));
                                 
                                 for(let j=i+1; j<testPoints.length; j++) {
                                     const tp2 = testPoints[j];
-                                    const isSpecial2 = tp2.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp2.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp2.piece.type));
+                                    const isSpecial2 = tp2.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp2.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp2.piece.type));
                                     
                                     if (tp1.piece && tp2.piece) {
                                         const idxDiff = Math.abs(tp1.piece.index - tp2.piece.index);
