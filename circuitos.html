@@ -1210,6 +1210,16 @@
                     p.direction = 'left'; 
                 }
 
+                // === SOLUCIÓN BIFURCACIONES ===
+                // Asignamos explícitamente el carril para que el 3D interprete correctamente las bifurcaciones y no las elimine
+                if (p.subtype === 'single_lane_1') {
+                    p.lane = 1;
+                } else if (p.subtype === 'single_lane_2') {
+                    p.lane = 2;
+                } else if (p.lane === undefined) {
+                    p.lane = 0;
+                }
+
                 // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
                 delete p.groupId;
                 delete p.cat;
@@ -1271,7 +1281,7 @@
                     return { bestIdx, connectedToIn, targetSearchNode, targetPieceNodeIndex };
                 };
 
-                let bestChainForLane = [];
+                let allChainsForLane = [];
 
                 while(pool.length > 0) {
                     let currentChain = [];
@@ -1380,20 +1390,14 @@
                         }
                     }
                     
-                    // Nos quedamos estrictamente con la cadena más larga (elimina basura suelta y ramales fallidos)
-                    if (currentChain.length > bestChainForLane.length) {
-                        bestChainForLane = currentChain;
+                    // Guardamos TODAS las ramas válidas para no borrar bifurcaciones ni pit lanes
+                    if (currentChain.length > 0) {
+                        allChainsForLane.push(currentChain);
                     }
                 }
                 
-                // IMPORTANTE: ELIMINADA LA SUBDIVISIÓN DE PIEZAS.
-                // Al subdividir pistas largas (como Carrera y Scalextric UK), el motor de físicas 3D 
-                // creaba múltiples colliders invisibles. Las ruedas del coche chocaban con estas 
-                // juntas internas ("Ghost Collisions"), causando los temidos trompicones.
-                // Ahora cada pista se envía como UN ÚNICO bloque físico sólido, permitiendo que el
-                // coche se deslice con fluidez extrema sin enganchones.
-
-                finalCompiled.push(...bestChainForLane);
+                // Añadimos todas las cadenas de este carril al compilado final
+                allChainsForLane.forEach(chain => finalCompiled.push(...chain));
             });
 
             // 3. MAGIA FINAL PARA EL MOTOR 3D:
