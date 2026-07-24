@@ -3904,12 +3904,6 @@
                     const rails = { lanes: Array.from({length: numLanes}, () => []), pit: [], changes: [] }, vertexDistances = [0]; let accumulatedDist = 0;
                     
                     scene = new THREE.Scene(); scene.background = new THREE.Color(0x60a5fa); scene.fog = new THREE.Fog(0x60a5fa, 500, 3000); 
-                    
-                    const gridHelper = new THREE.GridHelper(10000, 200, 0x39ff14, 0x39ff14);
-                    gridHelper.position.y = -0.5; 
-                    gridHelper.material.transparent = true;
-                    gridHelper.material.opacity = 0.1; 
-                    scene.add(gridHelper);
 
                     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 5000); 
                     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" }); 
@@ -3965,8 +3959,6 @@
                         stdHalfL = halfAsphalt;
                         stdHalfR = halfAsphalt;
                     }
-                    
-                    let currentWideOffsets = [...currentOffsets];
                     
                     const trackGroup = new THREE.Group(); 
                     
@@ -4170,23 +4162,7 @@
                             brandChangedLocal = true;
                         }
 
-                        let pieceStartsNewSegment = false;
-                        if (hasAbsoluteCoords) {
-                            const jumpDist = Math.hypot(p.x - curX, p.y - curZ);
-                            if (jumpDist > 1.0) {
-                                // Forzar nuevo segmento de asfalto/raíles al detectar un salto geográfico
-                                currentGeoData = null; 
-                                for(let j=0; j<numLanes; j++) rails.lanes[j].push(null);
-                                rails.pit.push(null);
-                                pieceStartsNewSegment = true;
-                            }
-                            curX = p.x;
-                            curZ = p.y;
-                            curAngle = p.rot;
-                        }
-                        
                         const isCrossing = p.subtype === 'crossing';
-                        const isSqueeze = p.subtype === 'squeeze';
                         const isPitEntry = p.type === 'pit_entry' || p.subtype === 'pit_entry';
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
                         const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
@@ -4289,38 +4265,24 @@
                             stdHalfL = endHalfL;
                             stdHalfR = endHalfR;
                             currentOffsets = [...tL];
-                            currentWideOffsets = [...tL];
                         }
-                        else if (isCrossing) { 
-                            tL.reverse(); 
-                            currentOffsets = [...tL]; 
-                            currentWideOffsets.reverse(); 
-                        } 
+                        else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
                         else if (isChicaneEntry) { 
                             const shift = (p.subtype === 'chicane3_entry') ? -3.6 : 0.0;
-                            tL = currentWideOffsets.map(off => (off * 0.22) + shift); 
+                            tL = stdOffsetsLocal.map(off => (off * 0.22) + shift); 
                             currentOffsets = [...tL]; 
-                            endHalfL = stdHalfL; 
-                            endHalfR = stdHalfR;
+                            // El asfalto NO se estrecha (Mantenemos ancho original)
                         }
                         else if (isChicaneMiddle) {
-                            const startShift = (p.subtype === 'chicane3_middle') ? -3.6 : 0.0;
                             const endShift = (p.subtype === 'chicane3_middle') ? 3.6 : 0.0;
-                            tL = currentWideOffsets.map(off => (off * 0.22) + endShift);
+                            tL = stdOffsetsLocal.map(off => (off * 0.22) + endShift);
                             currentOffsets = [...tL];
-                            startHalfL = stdHalfL; 
-                            startHalfR = stdHalfR;
-                            endHalfL = stdHalfL; 
-                            endHalfR = stdHalfR;
+                            // El asfalto NO se estrecha
                         }
                         else if (isChicaneExit) { 
-                            const startShift = (p.subtype === 'chicane3_exit') ? 3.6 : 0.0;
-                            tL = [...currentWideOffsets];
+                            tL = [...stdOffsetsLocal];
                             currentOffsets = [...tL];
-                            startHalfL = stdHalfL; 
-                            startHalfR = stdHalfR;
-                            endHalfL = stdHalfL; 
-                            endHalfR = stdHalfR;
+                            // El asfalto NO se estrecha
                         }
                         
                         const d12 = [], d21 = [];
@@ -4333,12 +4295,9 @@
                             if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(dStartX + perpX * sL[1], 0.2, dStartZ + perpZ * sL[1]));
                         }
 
-                        // Cerrar hueco visual al cambiar de marca, adaptador o salto geográfico (evita cortes entre pistas)
-                        if (brandChangedLocal || pieceStartsNewSegment) {
+                        // Cerrar hueco visual al cambiar de marca o adaptador
+                        if (brandChangedLocal) {
                             addAsphaltSlice(curX, curZ, curAngle, startHalfL, startHalfR, accumulatedDist, pieceBrand);
-                            if (pieceStartsNewSegment) {
-                                addRailPoint(curX, curZ, curAngle, currentOffsets, null, 0);
-                            }
                         }
 
                         for (let i = 1; i <= steps; i++) {
@@ -4353,26 +4312,22 @@
                             }
                             
                             let cL = [];
+                            const isSqueeze = p.subtype === 'squeeze';
                             for(let j=0; j<numLanes; j++) {
                                 // Asegurar que null se mantenga para no dibujar raíles en huecos (bifurcaciones)
                                 if (sL[j] === null || tL[j] === null) {
                                     cL.push(null);
                                 } else {
+                                    let lanePos = sL[j] + (tL[j] - sL[j]) * mixT;
+                                    
                                     if (isSqueeze) {
-                                        // Media entrada chicane y media salida chicane
-                                        let localT, mix;
-                                        if (t <= 0.5) {
-                                            localT = t / 0.5;
-                                            mix = localT * localT * (3 - 2 * localT);
-                                            cL.push(sL[j] + (sL[j] * 0.22 - sL[j]) * mix);
-                                        } else {
-                                            localT = (t - 0.5) / 0.5;
-                                            mix = localT * localT * (3 - 2 * localT);
-                                            cL.push((sL[j] * 0.22) + (sL[j] - sL[j] * 0.22) * mix);
-                                        }
-                                    } else {
-                                        cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                        // Parábola de estrechamiento: 0 en los extremos, 1 en el centro exacto de la pieza.
+                                        const squeezeFactor = 4 * t * (1 - t); 
+                                        const narrowOff = stdOffsetsLocal[j] * 0.22; // Raíles pegados al centro
+                                        lanePos = lanePos + (narrowOff - lanePos) * squeezeFactor;
                                     }
+                                    
+                                    cL.push(lanePos);
                                 }
                             }
 
