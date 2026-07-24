@@ -4169,6 +4169,7 @@
                         }
 
                         const isCrossing = p.subtype === 'crossing';
+                        const isSqueeze = p.subtype === 'squeeze';
                         const isPitEntry = p.type === 'pit_entry' || p.subtype === 'pit_entry';
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
                         const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
@@ -4332,7 +4333,21 @@
                                 if (sL[j] === null || tL[j] === null) {
                                     cL.push(null);
                                 } else {
-                                    cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                    if (isSqueeze) {
+                                        // Media entrada chicane y media salida chicane
+                                        let localT, mix;
+                                        if (t <= 0.5) {
+                                            localT = t / 0.5;
+                                            mix = localT * localT * (3 - 2 * localT);
+                                            cL.push(sL[j] + (sL[j] * 0.22 - sL[j]) * mix);
+                                        } else {
+                                            localT = (t - 0.5) / 0.5;
+                                            mix = localT * localT * (3 - 2 * localT);
+                                            cL.push((sL[j] * 0.22) + (sL[j] - sL[j] * 0.22) * mix);
+                                        }
+                                    } else {
+                                        cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                    }
                                 }
                             }
 
