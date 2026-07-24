@@ -4168,6 +4168,21 @@
                             brandChangedLocal = true;
                         }
 
+                        let pieceStartsNewSegment = false;
+                        if (hasAbsoluteCoords) {
+                            const jumpDist = Math.hypot(p.x - curX, p.y - curZ);
+                            if (jumpDist > 1.0) {
+                                // Forzar nuevo segmento de asfalto/raíles al detectar un salto geográfico
+                                currentGeoData = null; 
+                                for(let j=0; j<numLanes; j++) rails.lanes[j].push(null);
+                                rails.pit.push(null);
+                                pieceStartsNewSegment = true;
+                            }
+                            curX = p.x;
+                            curZ = p.y;
+                            curAngle = p.rot;
+                        }
+                        
                         const isCrossing = p.subtype === 'crossing';
                         const isSqueeze = p.subtype === 'squeeze';
                         const isPitEntry = p.type === 'pit_entry' || p.subtype === 'pit_entry';
@@ -4311,9 +4326,12 @@
                             if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(dStartX + perpX * sL[1], 0.2, dStartZ + perpZ * sL[1]));
                         }
 
-                        // Cerrar hueco visual al cambiar de marca o adaptador
-                        if (brandChangedLocal) {
+                        // Cerrar hueco visual al cambiar de marca, adaptador o salto geográfico (evita cortes entre pistas)
+                        if (brandChangedLocal || pieceStartsNewSegment) {
                             addAsphaltSlice(curX, curZ, curAngle, startHalfL, startHalfR, accumulatedDist, pieceBrand);
+                            if (pieceStartsNewSegment) {
+                                addRailPoint(curX, curZ, curAngle, currentOffsets, null, 0);
+                            }
                         }
 
                         for (let i = 1; i <= steps; i++) {
