@@ -6893,64 +6893,59 @@
                           if (Array.isArray(data)) {
                               const glbFiles = data.filter(f => f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf'));
                               
-                              if (glbFiles.length > 0) {
-                                  // Coche 1: 1er archivo
+                              if (glbFiles.length > 8) {
+                                  // Coche 1: 9no archivo (índice 8)
+                                  loadFromUrl(getRawUrl(glbFiles[8].name), glbFiles[8].name, 1);
+                              } else if (glbFiles.length > 0) {
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 1);
                               }
                               
-                              if (glbFiles.length > 1) {
-                                  // Coche 3: 2do archivo (posición 2 de la nube)
-                                  loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 3);
-                              }
-                              
-                              if (glbFiles.length > 3) {
-                                  // Coche 2: 4to archivo
-                                  loadFromUrl(getRawUrl(glbFiles[3].name), glbFiles[3].name, 2);
-                              } else if (glbFiles.length > 2) {
-                                  // Si hay 3 archivos, asigna el 3ro al Coche 2
-                                  loadFromUrl(getRawUrl(glbFiles[2].name), glbFiles[2].name, 2);
+                              if (glbFiles.length > 9) {
+                                  // Coche 2: 10mo archivo (índice 9)
+                                  loadFromUrl(getRawUrl(glbFiles[9].name), glbFiles[9].name, 2);
                               } else if (glbFiles.length > 1) {
-                                  // Fallback: si solo hay 2, usa el 2do para el Coche 2 también
                                   loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 2);
+                              } else if (glbFiles.length > 0) {
+                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 2);
+                              }
+
+                              if (glbFiles.length > 1) {
+                                  // Coche 3: 2do archivo (índice 1)
+                                  loadFromUrl(getRawUrl(glbFiles[1].name), glbFiles[1].name, 3);
+                              } else if (glbFiles.length > 0) {
+                                  loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 3);
                               }
 
                               if (glbFiles.length > 12) {
-                                  // Coche 4: 13vo archivo (posición 13 de la nube, índice 12)
+                                  // Coche 4: 13vo archivo (índice 12)
                                   loadFromUrl(getRawUrl(glbFiles[12].name), glbFiles[12].name, 4);
                               } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 13 archivos, repite el 1ero para el coche 4
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 4);
                               }
 
                               if (glbFiles.length > 11) {
-                                  // Coche 5: 12vo archivo (posición 12 de la nube, índice 11)
+                                  // Coche 5: 12vo archivo (índice 11)
                                   loadFromUrl(getRawUrl(glbFiles[11].name), glbFiles[11].name, 5);
                               } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 12 archivos, repite el 1ero para el coche 5
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 5);
                               }
 
                               if (glbFiles.length > 10) {
-                                  // Coche 6: 11vo archivo (posición 11 de la nube, índice 10)
+                                  // Coche 6: 11vo archivo (índice 10)
                                   loadFromUrl(getRawUrl(glbFiles[10].name), glbFiles[10].name, 6);
                               } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 11 archivos, repite el 1ero para el coche 6
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 6);
                               }
 
-                              if (glbFiles.length > 8) {
-                                  // Coche 7: 9no archivo (posición 9 de la nube, índice 8)
-                                  loadFromUrl(getRawUrl(glbFiles[8].name), glbFiles[8].name, 7);
-                              } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 9 archivos, repite el 1ero para el coche 7
+                              if (glbFiles.length > 0) {
+                                  // Coche 7: 1er archivo (índice 0)
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 7);
                               }
 
-                              if (glbFiles.length > 9) {
-                                  // Coche 8: 10mo archivo (posición 10 de la nube, índice 9)
-                                  loadFromUrl(getRawUrl(glbFiles[9].name), glbFiles[9].name, 8);
+                              if (glbFiles.length > 2) {
+                                  // Coche 8: 3er archivo (índice 2)
+                                  loadFromUrl(getRawUrl(glbFiles[2].name), glbFiles[2].name, 8);
                               } else if (glbFiles.length > 0) {
-                                  // Fallback: si no hay 10 archivos, repite el 1ero para el coche 8
                                   loadFromUrl(getRawUrl(glbFiles[0].name), glbFiles[0].name, 8);
                               }
                           }
