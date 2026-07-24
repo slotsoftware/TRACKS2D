@@ -1113,12 +1113,10 @@
         };
 
         // Compilador 3D MEJORADO: ENCADENAMIENTO ESTRICTO Y CONTINUO
-        // Transforma un "puzzle" caótico en un circuito perfecto dibujado "del tirón"
         const compileCircuitFor3D = (rawPieces) => {
             if (!rawPieces || rawPieces.length === 0) return [];
             
             const finalCompiled = [];
-            const lanes = {};
             
             // 0. ANTI-FANTASMAS: Eliminamos piezas superpuestas en las mismas coordenadas exactas
             const uniquePiecesMap = new Map();
@@ -1127,285 +1125,190 @@
                 const p = JSON.parse(JSON.stringify(rawP));
                 // Clave basada en posición con precisión de 1mm
                 const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
-                // Guardamos la pieza. Si hay un fantasma superpuesto, se sobreescribe, dejando solo 1 pieza real en ese espacio.
                 uniquePiecesMap.set(key, p);
             });
             
-            // 1. Clonamos profundamente las piezas para no corromper la memoria de React
+            // 1. Clonamos profundamente las piezas y aplicamos sanitización básica
             const expandedPieces = [];
 
             Array.from(uniquePiecesMap.values()).forEach(p => {
-                
-                // Mantenemos los subtypes originales para que el motor 3D dibuje las curvas 
-                // digitales exactamente igual que en 2D, sin alterar su comportamiento.
-                if (p.subtype === 'crossing_curve') {
-                    p.subtype = 'crossing'; // Adaptamos para que el motor 3D la dibuje sin dejar un hueco y cruce los carriles
-                }
+                if (p.subtype === 'crossing_curve') p.subtype = 'crossing'; 
 
-                // SANITIZACIÓN PARA 3D: Chicanes especiales SCX y Deslizantes
                 const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
                 const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
 
                 if (p.subtype === 'squeeze') {
-                    // EXPLICACIÓN DEL FALLO EN 3D:
-                    // El simulador 3D NO tiene programado el modelo "squeeze". Cuando lo lee, se rinde y dibuja una recta normal.
-                    // SOLUCIÓN MÁGICA: Dividimos el "squeeze" de 35cm en DOS piezas virtuales de 17.5cm (Entrada + Salida).
-                    // El motor 3D SÍ sabe dibujar entradas y salidas, así que ahora la pista se estrechará perfectamente.
-                    const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
-                    const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_out', subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing };
-                    
-                    // Posicionamos la segunda pieza justo en la mitad
+                    const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
+                    const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_out', subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
                     p2.x = p1.x + (p.length / 2) * Math.cos(p.rot || 0);
                     p2.y = p1.y + (p.length / 2) * Math.sin(p.rot || 0);
-                    
-                    delete p1.groupId; delete p1.cat; delete p1.brandKey;
-                    delete p2.groupId; delete p2.cat; delete p2.brandKey;
-                    
                     expandedPieces.push(p1, p2);
-                    return; // Saltamos la original
+                    return; 
                 }
 
                 if (p.subtype === 'chicane3_entry' || p.subtype === 'chicane_entry') {
-                    p.subtype = 'chicane_entry';
-                    p.id = 'n_chicane_in';
-                    p.width = brandDef.width;
-                    p.laneSpacing = brandDef.laneSpacing;
+                    p.subtype = 'chicane_entry'; p.id = 'n_chicane_in'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
                 } else if (p.subtype === 'chicane3_middle' || p.subtype === 'chicane_middle') {
-                    p.subtype = 'chicane_middle';
-                    p.id = 'n_chicane_mid';
-                    p.width = brandDef.width;
-                    p.laneSpacing = brandDef.laneSpacing;
+                    p.subtype = 'chicane_middle'; p.id = 'n_chicane_mid'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
                 } else if (p.subtype === 'chicane3_exit' || p.subtype === 'chicane_exit') {
-                    p.subtype = 'chicane_exit';
-                    p.id = 'n_chicane_out';
-                    p.width = brandDef.width;
-                    p.laneSpacing = brandDef.laneSpacing;
+                    p.subtype = 'chicane_exit'; p.id = 'n_chicane_out'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
                 } else if (p.subtype === 'crossing') {
-                    // Forzar a que cualquier cruce X use el ID de Ninco para que el motor 3D no falle
-                    p.id = 'n_cross';
-                    p.width = brandDef.width;
-                    p.laneSpacing = brandDef.laneSpacing;
+                    p.id = 'n_cross'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
                 }
 
-                // SANITIZACIÓN PARA 3D: Cambios en Curva de Carrera.
-                // A petición del piloto, queremos que el cambio de carril ocurra EN LA CURVA.
-                // Para que el motor 3D no se vuelva loco con el "compound spline" original, 
-                // transformamos la recta de entrada en una recta normal, y le asignamos 
-                // la orden matemática de "cambio de carril" directamente al arco de la curva.
                 if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
-                    // La recta previa actúa solo de aproximación (recta estándar 34.5cm)
-                    delete p.subtype;
-                    p.id = 'car_345'; 
-                    p.direction = 'left'; // Normalizamos rectas para el 3D
+                    delete p.subtype; p.id = 'car_345'; p.direction = 'left'; 
                 } else if (p.subtype === 'digital_arc_curve_in') {
-                    // La curva ejecuta dinámicamente el cambio hacia el INTERIOR mientras gira
                     p.subtype = p.direction === 'left' ? 'change_left' : 'change_right';
                 } else if (p.subtype === 'digital_arc_curve_out') {
-                    // La curva ejecuta dinámicamente el cambio hacia el EXTERIOR mientras gira
                     p.subtype = p.direction === 'left' ? 'change_right' : 'change_left';
                 }
 
-                // Limpieza de seguridad: las rectas no giran, forzamos left para evitar cuelgues
-                if (p.type === 'straight' || (p.type && p.type.includes('pit'))) {
-                    p.direction = 'left'; 
-                }
+                if (p.type === 'straight' || (p.type && p.type.includes('pit'))) p.direction = 'left'; 
 
-                // === SOLUCIÓN BIFURCACIONES ===
-                // Asignamos explícitamente el carril para que el 3D interprete correctamente las bifurcaciones y no las elimine
-                if (p.subtype === 'single_lane_1') {
-                    p.lane = 1;
-                } else if (p.subtype === 'single_lane_2') {
-                    p.lane = 2;
-                } else if (p.lane === undefined) {
-                    p.lane = 0;
-                }
-
-                // SANITIZAR PROPIEDADES EXTRAS (Elimina variables de control 2D que pueden crashear el parser JSON estricto del motor 3D)
-                delete p.groupId;
-                delete p.cat;
-                delete p.brandKey;
-
+                // NO borramos `brandKey` ni `subtype` aquí para que la geometría 2D calcule los nodos de snapping perfectos.
                 expandedPieces.push(p);
             });
 
-            expandedPieces.forEach(p => {
-                const laneId = p.lane || 0;
-                if (!lanes[laneId]) lanes[laneId] = [];
-                lanes[laneId].push(p);
-            });
+            // 2. POOL ÚNICO: NO separamos por carril. Permitimos que rectas y single_lanes se conecten físicamente.
+            let pool = [...expandedPieces];
+            const origGeos = new Map();
+            pool.forEach(p => origGeos.set(p.uid, getPieceGeometry(p)));
 
-            Object.keys(lanes).sort((a,b)=>a-b).forEach(laneId => {
-                let pool = lanes[laneId];
-                if (pool.length === 0) return;
+            const findNextPiece = (searchPointNodes, availablePool) => {
+                let bestIdx = -1; let bestDist = Infinity; let connectedToIn = true; let targetSearchNode = null;
 
-                const origGeos = new Map();
-                pool.forEach(p => {
-                    origGeos.set(p.uid, getPieceGeometry(p));
-                });
-
-                const findNextPiece = (searchPointNodes, availablePool) => {
-                    let bestIdx = -1;
-                    let bestDist = Infinity;
-                    let connectedToIn = true;
-                    let targetSearchNode = null;
-                    let targetPieceNodeIndex = -1;
-
-                    for (let i = 0; i < availablePool.length; i++) {
-                        const cand = availablePool[i];
-                        const ep = origGeos.get(cand.uid);
+                for (let i = 0; i < availablePool.length; i++) {
+                    const cand = availablePool[i];
+                    const ep = origGeos.get(cand.uid);
+                    
+                    searchPointNodes.forEach(sNode => {
+                        ep.inNodes.forEach((inNode) => {
+                            const dist = Math.hypot(sNode.x - inNode.x, sNode.y - inNode.y);
+                            const aDiff = getAngleDiff(sNode.angle, inNode.angle);
+                            if (dist < 15.0 && aDiff < 0.5 && dist < bestDist) {
+                                bestDist = dist; bestIdx = i; connectedToIn = true; targetSearchNode = sNode;
+                            }
+                        });
                         
-                        searchPointNodes.forEach(sNode => {
-                            ep.inNodes.forEach((inNode, idx) => {
-                                const dist = Math.hypot(sNode.x - inNode.x, sNode.y - inNode.y);
-                                const aDiff = getAngleDiff(sNode.angle, inNode.angle);
+                        const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
+                        if (!isCandRotonda) {
+                            ep.outNodes.forEach((outNode) => {
+                                const dist = Math.hypot(sNode.x - outNode.x, sNode.y - outNode.y);
+                                const aDiff = getAngleDiff(sNode.angle, (outNode.angle + Math.PI) % (Math.PI*2));
                                 if (dist < 15.0 && aDiff < 0.5 && dist < bestDist) {
-                                    bestDist = dist; bestIdx = i; connectedToIn = true;
-                                    targetSearchNode = sNode; targetPieceNodeIndex = idx;
+                                    bestDist = dist; bestIdx = i; connectedToIn = false; targetSearchNode = sNode;
                                 }
                             });
-                            
-                            const isCandRotonda = cand.type === 'rotonda' || cand.subtype === 'rotonda' || cand.subtype === 'rotonda_connect';
-                            if (!isCandRotonda) {
-                                ep.outNodes.forEach((outNode, idx) => {
-                                    const dist = Math.hypot(sNode.x - outNode.x, sNode.y - outNode.y);
-                                    const aDiff = getAngleDiff(sNode.angle, (outNode.angle + Math.PI) % (Math.PI*2));
-                                    if (dist < 15.0 && aDiff < 0.5 && dist < bestDist) {
-                                        bestDist = dist; bestIdx = i; connectedToIn = false;
-                                        targetSearchNode = sNode; targetPieceNodeIndex = idx;
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    return { bestIdx, connectedToIn, targetSearchNode, targetPieceNodeIndex };
-                };
-
-                let allChainsForLane = [];
-
-                while(pool.length > 0) {
-                    let currentChain = [];
-
-                    let startIdx = pool.findIndex(p => p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect');
-                    if (startIdx === -1) startIdx = pool.findIndex(p => p.subtype === 'analog_connect' || p.subtype === 'connection' || p.subtype === 'starting_grid' || p.subtype === 'digital_console');
-                    
-                    if (startIdx === -1) {
-                        startIdx = pool.findIndex(p => {
-                            const ep = origGeos.get(p.uid);
-                            let hasIncoming = false;
-                            for (const other of pool) {
-                                if (other.uid === p.uid) continue;
-                                const oEp = origGeos.get(other.uid);
-                                const distFromOut = Math.hypot(ep.inX - oEp.outX, ep.inY - oEp.outY);
-                                const distFromIn = Math.hypot(ep.inX - oEp.inX, ep.inY - oEp.inY);
-                                if ((distFromOut < 15.0 && getAngleDiff(ep.inAngle, oEp.outAngle) < 0.5) || 
-                                    (distFromIn < 15.0 && getAngleDiff(ep.inAngle, (oEp.inAngle + Math.PI)) < 0.5)) {
-                                    hasIncoming = true;
-                                    break;
-                                }
-                            }
-                            return !hasIncoming;
-                        });
-                    }
-                    if (startIdx === -1) startIdx = 0;
-
-                    let current = pool.splice(startIdx, 1)[0];
-                    current.inZ = current.elevation || 0;
-                    current.outZ = current.elevation || 0;
-                    currentChain.push(current);
-                    
-                    let firstGeo = getPieceGeometry(current);
-                    let currentSearchExitNodes = firstGeo.outNodes.map(n => ({ ...n, z: current.outZ }));
-
-                    let chainContinues = true;
-                    while (chainContinues && pool.length > 0) {
-                        const { bestIdx, connectedToIn, targetSearchNode } = findNextPiece(currentSearchExitNodes, pool);
-
-                        if (bestIdx !== -1) {
-                            let nextPiece = pool.splice(bestIdx, 1)[0];
-
-                            // 2. RECONSTRUCCIÓN MATEMÁTICA FÍSICA PARA EVITAR EL TELETRANSPORTE
-                            if (!connectedToIn) {
-                                // Si se montó al revés, físicamente la volvemos del derecho
-                                if (nextPiece.type === 'curve' || nextPiece.subtype === 'chicane_curve' || nextPiece.type === 'rotonda' || nextPiece.subtype === 'rotonda' || nextPiece.subtype === 'rotonda_connect') {
-                                    nextPiece.direction = nextPiece.direction === 'left' ? 'right' : 'left';
-                                }
-                                const tmpL = nextPiece.borderLeft;
-                                nextPiece.borderLeft = nextPiece.borderRight;
-                                nextPiece.borderRight = tmpL;
-                                
-                                // Intercambiamos Entradas por Salidas para que el 3D no choque
-                                if (nextPiece.subtype === 'chicane_entry') {
-                                    nextPiece.subtype = 'chicane_exit';
-                                    if (nextPiece.id === 'n_chicane_in') nextPiece.id = 'n_chicane_out';
-                                } else if (nextPiece.subtype === 'chicane_exit') {
-                                    nextPiece.subtype = 'chicane_entry';
-                                    if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in';
-                                }
-                                
-                                if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit';
-                                else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
-                                
-                                // Invertir propiedades de pistas de adaptación para que el motor 3D entienda el cambio de ancho
-                                if (nextPiece.subtype === 'adapter_ninco_scx') nextPiece.subtype = 'adapter_scx_ninco';
-                                else if (nextPiece.subtype === 'adapter_scx_ninco') nextPiece.subtype = 'adapter_ninco_scx';
-                                else if (nextPiece.subtype === 'adapter_ninco_suk') nextPiece.subtype = 'adapter_suk_ninco';
-                                else if (nextPiece.subtype === 'adapter_suk_ninco') nextPiece.subtype = 'adapter_ninco_suk';
-                                else if (nextPiece.subtype === 'adapter_scx_adv') nextPiece.subtype = 'adapter_adv_scx';
-                                else if (nextPiece.subtype === 'adapter_adv_scx') nextPiece.subtype = 'adapter_scx_adv';
-
-                                if (nextPiece.widthIn !== undefined) {
-                                    const tw = nextPiece.widthIn; nextPiece.widthIn = nextPiece.widthOut; nextPiece.widthOut = tw;
-                                }
-                                if (nextPiece.laneSpacingIn !== undefined) {
-                                    const tls = nextPiece.laneSpacingIn; nextPiece.laneSpacingIn = nextPiece.laneSpacingOut; nextPiece.laneSpacingOut = tls;
-                                }
-                            }
-
-                            nextPiece.invert = false;
-                            nextPiece.rot = targetSearchNode.angle;
-                            
-                            const ep = getPieceGeometry(nextPiece);
-                            let bestLocalDist = Infinity;
-                            let alignNode = ep.inNodes[0];
-                            ep.inNodes.forEach(n => {
-                                const d = Math.hypot(targetSearchNode.x - n.x, targetSearchNode.y - n.y);
-                                if (d < bestLocalDist) { bestLocalDist = d; alignNode = n; }
-                            });
-                            
-                            const newDx = targetSearchNode.x - alignNode.x;
-                            const newDy = targetSearchNode.y - alignNode.y;
-                            
-                            nextPiece.x += newDx;
-                            nextPiece.y += newDy;
-                            nextPiece.inZ = targetSearchNode.z;
-                            nextPiece.outZ = nextPiece.elevation || 0;
-                            
-                            const finalEp = getPieceGeometry(nextPiece);
-                            currentSearchExitNodes = finalEp.outNodes.map(n => ({ ...n, z: nextPiece.outZ }));
-                            
-                            currentChain.push(nextPiece);
-                        } else {
-                            chainContinues = false; // Fin de este tren
                         }
-                    }
-                    
-                    // Guardamos TODAS las ramas válidas para no borrar bifurcaciones ni pit lanes
-                    if (currentChain.length > 0) {
-                        allChainsForLane.push(currentChain);
+                    });
+                }
+                return { bestIdx, connectedToIn, targetSearchNode };
+            };
+
+            let allChains = [];
+
+            // 3. RECORRIDO DE CADENAS (Múltiples pasadas para detectar ramas/bifurcaciones)
+            while(pool.length > 0) {
+                let currentChain = [];
+
+                let startIdx = pool.findIndex(p => p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect');
+                if (startIdx === -1) startIdx = pool.findIndex(p => p.subtype === 'analog_connect' || p.subtype === 'connection' || p.subtype === 'starting_grid' || p.subtype === 'digital_console');
+                
+                if (startIdx === -1) {
+                    startIdx = pool.findIndex(p => {
+                        const ep = origGeos.get(p.uid);
+                        let hasIncoming = false;
+                        for (const other of pool) {
+                            if (other.uid === p.uid) continue;
+                            const oEp = origGeos.get(other.uid);
+                            const distFromOut = Math.hypot(ep.inX - oEp.outX, ep.inY - oEp.outY);
+                            const distFromIn = Math.hypot(ep.inX - oEp.inX, ep.inY - oEp.inY);
+                            if ((distFromOut < 15.0 && getAngleDiff(ep.inAngle, oEp.outAngle) < 0.5) || 
+                                (distFromIn < 15.0 && getAngleDiff(ep.inAngle, (oEp.inAngle + Math.PI)) < 0.5)) {
+                                hasIncoming = true; break;
+                            }
+                        }
+                        return !hasIncoming;
+                    });
+                }
+                if (startIdx === -1) startIdx = 0;
+
+                let current = pool.splice(startIdx, 1)[0];
+                current.inZ = current.elevation || 0;
+                current.outZ = current.elevation || 0;
+                currentChain.push(current);
+                
+                let firstGeo = getPieceGeometry(current);
+                let currentSearchExitNodes = firstGeo.outNodes.map(n => ({ ...n, z: current.outZ }));
+
+                let chainContinues = true;
+                while (chainContinues && pool.length > 0) {
+                    const { bestIdx, connectedToIn, targetSearchNode } = findNextPiece(currentSearchExitNodes, pool);
+
+                    if (bestIdx !== -1) {
+                        let nextPiece = pool.splice(bestIdx, 1)[0];
+
+                        if (!connectedToIn) {
+                            if (nextPiece.type === 'curve' || nextPiece.subtype === 'chicane_curve' || nextPiece.type === 'rotonda' || nextPiece.subtype === 'rotonda' || nextPiece.subtype === 'rotonda_connect') {
+                                nextPiece.direction = nextPiece.direction === 'left' ? 'right' : 'left';
+                            }
+                            const tmpL = nextPiece.borderLeft; nextPiece.borderLeft = nextPiece.borderRight; nextPiece.borderRight = tmpL;
+                            
+                            if (nextPiece.subtype === 'chicane_entry') { nextPiece.subtype = 'chicane_exit'; if (nextPiece.id === 'n_chicane_in') nextPiece.id = 'n_chicane_out'; } 
+                            else if (nextPiece.subtype === 'chicane_exit') { nextPiece.subtype = 'chicane_entry'; if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in'; }
+                            if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit'; else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
+                            
+                            if (nextPiece.subtype === 'adapter_ninco_scx') nextPiece.subtype = 'adapter_scx_ninco'; else if (nextPiece.subtype === 'adapter_scx_ninco') nextPiece.subtype = 'adapter_ninco_scx';
+                            else if (nextPiece.subtype === 'adapter_ninco_suk') nextPiece.subtype = 'adapter_suk_ninco'; else if (nextPiece.subtype === 'adapter_suk_ninco') nextPiece.subtype = 'adapter_ninco_suk';
+                            else if (nextPiece.subtype === 'adapter_scx_adv') nextPiece.subtype = 'adapter_adv_scx'; else if (nextPiece.subtype === 'adapter_adv_scx') nextPiece.subtype = 'adapter_scx_adv';
+
+                            if (nextPiece.widthIn !== undefined) { const tw = nextPiece.widthIn; nextPiece.widthIn = nextPiece.widthOut; nextPiece.widthOut = tw; }
+                            if (nextPiece.laneSpacingIn !== undefined) { const tls = nextPiece.laneSpacingIn; nextPiece.laneSpacingIn = nextPiece.laneSpacingOut; nextPiece.laneSpacingOut = tls; }
+                        }
+
+                        nextPiece.invert = false;
+                        nextPiece.rot = targetSearchNode.angle;
+                        
+                        const ep = getPieceGeometry(nextPiece);
+                        let bestLocalDist = Infinity; let alignNode = ep.inNodes[0];
+                        ep.inNodes.forEach(n => { const d = Math.hypot(targetSearchNode.x - n.x, targetSearchNode.y - n.y); if (d < bestLocalDist) { bestLocalDist = d; alignNode = n; } });
+                        
+                        nextPiece.x += (targetSearchNode.x - alignNode.x);
+                        nextPiece.y += (targetSearchNode.y - alignNode.y);
+                        nextPiece.inZ = targetSearchNode.z;
+                        nextPiece.outZ = nextPiece.elevation || 0;
+                        
+                        const finalEp = getPieceGeometry(nextPiece);
+                        currentSearchExitNodes = finalEp.outNodes.map(n => ({ ...n, z: nextPiece.outZ }));
+                        
+                        currentChain.push(nextPiece);
+                    } else {
+                        chainContinues = false; 
                     }
                 }
                 
-                // Añadimos todas las cadenas de este carril al compilado final
-                allChainsForLane.forEach(chain => finalCompiled.push(...chain));
-            });
+                if (currentChain.length > 0) allChains.push(currentChain);
+            }
 
-            // 3. MAGIA FINAL PARA EL MOTOR 3D:
-            // Engañamos al motor 3D reescribiendo los "uid" (DNI de la pista) en estricto orden secuencial.
-            // Así el motor cree que se ha construido seguido (como en tu archivo 222.json)
-            let fakeTimestamp = Date.now() - 1000000;
-            finalCompiled.forEach((p, idx) => {
-                p.uid = fakeTimestamp + (idx * 1000) + 0.1234; 
+            // 4. EXPORTACIÓN SEGURA:
+            allChains.forEach((chain, chainIndex) => {
+                const chainBaseUid = Date.now() - 1000000 + (chainIndex * 500000);
+                chain.forEach((p, idx) => {
+                    p.uid = chainBaseUid + (idx * 1000) + 0.1234; 
+                    p.chainIndex = chainIndex;
+
+                    if (p.subtype === 'single_lane_1') p.lane = 1;
+                    else if (p.subtype === 'single_lane_2') p.lane = 2;
+                    else if (p.lane === undefined) p.lane = 0;
+
+                    // Limpieza final de variables exclusivas del diseñador 2D
+                    delete p.groupId;
+                    delete p.cat;
+                    delete p.brandKey;
+
+                    finalCompiled.push(p);
+                });
             });
 
             return finalCompiled;
