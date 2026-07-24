@@ -4231,17 +4231,14 @@
                             let sShapeOffset = 0;
 
                             if (p.subtype === 'chicane3_entry') {
-                                // Fase 1: Empieza a curvar suavemente hacia un lado (0 a 90 grados)
-                                const phase = t * (Math.PI / 2);
-                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                                // Fase 1: Suavemente hacia un lado. Inicia paralelo al asfalto (0) y termina paralelo en el borde
+                                sShapeOffset = easeSine(t) * (currentLaneSpacing * 0.5);
                             } else if (p.subtype === 'chicane3_middle') {
-                                // Fase 2: Cruza fluidamente hacia el otro lado (90 a 270 grados)
-                                const phase = (Math.PI / 2) + (t * Math.PI);
-                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                                // Fase 2: Cruza de un borde al otro. Inicia paralelo y termina paralelo en el otro extremo
+                                sShapeOffset = (currentLaneSpacing * 0.5) - (easeSine(t) * currentLaneSpacing);
                             } else if (p.subtype === 'chicane3_exit') {
-                                // Fase 3: Retorna suavemente al centro (270 a 360 grados)
-                                const phase = (Math.PI * 1.5) + (t * (Math.PI / 2));
-                                sShapeOffset = Math.sin(phase) * (currentLaneSpacing * 0.4);
+                                // Fase 3: Retorna al centro. Inicia paralelo en el borde y termina paralelo en el centro (0)
+                                sShapeOffset = -(currentLaneSpacing * 0.5) + (easeSine(t) * (currentLaneSpacing * 0.5));
                             }
 
                             if (sShapeOffset !== 0) {
