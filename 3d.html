@@ -3966,6 +3966,8 @@
                         stdHalfR = halfAsphalt;
                     }
                     
+                    let currentWideOffsets = [...currentOffsets];
+                    
                     const trackGroup = new THREE.Group(); 
                     
                     // GESTIÓN MULTI-TEXTURAS PARA ADAPTADORES DE MARCA
@@ -4287,11 +4289,16 @@
                             stdHalfL = endHalfL;
                             stdHalfR = endHalfR;
                             currentOffsets = [...tL];
+                            currentWideOffsets = [...tL];
                         }
-                        else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
+                        else if (isCrossing) { 
+                            tL.reverse(); 
+                            currentOffsets = [...tL]; 
+                            currentWideOffsets.reverse(); 
+                        } 
                         else if (isChicaneEntry) { 
                             const shift = (p.subtype === 'chicane3_entry') ? -3.6 : 0.0;
-                            tL = stdOffsetsLocal.map(off => (off * 0.22) + shift); 
+                            tL = currentWideOffsets.map(off => (off * 0.22) + shift); 
                             currentOffsets = [...tL]; 
                             endHalfL = stdHalfL; 
                             endHalfR = stdHalfR;
@@ -4299,7 +4306,7 @@
                         else if (isChicaneMiddle) {
                             const startShift = (p.subtype === 'chicane3_middle') ? -3.6 : 0.0;
                             const endShift = (p.subtype === 'chicane3_middle') ? 3.6 : 0.0;
-                            tL = stdOffsetsLocal.map(off => (off * 0.22) + endShift);
+                            tL = currentWideOffsets.map(off => (off * 0.22) + endShift);
                             currentOffsets = [...tL];
                             startHalfL = stdHalfL; 
                             startHalfR = stdHalfR;
@@ -4308,7 +4315,7 @@
                         }
                         else if (isChicaneExit) { 
                             const startShift = (p.subtype === 'chicane3_exit') ? 3.6 : 0.0;
-                            tL = [...stdOffsetsLocal];
+                            tL = [...currentWideOffsets];
                             currentOffsets = [...tL];
                             startHalfL = stdHalfL; 
                             startHalfR = stdHalfR;
