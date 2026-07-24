@@ -1,4 +1,4 @@
-<!-- El archivo se ha limpiado. Por favor, vuelve a pegar tu código original aquí. --><<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -1577,10 +1577,8 @@
                             } else if (p.subtype === 'crossing') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); ctx.stroke();
                             } else if (p.subtype === 'squeeze') {
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); 
+                                ctx.fillStyle = '#facc15'; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); 
                                 const pinchOff = laneOff * 0.25;
-                                ctx.fillStyle = '#c2b280'; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, -hw + 1); ctx.bezierCurveTo(l*0.7, -laneOff, l*0.6, -pinchOff - 4*(s/5), l*0.5, -pinchOff - 4*(s/5)); ctx.bezierCurveTo(l*0.4, -pinchOff - 4*(s/5), l*0.3, -laneOff, 0, -hw + 1); ctx.fill();
-                                ctx.beginPath(); ctx.moveTo(0, hw); ctx.lineTo(l, hw); ctx.lineTo(l, hw - 1); ctx.bezierCurveTo(l*0.7, laneOff, l*0.6, pinchOff + 4*(s/5), l*0.5, pinchOff + 4*(s/5)); ctx.bezierCurveTo(l*0.4, pinchOff + 4*(s/5), l*0.3, laneOff, 0, hw - 1); ctx.fill();
                                 ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
                                 ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.3, -laneOff, l*0.4, -pinchOff, l*0.5, -pinchOff); ctx.bezierCurveTo(l*0.6, -pinchOff, l*0.7, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.4, pinchOff, l*0.5, pinchOff); ctx.bezierCurveTo(l*0.6, pinchOff, l*0.7, laneOff, l, laneOff); ctx.stroke();
                             } else if (p.subtype === 'chicane_entry') {
