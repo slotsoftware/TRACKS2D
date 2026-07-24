@@ -717,6 +717,10 @@
 
             // USAR EL CARGADOR OPTIMIZADO COMPARTIDO
             const loader = getSharedGLTFLoader();
+            if (!loader) {
+                setStatus("ERROR: CARGADOR NO DISPONIBLE");
+                return;
+            }
             loader.load(rawUrl, (gltf) => processLoadedModel(gltf.scene, fileData.name, rawUrl), (xhr) => setStatus(`BAJANDO ${(xhr.loaded / xhr.total * 100).toFixed(0)}%`), (err) => { console.error(err); setStatus("ERROR: NO ENCONTRADO (404)"); });
         };
 
@@ -743,6 +747,10 @@
             reader.onload = (event) => { 
                 // USAR EL CARGADOR OPTIMIZADO COMPARTIDO
                 const loader = getSharedGLTFLoader(); 
+                if (!loader) {
+                    setStatus("ERROR: CARGADOR NO DISPONIBLE");
+                    return;
+                }
                 loader.parse(event.target.result, '', (gltf) => { processLoadedModel(gltf.scene, file.name, null); if (onLoad) onLoad(file, targetCarId); }, (err) => { console.error(err); setStatus("ERROR PARSE GLB"); }); 
             }; 
             reader.readAsArrayBuffer(file); e.target.value = ''; 
@@ -3830,7 +3838,8 @@
                     } else if (Array.isArray(circuitData.pieces)) {
                         const groups = {};
                         circuitData.pieces.forEach(p => {
-                            const key = p.lane !== undefined ? p.lane : (p.track !== undefined ? p.track : (p.groupId !== undefined ? p.groupId : null));
+                            // FIX: Eliminamos p.groupId. Solo agrupamos por p.lane o p.track para circuitos de 4/6 carriles.
+                            const key = p.lane !== undefined ? p.lane : (p.track !== undefined ? p.track : null);
                             if (key !== null) {
                                 if (!groups[key]) groups[key] = [];
                                 groups[key].push(p);
@@ -4225,7 +4234,7 @@
                         }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
                         else if (isChicaneEntry) { 
-                            const shift = (p.subtype === 'chicane3_entry') ? -4.0 : 0.0;
+                            const shift = (p.subtype === 'chicane3_entry') ? -3.6 : 0.0;
                             tL = stdOffsetsLocal.map(off => (off * 0.22) + shift); 
                             currentOffsets = [...tL]; 
                             const narrowHalf = stdHalfL * 0.55;
@@ -4233,8 +4242,8 @@
                             endHalfR = narrowHalf + shift;
                         }
                         else if (isChicaneMiddle) {
-                            const startShift = (p.subtype === 'chicane3_middle') ? -4.0 : 0.0;
-                            const endShift = (p.subtype === 'chicane3_middle') ? 4.0 : 0.0;
+                            const startShift = (p.subtype === 'chicane3_middle') ? -3.6 : 0.0;
+                            const endShift = (p.subtype === 'chicane3_middle') ? 3.6 : 0.0;
                             tL = stdOffsetsLocal.map(off => (off * 0.22) + endShift);
                             currentOffsets = [...tL];
                             const narrowHalf = stdHalfL * 0.55;
@@ -4244,7 +4253,7 @@
                             endHalfR = narrowHalf + endShift;
                         }
                         else if (isChicaneExit) { 
-                            const startShift = (p.subtype === 'chicane3_exit') ? 4.0 : 0.0;
+                            const startShift = (p.subtype === 'chicane3_exit') ? 3.6 : 0.0;
                             tL = [...stdOffsetsLocal];
                             currentOffsets = [...tL];
                             
@@ -4273,14 +4282,11 @@
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps; if (p.type === 'curve') { const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2; curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle; } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
                             
-                            // Setari curba S pentru chicane SCX (Smoothstep / Smootherstep)
+                            // Setari curba S pentru chicane SCX (Smoothstep)
                             let mixT = t;
                             if (isCrossing || (p.subtype && p.subtype.includes('adapter'))) {
                                 mixT = easeSine(t);
-                            } else if (isChicaneMiddle) {
-                                // Smootherstep: Mantiene los extremos rectos y cruza más bruscamente por el centro
-                                mixT = t * t * t * (t * (t * 6 - 15) + 10);
-                            } else if (isChicaneEntry || isChicaneExit) {
+                            } else if (isChicaneEntry || isChicaneMiddle || isChicaneExit) {
                                 mixT = t * t * (3 - 2 * t); 
                             }
                             
@@ -5253,6 +5259,10 @@
                         // Función principal para cargar TUS archivos Reales
                         const loadRealTrees = (fileList) => {
                             const loader = getSharedGLTFLoader();
+                            if (!loader) {
+                                console.warn("GLTFLoader no disponible para cargar árboles.");
+                                return;
+                            }
                             const loadedTrees = [];
                             let loadedCount = 0;
 
@@ -6306,6 +6316,10 @@
                 if(!sceneReady || !customCarAssets || carMeshesRef.current.length === 0) return;
                 
                 const loader = getSharedGLTFLoader(); // Usar el loader unificado (No colapsará el navegador)
+                if (!loader) {
+                    console.warn("GLTFLoader no disponible para cargar coches.");
+                    return;
+                }
 
                 Object.entries(customCarAssets).forEach(([carId, asset]) => {
                     if (asset && asset.glb) {
