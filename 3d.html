@@ -3838,7 +3838,6 @@
                     } else if (Array.isArray(circuitData.pieces)) {
                         const groups = {};
                         circuitData.pieces.forEach(p => {
-                            // FIX: Eliminamos p.groupId. Solo agrupamos por p.lane o p.track para circuitos de 4/6 carriles.
                             const key = p.lane !== undefined ? p.lane : (p.track !== undefined ? p.track : null);
                             if (key !== null) {
                                 if (!groups[key]) groups[key] = [];
@@ -3852,7 +3851,9 @@
                             masterPieces = groups[keys[0]]; 
                             detectedLanes = keys.length * 2; 
                         } else {
+                            // "Es más fácil, no te compliques": Usamos todas las piezas sin filtros artificiales
                             masterPieces = circuitData.pieces;
+
                             detectedLanes = circuitData.lanes || circuitData.numLanes || 2;
                             if (typeof detectedLanes !== 'number') detectedLanes = 2;
                             
@@ -4039,6 +4040,22 @@
 
                     // CAMBIO CLAVE: Recorrer masterPieces en lugar de circuitData.pieces
                     masterPieces.forEach((p, index) => {
+                        // COORDENADAS ABSOLUTAS: Si el diseñador 2D envía (x, y, rot) usamos la posición exacta.
+                        // Esto permite dibujar cruces y bifurcaciones (carriles separados) a la perfección sin fideos.
+                        const hasAbsoluteCoords = p.x !== undefined && p.y !== undefined && p.rot !== undefined;
+                        if (hasAbsoluteCoords) {
+                            const jumpDist = Math.hypot(p.x - curX, p.y - curZ);
+                            if (jumpDist > 1.0) {
+                                // Forzar nuevo segmento de asfalto/raíles al detectar un salto geográfico
+                                currentGeoData = null; 
+                                for(let j=0; j<numLanes; j++) rails.lanes[j].push(null);
+                                rails.pit.push(null);
+                            }
+                            curX = p.x;
+                            curZ = p.y;
+                            curAngle = p.rot;
+                        }
+
                         if (p.subtype === 'rotonda') {
                             const steps = 40; const r = p.radius || 14.5; const loopCenterX = r * 1.3; const laneOffVal = laneSpacing / 2; const startX = curX; const startZ = curZ; const startAngle = curAngle; const straightLen = 10.0;
                             const rotVertexIndex = rails.lanes[0].length;
@@ -4180,6 +4197,29 @@
                         let startHalfL = stdHalfL, startHalfR = stdHalfR;
                         let endHalfL = stdHalfL, endHalfR = stdHalfR;
 
+                        // CONFIGURACIÓN DE DESVÍOS INDIVIDUALES ABSOLUTOS
+                        if (hasAbsoluteCoords) {
+                            if (p.subtype === 'single_lane_1') {
+                                sL = [0, null]; tL = [0, null];
+                                startHalfL = endHalfL = currentTrackWidth / 4;
+                                startHalfR = endHalfR = currentTrackWidth / 4;
+                            } else if (p.subtype === 'single_lane_2') {
+                                sL = [null, 0]; tL = [null, 0];
+                                startHalfL = endHalfL = currentTrackWidth / 4;
+                                startHalfR = endHalfR = currentTrackWidth / 4;
+                            }
+                        } else {
+                            if (p.subtype === 'single_lane_1') {
+                                sL = [sL[0], null]; tL = [tL[0], null]; 
+                                startHalfL = stdHalfL; startHalfR = 0;
+                                endHalfL = stdHalfL; endHalfR = 0;
+                            } else if (p.subtype === 'single_lane_2') {
+                                sL = [null, sL[1]]; tL = [null, tL[1]]; 
+                                startHalfL = 0; startHalfR = stdHalfR;
+                                endHalfL = 0; endHalfR = stdHalfR;
+                            }
+                        }
+
                         if (p.subtype && p.subtype.includes('adapter')) {
                             let wIn = p.widthIn || currentTrackWidth;
                             let wOut = p.widthOut || currentTrackWidth;
@@ -4237,29 +4277,25 @@
                             const shift = (p.subtype === 'chicane3_entry') ? -3.6 : 0.0;
                             tL = stdOffsetsLocal.map(off => (off * 0.22) + shift); 
                             currentOffsets = [...tL]; 
-                            const narrowHalf = stdHalfL * 0.55;
-                            endHalfL = narrowHalf - shift; 
-                            endHalfR = narrowHalf + shift;
+                            endHalfL = stdHalfL; 
+                            endHalfR = stdHalfR;
                         }
                         else if (isChicaneMiddle) {
                             const startShift = (p.subtype === 'chicane3_middle') ? -3.6 : 0.0;
                             const endShift = (p.subtype === 'chicane3_middle') ? 3.6 : 0.0;
                             tL = stdOffsetsLocal.map(off => (off * 0.22) + endShift);
                             currentOffsets = [...tL];
-                            const narrowHalf = stdHalfL * 0.55;
-                            startHalfL = narrowHalf - startShift; 
-                            startHalfR = narrowHalf + startShift;
-                            endHalfL = narrowHalf - endShift; 
-                            endHalfR = narrowHalf + endShift;
+                            startHalfL = stdHalfL; 
+                            startHalfR = stdHalfR;
+                            endHalfL = stdHalfL; 
+                            endHalfR = stdHalfR;
                         }
                         else if (isChicaneExit) { 
                             const startShift = (p.subtype === 'chicane3_exit') ? 3.6 : 0.0;
                             tL = [...stdOffsetsLocal];
                             currentOffsets = [...tL];
-                            
-                            const narrowHalf = stdHalfL * 0.55;
-                            startHalfL = narrowHalf - startShift; 
-                            startHalfR = narrowHalf + startShift;
+                            startHalfL = stdHalfL; 
+                            startHalfR = stdHalfR;
                             endHalfL = stdHalfL; 
                             endHalfR = stdHalfR;
                         }
@@ -4292,7 +4328,12 @@
                             
                             let cL = [];
                             for(let j=0; j<numLanes; j++) {
-                                cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                // Asegurar que null se mantenga para no dibujar raíles en huecos (bifurcaciones)
+                                if (sL[j] === null || tL[j] === null) {
+                                    cL.push(null);
+                                } else {
+                                    cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                }
                             }
 
                             const pcd = (currentLaneSpacing / 2) + currentLaneSpacing;
@@ -4304,8 +4345,6 @@
                             else if (p.subtype && p.subtype.includes('pit_parallel')) { cPit = pitDir * pcd; if(pitSide==='right') cTWR = poe; else cTWL = poe; }
                             
                             let curL_Vis = [...cL];
-                            if (p.subtype === 'single_lane_1') { curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); cTWR = 0; }
-                            if (p.subtype === 'single_lane_2') { curL_Vis = curL_Vis.map((v, idx) => idx === 1 ? v : null); cTWL = 0; }
 
                             addRailPoint(curX, curZ, curAngle, curL_Vis, cPit, stepPhysDist); 
                             addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
