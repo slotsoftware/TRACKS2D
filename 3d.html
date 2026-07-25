@@ -3887,16 +3887,23 @@
                     
                     let curX = 0, curZ = 0, curAngle = 0;
 
-                    const addRailPoint = (x, z, ang, lOffs, po, di) => { 
+                    const addRailPoint = (x, z, ang, lOffs, po, di, brand) => { 
                         const px = Math.cos(ang + Math.PI/2), pz = Math.sin(ang + Math.PI/2); 
                         for(let i=0; i<numLanes; i++) {
-                            if (lOffs && lOffs[i] !== null && lOffs[i] !== undefined) rails.lanes[i].push(new THREE.Vector3(x + px * lOffs[i], 0.2, z + pz * lOffs[i])); 
-                            else rails.lanes[i].push(null);
+                            if (lOffs && lOffs[i] !== null && lOffs[i] !== undefined) {
+                                const pt = new THREE.Vector3(x + px * lOffs[i], 0.2, z + pz * lOffs[i]);
+                                pt.brand = brand;
+                                rails.lanes[i].push(pt); 
+                            } else rails.lanes[i].push(null);
                         }
-                        if (po !== null) rails.pit.push(new THREE.Vector3(x + px * po, 0.2, z + pz * po)); else rails.pit.push(null); 
+                        if (po !== null) {
+                            const pt = new THREE.Vector3(x + px * po, 0.2, z + pz * po);
+                            pt.brand = brand;
+                            rails.pit.push(pt);
+                        } else rails.pit.push(null); 
                         if (di > 0) { accumulatedDist += di; vertexDistances.push(accumulatedDist); } 
                     };
-                    addRailPoint(0,0,0, currentOffsets, null, 0); 
+                    addRailPoint(0,0,0, currentOffsets, null, 0, currentBrandKey); 
                     addAsphaltSlice(0,0,0, stdHalfL, stdHalfR, 0, currentBrandKey); 
                     
                     const easeSine = (t) => (1 - Math.cos(t * Math.PI)) / 2;
@@ -3928,7 +3935,9 @@
                             // TRANSICIÓN DE ENTRADA: Cierra el carril izquierdo plano verticalmente sin estirar texturas
                             const entryRailX = startX + Math.cos(startAngle + Math.PI/2) * -laneOffVal;
                             const entryRailZ = startZ + Math.sin(startAngle + Math.PI/2) * -laneOffVal;
-                            loopRailPoints.push(new THREE.Vector3(entryRailX, 0.2, entryRailZ));
+                            const entryPt = new THREE.Vector3(entryRailX, 0.2, entryRailZ);
+                            entryPt.brand = currentBrandKey;
+                            loopRailPoints.push(entryPt);
                             addAsphaltSlice(entryRailX, entryRailZ, startAngle, laneAsphaltHalfWidth, laneAsphaltHalfWidth, accumulatedDist + 0.01, currentBrandKey);
 
                             // 1. TRAMO RECTO DE IDA (Solo carril derecho)
@@ -3936,7 +3945,9 @@
                                 const dist = i * (straightLen / straightSteps);
                                 const railX = startX + Math.cos(startAngle) * dist + Math.cos(startAngle + Math.PI/2) * -laneOffVal;
                                 const railZ = startZ + Math.sin(startAngle) * dist + Math.sin(startAngle + Math.PI/2) * -laneOffVal;
-                                loopRailPoints.push(new THREE.Vector3(railX, 0.2, railZ));
+                                const pt1 = new THREE.Vector3(railX, 0.2, railZ);
+                                pt1.brand = currentBrandKey;
+                                loopRailPoints.push(pt1);
                                 addAsphaltSlice(railX, railZ, startAngle, laneAsphaltHalfWidth, laneAsphaltHalfWidth, accumulatedDist + dist, currentBrandKey);
                             }
                             
@@ -3973,7 +3984,9 @@
                                 const worldZ = straightEndZ + (localX * sinA + localZ * cosA); 
                                 const worldAngle = startAngle + localAngle;
                                 
-                                loopRailPoints.push(new THREE.Vector3(worldX, 0.2, worldZ)); 
+                                const ptLoop = new THREE.Vector3(worldX, 0.2, worldZ);
+                                ptLoop.brand = currentBrandKey;
+                                loopRailPoints.push(ptLoop); 
                                 addAsphaltSlice(worldX, worldZ, worldAngle, laneAsphaltHalfWidth, laneAsphaltHalfWidth, accumulatedDist + straightLen + (i * loopStepDist), currentBrandKey);
                             }
                             
@@ -3983,14 +3996,16 @@
                                 const travel = straightLen - dist; // Volvemos hacia atrás
                                 const railX = startX + Math.cos(startAngle) * travel + Math.cos(startAngle + Math.PI/2) * laneOffVal;
                                 const railZ = startZ + Math.sin(startAngle) * travel + Math.sin(startAngle + Math.PI/2) * laneOffVal;
-                                loopRailPoints.push(new THREE.Vector3(railX, 0.2, railZ));
+                                const pt2 = new THREE.Vector3(railX, 0.2, railZ);
+                                pt2.brand = currentBrandKey;
+                                loopRailPoints.push(pt2);
                                 addAsphaltSlice(railX, railZ, startAngle + Math.PI, laneAsphaltHalfWidth, laneAsphaltHalfWidth, accumulatedDist + straightLen + teardropLen + dist, currentBrandKey);
                             }
                             
                             rails.changes.push({ points: loopRailPoints, refIdx: rotVertexIndex, count: loopRailPoints.length, isRotonda: true });
                             curX = startX; curZ = startZ; curAngle = startAngle + Math.PI; accumulatedDist += totalPieceLen;
                             
-                            addRailPoint(curX, curZ, curAngle, currentOffsets, null, 0); 
+                            addRailPoint(curX, curZ, curAngle, currentOffsets, null, 0, currentBrandKey); 
                             vertexDistances.push(accumulatedDist); 
                             
                             // TRANSICIÓN DE SALIDA: Cierre de asfalto ancho completo para empalmar limpio con la siguiente pista
@@ -4014,9 +4029,39 @@
                         if (pb && pb !== currentBrandKey) {
                             currentBrandKey = pb;
                             brandChanged = true;
+                            
+                            // Si no es un adaptador, actualizamos abruptamente anchos para pistas regulares mezcladas
+                            if (!p.subtype || !p.subtype.includes('adapter')) {
+                                const newDef = TRACK_DEFINITIONS[pb];
+                                if (newDef) {
+                                    currentTrackWidth = newDef.width || currentTrackWidth;
+                                    currentLaneSpacing = newDef.laneSpacing || currentLaneSpacing;
+                                    
+                                    let tL = [];
+                                    if (hasGroups) {
+                                        for (let i = 0; i < numLanes; i++) {
+                                            const pairIndex = Math.floor(i / 2);
+                                            const isRightLane = i % 2 === 1;
+                                            const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
+                                            tL.push(localOffset + (pairIndex * currentTrackWidth));
+                                        }
+                                        stdHalfL = currentTrackWidth / 2;
+                                        stdHalfR = ((numLanes / 2) - 1) * currentTrackWidth + (currentTrackWidth / 2);
+                                    } else {
+                                        for(let i=0; i<numLanes; i++) {
+                                            tL.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
+                                        }
+                                        const borderWidth = (currentTrackWidth - currentLaneSpacing) / 2;
+                                        const halfAsphalt = ((numLanes - 1) * currentLaneSpacing) / 2 + Math.max(4.5, borderWidth);
+                                        stdHalfL = halfAsphalt;
+                                        stdHalfR = halfAsphalt;
+                                    }
+                                    currentOffsets = [...tL];
+                                }
+                            }
                         }
                         
-                        let pieceBrand = (p.subtype && p.subtype.includes('adapter')) ? 'ADAPTER' : currentBrandKey;
+                        let pieceBrand = currentBrandKey;
                         let brandChangedLocal = false;
                         if (currentGeoData && currentGeoData.brand !== pieceBrand) {
                             brandChangedLocal = true;
@@ -4119,8 +4164,16 @@
                         if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype) && numLanes >= 2) {
                             const perpX = Math.cos(dStartAngle + Math.PI/2);
                             const perpZ = Math.sin(dStartAngle + Math.PI/2);
-                            if (p.subtype !== 'change_left') d12.push(new THREE.Vector3(dStartX + perpX * sL[0], 0.2, dStartZ + perpZ * sL[0]));
-                            if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(dStartX + perpX * sL[1], 0.2, dStartZ + perpZ * sL[1]));
+                            if (p.subtype !== 'change_left') {
+                                const pt12 = new THREE.Vector3(dStartX + perpX * sL[0], 0.2, dStartZ + perpZ * sL[0]);
+                                pt12.brand = pieceBrand;
+                                d12.push(pt12);
+                            }
+                            if (p.subtype !== 'change_right') {
+                                const pt21 = new THREE.Vector3(dStartX + perpX * sL[1], 0.2, dStartZ + perpZ * sL[1]);
+                                pt21.brand = pieceBrand;
+                                d21.push(pt21);
+                            }
                         }
 
                         // Cerrar hueco visual al cambiar de marca o adaptador
@@ -4171,13 +4224,21 @@
                                 railZ += pz * sShapeOffset;
                             }
 
-                            addRailPoint(railX, railZ, curAngle, curL_Vis, cPit, stepPhysDist); 
+                            addRailPoint(railX, railZ, curAngle, curL_Vis, cPit, stepPhysDist, pieceBrand); 
                             addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
                             
                             if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype) && numLanes >= 2) { 
                                 const ct = easeSine(t), o12 = sL[0] + (sL[1]-sL[0])*ct, o21 = sL[1] + (sL[0]-sL[1])*ct, px = Math.cos(curAngle+Math.PI/2), pz = Math.sin(curAngle+Math.PI/2); 
-                                if (p.subtype !== 'change_left') d12.push(new THREE.Vector3(curX+px*o12, 0.2, curZ+pz*o12)); 
-                                if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(curX+px*o21, 0.2, curZ+pz*o21)); 
+                                if (p.subtype !== 'change_left') {
+                                    const pt12_t = new THREE.Vector3(curX+px*o12, 0.2, curZ+pz*o12);
+                                    pt12_t.brand = pieceBrand;
+                                    d12.push(pt12_t); 
+                                }
+                                if (p.subtype !== 'change_right') {
+                                    const pt21_t = new THREE.Vector3(curX+px*o21, 0.2, curZ+pz*o21);
+                                    pt21_t.brand = pieceBrand;
+                                    d21.push(pt21_t); 
+                                }
                             }
                         }
                         if (d12.length > 0) rails.changes.push({ points: d12, refIdx: startVertexIdx, count: steps });
@@ -4876,7 +4937,7 @@
                     rallyPathRef.current = finalRallyPath; rallyDistancesRef.current = rallyDists;
 
                     const totalDist = accumulatedDist; physicsState.current.forEach(car => { if (totalDist > 0) { while (car.distance < 0) car.distance += totalDist; car.distance = car.distance % totalDist; } });
-                    const createRailMesh = (pts, c, w=0.6) => { 
+                    const createRailMesh = (pts, brand, w=0.6) => { 
                         const cp = pts.filter(p => p !== null); 
                         if(cp.length < 2) return; 
                         
@@ -4912,15 +4973,39 @@
                         const gR = new THREE.TubeGeometry(pathR, segments, w/3.5, 3, false);
                         const gS = new THREE.TubeGeometry(pathS, segments, w/2.2, 3, false);
 
-                        // OPTIMIZACIÓN MATERIALES: Usar Phong/Lambert evita que la GPU calcule metalness/roughness por pixel
-                        const mMetal = new THREE.MeshPhongMaterial({ color: 0xd0d0d0, shininess: 50 });
-                        const mSlot = new THREE.MeshLambertMaterial({ color: 0x020202 });
+                        // OPTIMIZACIÓN MATERIALES COLORIDOS POR MARCA
+                        const bDef = TRACK_DEFINITIONS[brand] || TRACK_DEFINITIONS.NINCO;
+                        const rCol = parseInt((bDef.railColor || '#dcdcdc').replace('#', '0x'));
+                        const sCol = parseInt((bDef.slotColor || '#000000').replace('#', '0x'));
+
+                        const mMetal = new THREE.MeshPhongMaterial({ color: rCol, shininess: 50 });
+                        const mSlot = new THREE.MeshLambertMaterial({ color: sCol });
 
                         const meshL = new THREE.Mesh(gL, mMetal); meshL.castShadow = true; meshL.receiveShadow = true; trackGroup.add(meshL);
                         const meshR = new THREE.Mesh(gR, mMetal); meshR.castShadow = true; meshR.receiveShadow = true; trackGroup.add(meshR);
                         const meshS = new THREE.Mesh(gS, mSlot); meshS.receiveShadow = true; trackGroup.add(meshS);
                     };
-                    const createMultiSegmentRailMesh = (points, color, width=0.6) => { let currentSegment = []; for (let p of points) { if (p === null) { if (currentSegment.length > 1) createRailMesh(currentSegment, color, width); currentSegment = []; } else { currentSegment.push(p); } } if (currentSegment.length > 1) createRailMesh(currentSegment, color, width); };
+                    const createMultiSegmentRailMesh = (points, w=0.6) => { 
+                        let currentSegment = []; 
+                        let currentBrand = null;
+                        for (let p of points) { 
+                            if (p === null) { 
+                                if (currentSegment.length > 1) createRailMesh(currentSegment, currentBrand, w); 
+                                currentSegment = []; 
+                            } else { 
+                                if (currentBrand && p.brand !== currentBrand && currentSegment.length > 0) {
+                                    currentSegment.push(p);
+                                    createRailMesh(currentSegment, currentBrand, w);
+                                    currentSegment = [p];
+                                    currentBrand = p.brand;
+                                } else {
+                                    if (!currentBrand) currentBrand = p.brand;
+                                    currentSegment.push(p); 
+                                }
+                            } 
+                        } 
+                        if (currentSegment.length > 1) createRailMesh(currentSegment, currentBrand, w); 
+                    };
 
                     // CONSTRUIMOS Y AÑADIMOS UNA MALLA POR CADA SEGMENTO CREADO
                     asphaltGeometries.forEach(geoData => {
@@ -4944,11 +5029,11 @@
                     });
                     
                     for(let j=0; j<numLanes; j++) {
-                        createMultiSegmentRailMesh(rails.lanes[j], null, 0.7); 
+                        createMultiSegmentRailMesh(rails.lanes[j], 0.7); 
                     }
                     
-                    let curSeg = []; for (let p of rails.pit) { if (p === null) { if (curSeg.length > 1) createRailMesh(curSeg, null, 0.6); curSeg = []; } else { curSeg.push(p); } } if (curSeg.length > 1) createRailMesh(curSeg, null, 0.6); 
-                    rails.changes.forEach(obj => { if (obj.points) createRailMesh(obj.points, null, 0.5); else createRailMesh(obj, null, 0.5); });
+                    createMultiSegmentRailMesh(rails.pit, 0.6); 
+                    rails.changes.forEach(obj => { if (obj.points) createMultiSegmentRailMesh(obj.points, 0.5); else createMultiSegmentRailMesh(obj, 0.5); });
                     
                     const finishLinePiece = pieceMapRef.current.find(p => p.subtype === 'analog_connect' || p.subtype === 'connection' || p.subtype === 'digital_console') || pieceMapRef.current[0];
                     if (finishLinePiece) {
