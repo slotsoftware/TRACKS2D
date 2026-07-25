@@ -1983,6 +1983,93 @@
                     }
                 });
 
+                if (options.showStitchOverlay) {
+                    const compiledChains = compileCircuitFor3D(pieces);
+                    const chainsMap = new Map();
+                    compiledChains.forEach(p => {
+                        if (!chainsMap.has(p.chainIndex)) chainsMap.set(p.chainIndex, []);
+                        chainsMap.get(p.chainIndex).push(p);
+                    });
+
+                    const s = view.scale;
+                    chainsMap.forEach(chain => {
+                        [1, 2].forEach(startLane => {
+                            ctx.save();
+                            ctx.beginPath();
+                            let currentLane = startLane;
+                            ctx.strokeStyle = startLane === 1 ? '#ef4444' : '#3b82f6'; // Rojo para carril 1, Azul para carril 2
+                            ctx.lineWidth = 4 * s;
+                            ctx.shadowColor = startLane === 1 ? '#ef4444' : '#3b82f6';
+                            ctx.shadowBlur = 15;
+                            ctx.lineCap = 'round';
+                            
+                            chain.forEach((p, idx) => {
+                                const geo = p.worldGeo;
+                                if (!geo) return;
+                                
+                                const inNode = geo.inNodes[currentLane] || geo.inNodes[0];
+                                let outLane = p.laneMapping ? p.laneMapping[currentLane] : currentLane;
+                                const outNode = geo.outNodes[outLane] || geo.outNodes[0];
+                                
+                                if (idx === 0) {
+                                    ctx.moveTo(view.x + inNode.x * s, view.y + inNode.y * s);
+                                } else {
+                                    ctx.lineTo(view.x + inNode.x * s, view.y + inNode.y * s);
+                                }
+                                
+                                const pull = Math.hypot(outNode.x - inNode.x, outNode.y - inNode.y) * 0.4;
+                                const cp1X = view.x + (inNode.x + Math.cos(inNode.angle) * pull) * s;
+                                const cp1Y = view.y + (inNode.y + Math.sin(inNode.angle) * pull) * s;
+                                const cp2X = view.x + (outNode.x - Math.cos(outNode.angle) * pull) * s;
+                                const cp2Y = view.y + (outNode.y - Math.sin(outNode.angle) * pull) * s;
+                                
+                                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, view.x + outNode.x * s, view.y + outNode.y * s);
+                                
+                                currentLane = outLane;
+                            });
+                            
+                            // Rellenar falta de pista (Gap Fill)
+                            const lastP = chain[chain.length - 1];
+                            const firstP = chain[0];
+                            const lastGeo = lastP.worldGeo;
+                            const firstGeo = firstP.worldGeo;
+                            
+                            if (firstGeo && lastGeo) {
+                                const dist = Math.hypot(firstGeo.inX - lastGeo.outX, firstGeo.inY - lastGeo.outY);
+                                if (dist > 1.0) {
+                                    ctx.stroke(); 
+                                    
+                                    ctx.beginPath();
+                                    ctx.setLineDash([8 * s, 8 * s]);
+                                    ctx.strokeStyle = '#10b981'; // Verde para rellenar hueco
+                                    ctx.shadowColor = '#10b981';
+                                    
+                                    const outNode = lastGeo.outNodes[currentLane] || lastGeo.outNodes[0];
+                                    const inNode = firstGeo.inNodes[startLane] || firstGeo.inNodes[0];
+                                    
+                                    ctx.moveTo(view.x + outNode.x * s, view.y + outNode.y * s);
+                                    
+                                    const pull = dist * 0.5;
+                                    const cp1X = view.x + (outNode.x + Math.cos(outNode.angle) * pull) * s;
+                                    const cp1Y = view.y + (outNode.y + Math.sin(outNode.angle) * pull) * s;
+                                    const cp2X = view.x + (inNode.x - Math.cos(firstGeo.inAngle) * pull) * s;
+                                    const cp2Y = view.y + (inNode.y - Math.sin(firstGeo.inAngle) * pull) * s;
+                                    
+                                    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, view.x + inNode.x * s, view.y + inNode.y * s);
+                                    ctx.stroke();
+                                    ctx.setLineDash([]);
+                                } else {
+                                    ctx.stroke();
+                                }
+                            } else {
+                                ctx.stroke();
+                            }
+                            
+                            ctx.restore();
+                        });
+                    });
+                }
+
                 return pieceExtents;
             }
         };
@@ -2124,6 +2211,8 @@
           
           const [autoBorders, setAutoBorders] = useState(initDraft ? initDraft.autoBorders : false);
           const [paintBorderMode, setPaintBorderMode] = useState('none'); 
+
+          const [showStitchOverlay, setShowStitchOverlay] = useState(false);
 
           const [boardPoints, setBoardPoints] = useState(initDraft ? initDraft.boardPoints : []); 
           const [boardClosed, setBoardClosed] = useState(initDraft ? initDraft.boardClosed : false); 
@@ -2462,13 +2551,13 @@
             ctx.strokeStyle = currentBrand.neonColor; ctx.globalAlpha = 0.1; ctx.lineWidth = 1; const gridSize = 10 * view.scale; const offsetX = view.x % gridSize; const offsetY = view.y % gridSize; ctx.beginPath(); for(let x = offsetX; x < ctx.canvas.width; x += gridSize) { ctx.moveTo(x, 0); ctx.lineTo(x, ctx.canvas.height); } for(let y = offsetY; y < ctx.canvas.height; y += gridSize) { ctx.moveTo(0, y); ctx.lineTo(ctx.canvas.width, y); } ctx.stroke(); ctx.globalAlpha = 1.0;
             
             try { 
-                piecePositions.current = DrawEngine2D.renderTrack( ctx, pieces, view, activeBrand, selectedPieceIds, dragGroup, imageCache, boardPoints, boardClosed, { autoBorders } ); 
+                piecePositions.current = DrawEngine2D.renderTrack( ctx, pieces, view, activeBrand, selectedPieceIds, dragGroup, imageCache, boardPoints, boardClosed, { autoBorders, showStitchOverlay } ); 
                 if (pendingFit.current && piecePositions.current.length > 0) {
                     pendingFit.current = false;
                     setTimeout(fitToScreen, 10);
                 }
             } catch (error) { console.error(error); }
-          }, [pieces, view, activeBrand, selectedPieceIds, dragGroup, boardPoints, boardClosed, windowSize, autoBorders]);
+          }, [pieces, view, activeBrand, selectedPieceIds, dragGroup, boardPoints, boardClosed, windowSize, autoBorders, showStitchOverlay]);
 
           const pushHistory = (newPieces) => { const newHistory = history.slice(0, historyStep + 1); newHistory.push(newPieces); setHistory(newHistory); setHistoryStep(newHistory.length - 1); };
           const handleUndo = () => { if (historyStep > 0) { setHistoryStep(historyStep - 1); setSelectedPieceIds([]); } }; const handleRedo = () => { if (historyStep < history.length - 1) { setHistoryStep(historyStep + 1); setSelectedPieceIds([]); } };
@@ -2523,7 +2612,11 @@
               });
               
               pushHistory(stitchedPieces);
-              alert(lang === 'es' ? "¡Circuito cosido a la perfección! Se han eliminado todas las holguras matemáticas y ahora es un spline continuo 100% perfecto para el 3D." : "Track perfectly stitched! All mathematical gaps removed, 100% continuous spline ready for 3D.");
+              
+              setShowStitchOverlay(true);
+              setTimeout(() => {
+                  setShowStitchOverlay(false);
+              }, 6000);
           };
 
           const addPiece = (p, d='left') => {
