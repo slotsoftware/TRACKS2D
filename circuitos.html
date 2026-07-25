@@ -1992,7 +1992,7 @@
                 cat: { 'Rectas': 'Rectas', 'Curvas': 'Curvas', 'Digital': 'Digital', 'Boxes': 'Boxes', 'RALLY': 'RALLY', 'Kits': 'Kits' },
                 garage: { motorPower: 'MOTOR & POTENCIA', tires: 'NEUMÁTICOS & AGARRE', transmission: 'TRANSMISIÓN & DESARROLLO', gears: 'CORONAS', pinions: 'PIÑONES', digitalScale: 'BÁSCULA DIGITAL', powerSupply: 'FUENTE DS-3' },
                 report: { date: 'Fecha:', generated: 'Generado automáticamente', metrics: 'Métricas del Circuito', total: 'TOTAL PIEZAS', pPiece: 'Pieza', pCat: 'Categoría', pQty: 'Cantidad', pTotal: 'TOTAL', page: 'Página' },
-                tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
+                tools: { move: 'MOVER TABLERO', save: 'GUARDAR', open: 'ABRIR', report: 'INFORME', board: 'TABLERO', bridges: 'PUENTES', community: 'COMUNIDAD', fullscreen: 'FULLSCREEN', publish: 'PUBLICAR', multilane: 'MULTI-CARRIL', stitch: 'COSER PISTA', borders: 'BORDES', chat: 'CHAT', branch: 'BIFURCACIÓN' },
                 actions: { undo: 'DESHACER', redo: 'REHACER', zoomOut: 'ALEJAR', center: 'CENTRAR', zoomIn: 'ACERCAR', sim: 'SIMULACIÓN', deco: 'DECORACION', clubs: 'CLUBS DE SLOT', multiselect: 'MULTI-SEL', game2d: 'GARAJE 3D', game3d: '3D GAME', new: 'NUEVO' },
                 board: { title: 'TABLERO', rect: 'Medidas (Rectángulo)', create: 'Crear Rectángulo', manual: 'Manual (Punto a Punto)', length: 'Longitud:', up: 'ARRIBA', down: 'ABAJO', left: 'IZQ', right: 'DER', close: 'CIERRE', clear: 'BORRAR', exit: 'SALIR DEL TABLERO' },
                 borders: { title: 'PIANOS Y BORDES', auto: 'Pianos Automáticos', autoDesc: 'Añade bordes exteriores en curvas.', paintLeft: 'Pintar Borde IZQ', paintRight: 'Pintar Borde DER', clear: 'Borrar Bordes Manuales' },
@@ -2010,7 +2010,7 @@
                 cat: { 'Rectas': 'Straights', 'Curvas': 'Curves', 'Digital': 'Digital', 'Boxes': 'Pit Box', 'RALLY': 'RALLY', 'Kits': 'Kits', 'Cruces': 'Crossings' },
                 garage: { motorPower: 'MOTOR & POWER', tires: 'TIRES & GRIP', transmission: 'TRANSMISSION & GEARING', gears: 'CROWN GEARS', pinions: 'PINIONS', digitalScale: 'DIGITAL SCALE', powerSupply: 'POWER SUPPLY' },
                 report: { date: 'Date:', generated: 'Auto-generated', metrics: 'Track Metrics', total: 'TOTAL PIECES', pPiece: 'Piece', pCat: 'Category', pQty: 'Quantity', pTotal: 'TOTAL', page: 'Page' },
-                tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
+                tools: { move: 'MOVE CANVAS', save: 'SAVE', open: 'OPEN', report: 'REPORT', board: 'BOARD', bridges: 'BRIDGES', community: 'COMMUNITY', fullscreen: 'FULLSCREEN', publish: 'PUBLISH', multilane: 'MULTI-LANE', stitch: 'STITCH TRACK', borders: 'BORDERS', chat: 'CHAT', branch: 'BRANCH' },
                 actions: { undo: 'UNDO', redo: 'REDO', zoomOut: 'ZOOM OUT', center: 'CENTER', zoomIn: 'ZOOM IN', sim: 'SIMULATION', deco: 'DECORATION', clubs: 'SLOT CLUBS', multiselect: 'MULTI-SEL', game2d: '3D GARAGE', game3d: '3D GAME', new: 'NEW' },
                 board: { title: 'BOARD', rect: 'Dimensions (Rect)', create: 'Create Rectangle', manual: 'Manual (Point to Point)', length: 'Length:', up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT', close: 'CLOSE', clear: 'CLEAR', exit: 'EXIT BOARD' },
                 borders: { title: 'KERBS & BORDERS', auto: 'Auto Kerbs', autoDesc: 'Adds outer borders on all curves.', paintLeft: 'Paint LEFT Kerb', paintRight: 'Paint RIGHT Kerb', clear: 'Clear Manual Kerbs' },
@@ -2484,6 +2484,46 @@
                       setView({ x: window.innerWidth/2, y: window.innerHeight/2, scale: 5.0 });
                   }
               }
+          };
+
+          const handleCoserPista = () => {
+              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
+              
+              // Guardamos temporalmente los atributos originales de UI que el compilador suele borrar
+              const attributesMap = new Map();
+              pieces.forEach(p => {
+                  if (p) attributesMap.set(p.uid, { brandKey: p.brandKey, groupId: p.groupId, cat: p.cat, lane: p.lane, label: p.label, id: p.id, type: p.type, subtype: p.subtype });
+              });
+              
+              // Utilizamos el compilador 3D para encadenar matemáticamente y eliminar holguras
+              const compiled = compileCircuitFor3D(pieces);
+              
+              const stitchedPieces = compiled.map(p => {
+                  const newP = { ...p };
+                  // Eliminamos las mallas temporales 3D
+                  delete newP.worldGeo;
+                  delete newP.chainIndex;
+                  delete newP.chainOrder;
+                  delete newP.laneMapping;
+                  
+                  // Restauramos los valores originales del UI 2D
+                  const original = attributesMap.get(newP.uid);
+                  if (original) {
+                      newP.brandKey = original.brandKey;
+                      newP.groupId = original.groupId;
+                      newP.cat = original.cat;
+                      newP.lane = original.lane;
+                      newP.label = original.label;
+                      newP.id = original.id;
+                      newP.type = original.type;
+                      newP.subtype = original.subtype;
+                  }
+                  
+                  return newP;
+              });
+              
+              pushHistory(stitchedPieces);
+              alert(lang === 'es' ? "¡Circuito cosido a la perfección! Se han eliminado todas las holguras matemáticas y ahora es un spline continuo 100% perfecto para el 3D." : "Track perfectly stitched! All mathematical gaps removed, 100% continuous spline ready for 3D.");
           };
 
           const addPiece = (p, d='left') => {
@@ -3630,6 +3670,7 @@
                       <button onClick={() => { setShowBridgesTools(!showBridgesTools); setShowBoardTools(false); setShowMultiLaneTools(false); setShowBordersTools(false); setIsPaintElevationMode(false); setPaintBorderMode('none'); setShowChat(false); }} title={t.tools.bridges} className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-indigo-400 border border-indigo-500/50 rounded-lg hover:bg-indigo-500/10 hover:border-indigo-400 hover:text-indigo-200 hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] shadow-[0_0_10px_rgba(99,102,241,0.2)] transition-all font-bold text-xs shrink-0"><Layers size={16}/> {t.tools.bridges}</button>
                       <button onClick={() => { setShowBordersTools(!showBordersTools); setShowBoardTools(false); setShowBridgesTools(false); setShowMultiLaneTools(false); setIsPaintElevationMode(false); setPaintBorderMode('none'); setShowChat(false); }} title={t.tools.borders} className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-red-400 border border-red-500/50 rounded-lg hover:bg-red-500/10 hover:border-red-400 hover:text-red-200 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] shadow-[0_0_10px_rgba(239,68,68,0.2)] transition-all font-bold text-xs shrink-0"><Shield size={16}/> {t.borders.title}</button>
                       <button onClick={() => { setShowMultiLaneTools(!showMultiLaneTools); setShowBoardTools(false); setShowBridgesTools(false); setShowBordersTools(false); setIsPaintElevationMode(false); setPaintBorderMode('none'); setShowChat(false); }} title={t.tools.multilane} className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-amber-400 border border-amber-500/50 rounded-lg hover:bg-amber-500/10 hover:border-amber-400 hover:text-amber-200 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all font-bold text-xs shrink-0"><Hash size={16}/> {t.tools.multilane}</button>
+                      <button onClick={handleCoserPista} title={t.tools.stitch} className="flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-emerald-400 border border-emerald-500/50 rounded-lg hover:bg-emerald-500/10 hover:border-emerald-400 hover:text-emerald-200 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] shadow-[0_0_10px_rgba(16,185,129,0.2)] transition-all font-bold text-xs shrink-0"><GitCommit size={16}/> {t.tools.stitch}</button>
                       <button onClick={() => handleProtectedAction(handlePublishToCommunity)} disabled={isPublishing || pieces.length === 0} title={t.tools.publish} className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border transition-all font-bold text-xs shrink-0 ${pieces.length > 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-indigo-500/40 hover:text-white' : 'bg-transparent text-gray-500 border-gray-600/50 opacity-50 cursor-not-allowed'}`}> {isPublishing ? <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div> : <CloudUpload size={16}/>} {t.tools.publish}</button>
                       <button onClick={() => handleProtectedAction(() => setShowCommunityModal(true))} title={t.tools.community} className="btn-neon-purple flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent text-purple-400 border rounded-lg hover:bg-purple-500/20 hover:text-purple-100 transition-all font-bold text-xs shrink-0"><Users size={16}/> {t.tools.community}</button>
                       <button onClick={() => handleProtectedAction(() => { setShowChat(!showChat); setShowBordersTools(false); setShowBoardTools(false); setShowBridgesTools(false); setShowMultiLaneTools(false); setIsPaintElevationMode(false); setPaintBorderMode('none'); })} title={t.tools.chat} className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border transition-all font-bold text-xs shrink-0 ${showChat ? 'bg-cyan-500/30 text-white shadow-[0_0_20px_rgba(6,182,212,0.8)] border-cyan-400' : 'btn-neon-cyan bg-transparent text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-100'}`}><MessageSquare size={16}/> {t.tools.chat}</button>
