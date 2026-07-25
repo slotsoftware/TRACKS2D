@@ -1342,7 +1342,7 @@
                     // Limpieza final de variables exclusivas del diseñador 2D
                     delete p.groupId;
                     delete p.cat;
-                    delete p.brandKey;
+                    // ELIMINADO: delete p.brandKey; -> Ahora lo conservamos para que el 3D detecte el color de la marca
 
                     finalCompiled.push(p);
                 });
