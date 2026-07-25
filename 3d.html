@@ -144,12 +144,13 @@
 
         /* --- 1. DATOS ESTÁTICOS (TRACK DEFINITIONS) --- */
         const TRACK_DEFINITIONS = {
-          NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#050505', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444' },
-          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#050505', railColor: '#d0d0d0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          SCX_CLASSIC: { name: 'SCX CLASSIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#050505', railColor: '#d0d0d0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#666666', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-500 font-bold', trackColor: '#050505', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 9.0, connectionBoxColor: '#333' },
-          SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#6b6b6b', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af' },
+          NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444' },
+          SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#555555', railColor: '#d0d0d0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
+          SCX_CLASSIC: { name: 'SCX CLASSIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:bg-yellow-950/30', activeClass: 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(250,204,21,0.6)] border-yellow-400 font-bold', trackColor: '#111111', railColor: '#d0d0d0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
+          SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:bg-blue-950/30', activeClass: 'bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-400 font-bold', trackColor: '#555555', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
+          CARRERA: { name: 'CARRERA', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:bg-red-950/30', activeClass: 'bg-red-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.6)] border-red-500', trackColor: '#111111', railColor: '#e0e0e0', slotColor: '#000000', width: 19.8, laneSpacing: 9.9, connectionBoxColor: '#ef4444' },
+          POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:bg-orange-950/30', activeClass: 'bg-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-500 font-bold', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 9.0, connectionBoxColor: '#333' },
+          SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400 shadow-[0_0_15px_rgba(132,204,22,0.3)] hover:bg-lime-950/30', activeClass: 'bg-lime-500 text-black shadow-[0_0_20px_rgba(132,204,22,0.6)] border-lime-400 font-bold', trackColor: '#555555', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af' },
           ADAPTER: { trackColor: '#2a2a2a' }
         };
 
@@ -243,92 +244,13 @@
                 importRestore: "Importar piezas (Restaurar)",
                 restoreSuccess: "✅ Piezas personalizadas restauradas correctamente.",
                 restoreError: "❌ Error al restaurar el archivo de piezas."
-            },
-            en: {
-                lobbyTitle: "SELECT SOURCE",
-                lobbySub: "Load a track file or return to the designer",
-                btnLoad: "LOAD JSON (.JSON)",
-                btn2D: "GO TO 2D DESIGNER",
-                clearCache: "Clear browser cache",
-                prep: "PREPARATION",
-                practice: "PRACTICE",
-                rally: "RALLY TIMER",
-                analog: "ANALOG",
-                digital: "DIGITAL",
-                back: "BACK",
-                start: "START",
-                pause: "PAUSE",
-                resume: "RESUME",
-                menu: "MENU",
-                laps: "LAPS",
-                total: "TOTAL",
-                pilots: "DRIVERS",
-                pilot: "DRIVER",
-                speed: "SPEED",
-                lastLap: "LAST LAP",
-                bestLap: "BEST LAP",
-                telemetry: "TELEMETRY",
-                winner: "WINNER!",
-                continue: "CONTINUE",
-                freePractice: "FREE PRACTICE",
-                powertrain: "POWERTRAIN",
-                tireManagement: "TIRE MANAGEMENT",
-                workshopSettings: "WORKSHOP SETTINGS",
-                motorPower: "MOTOR & POWER",
-                compounds: "COMPOUNDS",
-                gears: "CROWN GEARS",
-                pinions: "PINIONS",
-                digitalScale: "DIGITAL SCALE",
-                powerSupply: "POWER SUPPLY",
-                save: "SAVE",
-                open: "OPEN",
-                car: "CAR",
-                motor: "MOTOR",
-                tires: "TIRES",
-                gearRatio: "GEAR RATIO",
-                testingMonitor: "TESTING MONITOR",
-                lap: "LAP",
-                last: "LAST",
-                sector: "SECTOR",
-                activeConfig: "ACTIVE CONFIG",
-                controller: "CONTROL",
-                manualControl: "Manual Control",
-                slide: "SLIDE",
-                slideTitle: "Slide up to accelerate your car",
-                laneChange1: "LANE",
-                laneChange2: "CHANGE",
-                pitEntry1: "PIT",
-                pitEntry2: "ENTRY",
-                voice: "VOICE",
-                polarity: "POLARITY",
-                voiceOn: "Enable Announcer",
-                voiceOff: "Mute Announcer",
-                polarityChange: "Change Polarity",
-                alertPolarity: "You can only change direction before starting the race or in free practice.",
-                manualDrivingTypes: "MANUAL DRIVING TYPES",
-                garage: "GARAGE",
-                garage3d: "3D GARAGE",
-                forest: "FOREST",
-                camera: "CAMERA",
-                camRace: "RACE",
-                camChase: "CHASE",
-                camPilot: "PILOT",
-                camHood: "HOOD",
-                camFront: "FRONT",
-                customParts: "CUSTOM PARTS:",
-                backup: "BACKUP",
-                restore: "RESTORE",
-                exportBackup: "Export all parts (Backup)",
-                importRestore: "Import parts (Restore)",
-                restoreSuccess: "✅ Custom parts restored successfully.",
-                restoreError: "❌ Error restoring parts file."
-            }
-        };
+        }
+    };
 
-        const LanguageContext = React.createContext({ lang: 'es', t: (key) => key });
-        const useTranslation = () => React.useContext(LanguageContext);
+    const LanguageContext = React.createContext({ lang: 'es', t: (key) => key, handleLangChange: () => {} });
+    const useTranslation = () => React.useContext(LanguageContext);
 
-        /* --- OPTIMIZACIÓN DRACO LOADER (SINGLETON) --- */
+    /* --- OPTIMIZACIÓN DRACO LOADER (SINGLETON) --- */
         // Creamos una única instancia global para evitar saturar el procesador con Web Workers
         let sharedGLTFLoader = null;
         const getSharedGLTFLoader = () => {
@@ -2586,7 +2508,7 @@
 
         /* --- 3. VISOR 3D (CORE LOGIC) --- */
         const Telemetry3DViewer = ({ circuitData, carSettings, customCarAssets, onCarAssetUpdate, onClose }) => {
-            const { t, lang } = useTranslation();
+            const { t, lang, handleLangChange } = useTranslation();
             const containerRef = useRef(null);
             const [paused, setPaused] = useState(false); 
             const [selectedCarId, setSelectedCarId] = useState(1);
@@ -3637,8 +3559,8 @@
                     cx.fillStyle = bc || '#080808'; 
                     cx.fillRect(0, 0, 256, 256); 
                     for (let i = 0; i < 8000; i++) { // Reducido de 15.000 a 8.000 para cargar más rápido
-                        const v = Math.floor(Math.random() * 25); 
-                        cx.fillStyle = `rgba(${v}, ${v}, ${v}, 0.2)`; 
+                        const v = Math.random() > 0.5 ? 255 : 0; 
+                        cx.fillStyle = `rgba(${v}, ${v}, ${v}, 0.04)`; 
                         cx.fillRect(Math.random() * 256, Math.random() * 256, 1.5, 1.5); 
                     } 
                     const t = new THREE.CanvasTexture(cv); 
@@ -4087,9 +4009,10 @@
                         const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * p.radius) * (Math.abs(p.angle) / 360) / steps;
                         
+                        let pb = p.brand || p.brandKey;
                         let brandChanged = false;
-                        if (p.brandKey && p.brandKey !== currentBrandKey) {
-                            currentBrandKey = p.brandKey;
+                        if (pb && pb !== currentBrandKey) {
+                            currentBrandKey = pb;
                             brandChanged = true;
                         }
                         
@@ -5011,7 +4934,7 @@
 
                         const mat = new THREE.MeshLambertMaterial({ 
                             map: geoData.texture, 
-                            color: 0xcccccc,
+                            color: 0xffffff,
                             side: THREE.DoubleSide
                         });
                         const mesh = new THREE.Mesh(geo, mat);
@@ -6357,7 +6280,9 @@
                     <div ref={containerRef} className="absolute inset-0 w-full h-full" /> 
                     
                     {/* Botón Fullscreen */}
-                    <button onClick={toggleFullscreen} className="absolute top-6 right-6 z-[80] w-12 h-12 flex items-center justify-center rounded-lg bg-black/60 border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-black transition-all duration-300 backdrop-blur-md shadow-[0_0_15px_rgba(249,115,22,0.5)] pointer-events-auto group animate-pulse hover:animate-none">{isFullscreen ? <Minimize size={24}/> : <Maximize size={24}/>}</button>
+                    <button onClick={toggleFullscreen} className="absolute top-4 right-4 z-[80] w-10 h-10 flex items-center justify-center rounded-sm bg-black/40 hover:bg-black/80 text-gray-400 hover:text-white border border-white/10 transition-all duration-300 backdrop-blur-sm pointer-events-auto" title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
+                        {isFullscreen ? <Minimize size={22}/> : <Maximize size={22}/>}
+                    </button>
                     
                     {/* MENSAJE DE ERROR FLOTANTE (NUEVO) */}
                     {validationError && (
@@ -6378,9 +6303,19 @@
 
                     {activeButton !== 'ANALOG' && activeButton !== 'DIGITAL' && activeButton !== 'PRACTICE' && (
                         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[70] flex items-start gap-8 pointer-events-none w-full justify-center px-4">
-                            <div className="flex flex-col gap-2 mt-2 pointer-events-auto animate-in items-center transition-opacity duration-300">
-                                <button onClick={enterGridMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'GRID' ? 'bg-[#22d3ee] border-[#22d3ee] text-black shadow-[0_0_30px_rgba(34,211,238,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{t('prep')}</button>
-                                <button onClick={startPracticeMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'PRACTICE' ? 'bg-[#a3e635] border-[#a3e635] text-black shadow-[0_0_30px_rgba(163,230,53,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{hasRotonda ? t('rally') : t('practice')}</button>
+                            <div className="flex gap-4 items-center mt-2">
+                                <div className="flex flex-row items-center bg-black/80 border border-gray-600 rounded-xl p-1 pointer-events-auto shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+                                    <button onClick={() => handleLangChange('es')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-black transition-all ${lang === 'es' ? 'bg-[#39ff14] text-black shadow-[0_0_10px_#39ff14]' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                                        <span className="text-xs leading-none">🇪🇸</span> ES
+                                    </button>
+                                    <button onClick={() => handleLangChange('en')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-black transition-all ${lang === 'en' ? 'bg-[#39ff14] text-black shadow-[0_0_10px_#39ff14]' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                                        <span className="text-xs leading-none">🇬🇧</span> EN
+                                    </button>
+                                </div>
+                                <div className="flex flex-col gap-2 pointer-events-auto animate-in items-center transition-opacity duration-300">
+                                    <button onClick={enterGridMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'GRID' ? 'bg-[#22d3ee] border-[#22d3ee] text-black shadow-[0_0_30px_rgba(34,211,238,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{t('prep')}</button>
+                                    <button onClick={startPracticeMode} className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-[0.2em] border-2 uppercase transition-all duration-300 w-36 ${activeButton === 'PRACTICE' ? 'bg-[#a3e635] border-[#a3e635] text-black shadow-[0_0_30px_rgba(163,230,53,0.8)]' : 'bg-gray-900/80 border-gray-700 text-gray-400'}`}>{hasRotonda ? t('rally') : t('practice')}</button>
+                                </div>
                             </div>
                             
                             <div className="flex flex-col items-center mt-2 shrink-0 pointer-events-auto">
@@ -7032,13 +6967,8 @@
 
           if (circuitData) {
             return (
-                <LanguageContext.Provider value={{ lang, t }}>
+                <LanguageContext.Provider value={{ lang, t, handleLangChange }}>
                     <React.Fragment>
-                        {/* BANDERAS DE IDIOMA EN EL VISOR 3D */}
-                        <div className="absolute top-6 right-24 z-[90] flex gap-3 bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md pointer-events-auto">
-                            <button onClick={() => handleLangChange('es')} className={`text-2xl transition-all ${lang === 'es' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="Español">🇪🇸</button>
-                            <button onClick={() => handleLangChange('en')} className={`text-2xl transition-all ${lang === 'en' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="English">🇬🇧</button>
-                        </div>
                         <Telemetry3DViewer 
                             circuitData={circuitData} 
                             carSettings={carSettings} 
@@ -7052,13 +6982,17 @@
           }
 
           return (
-            <LanguageContext.Provider value={{ lang, t }}>
+            <LanguageContext.Provider value={{ lang, t, handleLangChange }}>
                 <div className="flex flex-col h-[100dvh] w-full bg-[#0a0a0a] overflow-hidden font-sans select-none text-gray-200 justify-center items-center relative">
                     
                     {/* BANDERAS DE IDIOMA */}
-                    <div className="absolute top-6 right-6 z-50 flex gap-3 bg-black/50 p-2 rounded-full border border-white/10 backdrop-blur-md">
-                        <button onClick={() => handleLangChange('es')} className={`text-2xl transition-all ${lang === 'es' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="Español">🇪🇸</button>
-                        <button onClick={() => handleLangChange('en')} className={`text-2xl transition-all ${lang === 'en' ? 'scale-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] grayscale-0' : 'opacity-50 grayscale hover:grayscale-0 hover:opacity-100'}`} title="English">🇬🇧</button>
+                    <div className="absolute top-6 right-6 z-50 flex flex-row items-center bg-black/60 border border-gray-600 rounded-2xl p-1 shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md">
+                        <button onClick={() => handleLangChange('es')} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all ${lang === 'es' ? 'bg-[#39ff14] text-black shadow-[0_0_10px_#39ff14]' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                            <span className="text-lg leading-none">🇪🇸</span> ES
+                        </button>
+                        <button onClick={() => handleLangChange('en')} className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all ${lang === 'en' ? 'bg-[#39ff14] text-black shadow-[0_0_10px_#39ff14]' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                            <span className="text-lg leading-none">🇬🇧</span> EN
+                        </button>
                     </div>
 
                     {/* LOBBY SCREEN */}
