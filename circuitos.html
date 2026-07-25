@@ -935,9 +935,9 @@
 
             if (p.type === 'curve') {
                 if (p.subtype === 'single_lane_1') {
-                    effectiveRadius = p.direction === 'left' ? p.radius - laneOff : p.radius + laneOff;
+                    effectiveRadius = Math.abs(p.radius) - laneOff;
                 } else if (p.subtype === 'single_lane_2') {
-                    effectiveRadius = p.direction === 'left' ? p.radius + laneOff : p.radius - laneOff;
+                    effectiveRadius = Math.abs(p.radius) + laneOff;
                 }
             }
 
@@ -1053,8 +1053,8 @@
                 }
                 else if (p.type === 'curve') {
                     let effectiveRadius = Math.abs(p.radius);
-                    if (p.subtype === 'single_lane_1') effectiveRadius = p.direction === 'left' ? effectiveRadius - laneOff : effectiveRadius + laneOff;
-                    else if (p.subtype === 'single_lane_2') effectiveRadius = p.direction === 'left' ? effectiveRadius + laneOff : effectiveRadius - laneOff;
+                    if (p.subtype === 'single_lane_1') effectiveRadius = effectiveRadius - laneOff;
+                    else if (p.subtype === 'single_lane_2') effectiveRadius = effectiveRadius + laneOff;
                     
                     const r = effectiveRadius;
                     const aRad = (p.angle * Math.PI) / 180;
@@ -1270,8 +1270,6 @@
                             else if (nextPiece.subtype === 'chicane_exit') { nextPiece.subtype = 'chicane_entry'; if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in'; }
                             else if (nextPiece.subtype === 'chicane3_entry') { nextPiece.subtype = 'chicane3_exit'; }
                             else if (nextPiece.subtype === 'chicane3_exit') { nextPiece.subtype = 'chicane3_entry'; }
-                            else if (nextPiece.subtype === 'single_lane_1') { nextPiece.subtype = 'single_lane_2'; }
-                            else if (nextPiece.subtype === 'single_lane_2') { nextPiece.subtype = 'single_lane_1'; }
                             
                             if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit'; else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
                             
@@ -1344,9 +1342,9 @@
                         if (p.type === 'curve') {
                             const laneOff = brandDef.laneSpacing / 2;
                             if (p.subtype === 'single_lane_1') {
-                                p.radius = p.direction === 'left' ? p.radius - laneOff : p.radius + laneOff;
+                                p.radius = Math.abs(p.radius) - laneOff;
                             } else {
-                                p.radius = p.direction === 'left' ? p.radius + laneOff : p.radius - laneOff;
+                                p.radius = Math.abs(p.radius) + laneOff;
                             }
                         }
                     }
