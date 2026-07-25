@@ -1270,6 +1270,8 @@
                             else if (nextPiece.subtype === 'chicane_exit') { nextPiece.subtype = 'chicane_entry'; if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in'; }
                             else if (nextPiece.subtype === 'chicane3_entry') { nextPiece.subtype = 'chicane3_exit'; }
                             else if (nextPiece.subtype === 'chicane3_exit') { nextPiece.subtype = 'chicane3_entry'; }
+                            else if (nextPiece.subtype === 'single_lane_1') { nextPiece.subtype = 'single_lane_2'; }
+                            else if (nextPiece.subtype === 'single_lane_2') { nextPiece.subtype = 'single_lane_1'; }
                             
                             if (nextPiece.type === 'pit_entry') nextPiece.type = 'pit_exit'; else if (nextPiece.type === 'pit_exit') nextPiece.type = 'pit_entry';
                             
@@ -1321,9 +1323,7 @@
                         currentLaneMap = { 1: currentLaneMap[2], 2: currentLaneMap[1] };
                     }
 
-                    if (p.subtype === 'single_lane_1') p.lane = 1;
-                    else if (p.subtype === 'single_lane_2') p.lane = 2;
-                    else if (p.lane === undefined) p.lane = 0;
+                    if (p.lane === undefined) p.lane = 0;
 
                     // Adjuntar geometría absoluta explícita de carriles para el 3D
                     const geo = getPieceGeometry(p);
