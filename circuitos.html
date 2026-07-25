@@ -2003,16 +2003,31 @@
                             ctx.shadowBlur = 15;
                             ctx.lineCap = 'round';
                             
+                            let isDrawing = false;
+                            
                             chain.forEach((p, idx) => {
                                 const geo = p.worldGeo;
                                 if (!geo) return;
                                 
-                                const inNode = geo.inNodes[currentLane] || geo.inNodes[0];
                                 let outLane = p.laneMapping ? p.laneMapping[currentLane] : currentLane;
+                                
+                                // Verificar si la pieza actual soporta físicamente este carril
+                                let supportsLane = true;
+                                if (p.subtype === 'single_lane_1' && currentLane !== 1) supportsLane = false;
+                                if (p.subtype === 'single_lane_2' && currentLane !== 2) supportsLane = false;
+                                
+                                if (!supportsLane) {
+                                    isDrawing = false;
+                                    currentLane = outLane;
+                                    return; // Saltamos el dibujado en este tramo
+                                }
+                                
+                                const inNode = geo.inNodes[currentLane] || geo.inNodes[0];
                                 const outNode = geo.outNodes[outLane] || geo.outNodes[0];
                                 
-                                if (idx === 0) {
+                                if (!isDrawing) {
                                     ctx.moveTo(view.x + inNode.x * s, view.y + inNode.y * s);
+                                    isDrawing = true;
                                 } else {
                                     ctx.lineTo(view.x + inNode.x * s, view.y + inNode.y * s);
                                 }
@@ -2028,24 +2043,34 @@
                                 currentLane = outLane;
                             });
                             
+                            ctx.stroke();
+                            
                             // Rellenar falta de pista (Gap Fill)
                             const lastP = chain[chain.length - 1];
                             const firstP = chain[0];
                             const lastGeo = lastP.worldGeo;
                             const firstGeo = firstP.worldGeo;
                             
-                            if (firstGeo && lastGeo) {
-                                const dist = Math.hypot(firstGeo.inX - lastGeo.outX, firstGeo.inY - lastGeo.outY);
-                                if (dist > 1.0) {
-                                    ctx.stroke(); 
-                                    
+                            let lastSupports = true;
+                            if (lastP.subtype === 'single_lane_1' && currentLane !== 1) lastSupports = false;
+                            if (lastP.subtype === 'single_lane_2' && currentLane !== 2) lastSupports = false;
+
+                            let firstSupports = true;
+                            if (firstP.subtype === 'single_lane_1' && startLane !== 1) firstSupports = false;
+                            if (firstP.subtype === 'single_lane_2' && startLane !== 2) firstSupports = false;
+                            
+                            if (firstGeo && lastGeo && lastSupports && firstSupports && isDrawing) {
+                                const outNode = lastGeo.outNodes[currentLane] || lastGeo.outNodes[0];
+                                const inNode = firstGeo.inNodes[startLane] || firstGeo.inNodes[0];
+                                
+                                const dist = Math.hypot(inNode.x - outNode.x, inNode.y - outNode.y);
+                                
+                                // Limitamos el Gap Fill a pequeños huecos (<25cm) para no cruzar pistas sueltas aisladas
+                                if (dist > 1.0 && dist < 25.0) {
                                     ctx.beginPath();
                                     ctx.setLineDash([8 * s, 8 * s]);
                                     ctx.strokeStyle = '#10b981'; // Verde para rellenar hueco
                                     ctx.shadowColor = '#10b981';
-                                    
-                                    const outNode = lastGeo.outNodes[currentLane] || lastGeo.outNodes[0];
-                                    const inNode = firstGeo.inNodes[startLane] || firstGeo.inNodes[0];
                                     
                                     ctx.moveTo(view.x + outNode.x * s, view.y + outNode.y * s);
                                     
@@ -2058,11 +2083,7 @@
                                     ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, view.x + inNode.x * s, view.y + inNode.y * s);
                                     ctx.stroke();
                                     ctx.setLineDash([]);
-                                } else {
-                                    ctx.stroke();
                                 }
-                            } else {
-                                ctx.stroke();
                             }
                             
                             ctx.restore();
