@@ -1615,6 +1615,13 @@
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; DrawEngine2D.drawRails(ctx, l, narrowLane, brand);
                             } else if (p.subtype === 'chicane_exit') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke();
+                            } else if (p.subtype === 'gap_fill') {
+                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                                ctx.fillStyle = 'rgba(16, 185, 129, 0.25)'; ctx.fillRect(0, -hw, l, w);
+                                ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2*(s/5); ctx.setLineDash([8*(s/5), 4*(s/5)]); ctx.strokeRect(0, -hw, l, w); ctx.setLineDash([]);
+                                drawCarreraCenterLineStraight();
+                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                                ctx.fillStyle = '#10b981'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("AUTO-FIX", l/2, 0);
                             } else if (p.subtype === 'adapter_ninco_scx') {
                                 const scxW = 15.6 * s; const nincoW = w; const scxLaneOff = (7.7 / 2) * s; const nincoLaneOff = laneOff;
                                 ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -scxW/2); ctx.lineTo(l, scxW/2); ctx.lineTo(0, nincoW/2); ctx.closePath(); ctx.fill();
@@ -2608,6 +2615,48 @@
               // Utilizamos el compilador 3D para encadenar matemáticamente y eliminar holguras
               const compiled = compileCircuitFor3D(pieces);
               
+              // --- NUEVA LÓGICA: DETECCIÓN Y RELLENO FÍSICO DE HUECOS (GAP FILL) ---
+              const chainsMap = new Map();
+              compiled.forEach(p => {
+                  if (!chainsMap.has(p.chainIndex)) chainsMap.set(p.chainIndex, []);
+                  chainsMap.get(p.chainIndex).push(p);
+              });
+
+              const gapFillers = [];
+              chainsMap.forEach(chain => {
+                  if (chain.length < 2) return;
+                  const firstP = chain[0];
+                  const lastP = chain[chain.length - 1];
+                  const firstGeo = firstP.worldGeo;
+                  const lastGeo = lastP.worldGeo;
+
+                  if (firstGeo && lastGeo) {
+                      const inNode = firstGeo.inNodes.find(n => n.role === 'center') || firstGeo.inNodes[0];
+                      const outNode = lastGeo.outNodes.find(n => n.role === 'center') || lastGeo.outNodes[0];
+
+                      const dist = Math.hypot(inNode.x - outNode.x, inNode.y - outNode.y);
+
+                      // Rellenar huecos de hasta 45cm de forma invisible
+                      if (dist > 1.0 && dist < 45.0) {
+                          const angle = Math.atan2(inNode.y - outNode.y, inNode.x - outNode.x);
+                          gapFillers.push({
+                              uid: Date.now() + Math.random(),
+                              brandKey: activeBrand,
+                              id: 'gap_fill',
+                              label: 'Ajuste 3D',
+                              type: 'straight',
+                              subtype: 'gap_fill',
+                              length: dist,
+                              x: outNode.x,
+                              y: outNode.y,
+                              rot: angle,
+                              elevation: lastP.outZ || lastP.elevation || 0,
+                              cat: 'System'
+                          });
+                      }
+                  }
+              });
+              
               const stitchedPieces = compiled.map(p => {
                   const newP = { ...p };
                   // Eliminamos las mallas temporales 3D
@@ -2632,7 +2681,8 @@
                   return newP;
               });
               
-              pushHistory(stitchedPieces);
+              // Añadimos las piezas reparadoras al circuito
+              pushHistory([...stitchedPieces, ...gapFillers]);
               
               setShowStitchOverlay(true);
               setTimeout(() => {
