@@ -2546,15 +2546,24 @@
           const handleUndo = () => { if (historyStep > 0) { setHistoryStep(historyStep - 1); setSelectedPieceIds([]); } }; const handleRedo = () => { if (historyStep < history.length - 1) { setHistoryStep(historyStep + 1); setSelectedPieceIds([]); } };
           
           const handleNewCircuit = () => {
+              const resetApp = () => {
+                  setHistory([[]]);
+                  setHistoryStep(0);
+                  setSelectedPieceIds([]);
+                  setBoardPoints([]);
+                  setBoardClosed(false);
+                  setView({ x: window.innerWidth/2, y: window.innerHeight/2, scale: 5.0 });
+                  if (!document.fullscreenElement) { 
+                      document.documentElement.requestFullscreen().then(() => setIsFullScreen(true)).catch(e => console.error(e)); 
+                  }
+              };
+
               if (pieces.length > 0 || boardPoints.length > 0) {
                   if (window.confirm(t.alerts.confirmNew)) {
-                      setHistory([[]]);
-                      setHistoryStep(0);
-                      setSelectedPieceIds([]);
-                      setBoardPoints([]);
-                      setBoardClosed(false);
-                      setView({ x: window.innerWidth/2, y: window.innerHeight/2, scale: 5.0 });
+                      resetApp();
                   }
+              } else {
+                  resetApp();
               }
           };
 
