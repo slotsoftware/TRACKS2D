@@ -1344,11 +1344,7 @@
                         };
                     }
 
-                    // Limpieza final de variables exclusivas del diseñador 2D
-                    delete p.groupId;
-                    delete p.cat;
-                    delete p.brandKey;
-
+                    // IMPORTANTE: NO borramos p.brandKey para que el simulador 3D sepa la marca exacta de cada pista mixta.
                     finalCompiled.push(p);
                 });
             });
@@ -3266,7 +3262,52 @@
           const getCircuitDataPayload = (piecesToSend) => {
               const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
               const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
-              return { version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, mixedBrands: getMixedBrandsPayload(piecesToSend), pieces: compileCircuitFor3D(piecesToSend), boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
+              
+              const compiledPieces = compileCircuitFor3D(piecesToSend);
+              
+              // CENTRADO ABSOLUTO EN (0,0) PARA LOS MOTORES 3D
+              // Soluciona el problema de que el 3D "no lo hace" cuando se dibuja en el 2D muy lejos del centro
+              let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+              compiledPieces.forEach(p => {
+                  if (p.worldGeo) {
+                      p.worldGeo.inNodes.forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; if (n.y < minY) minY = n.y; if (n.y > maxY) maxY = n.y; });
+                      p.worldGeo.outNodes.forEach(n => { if (n.x < minX) minX = n.x; if (n.x > maxX) maxX = n.x; if (n.y < minY) minY = n.y; if (n.y > maxY) maxY = n.y; });
+                  } else {
+                      if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x; if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+                  }
+              });
+
+              let cx = 0, cy = 0;
+              if (minX !== Infinity) {
+                  cx = (minX + maxX) / 2;
+                  cy = (minY + maxY) / 2;
+              }
+
+              compiledPieces.forEach(p => {
+                  p.x -= cx;
+                  p.y -= cy;
+                  if (p.worldGeo) {
+                      p.worldGeo.inX -= cx; p.worldGeo.outX -= cx;
+                      p.worldGeo.inY -= cy; p.worldGeo.outY -= cy;
+                      p.worldGeo.inNodes.forEach(n => { n.x -= cx; n.y -= cy; });
+                      p.worldGeo.outNodes.forEach(n => { n.x -= cx; n.y -= cy; });
+                  }
+              });
+
+              const centeredBoardPoints = boardPoints.map(bp => ({ x: bp.x - cx, y: bp.y - cy }));
+
+              return { 
+                  version: "2.0", 
+                  date: new Date().toISOString(), 
+                  brand: activeBrand, 
+                  brandColors: bColors, 
+                  mixedBrands: getMixedBrandsPayload(piecesToSend), 
+                  pieces: compiledPieces, 
+                  boardPoints: centeredBoardPoints, 
+                  boardClosed: boardClosed, 
+                  autoBorders: autoBorders, 
+                  carSetups: carSetups 
+              };
           };
 
           const goToSimulation = () => {
