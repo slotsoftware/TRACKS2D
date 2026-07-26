@@ -1897,26 +1897,6 @@
                     ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
                     ctx.restore();
 
-                    if (isSelected && selectedPieceIds.length === 1) {
-                        ctx.save();
-                        const midWorldX = view.x + geo.midX * view.scale;
-                        const midWorldY = view.y + geo.midY * view.scale;
-                        
-                        ctx.translate(midWorldX, midWorldY);
-                        ctx.rotate(p.rot);
-                        
-                        const handleDist = geo.hitRadius * view.scale + 20;
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(handleDist, 0); ctx.stroke();
-                        
-                        ctx.fillStyle = '#0ea5e9'; ctx.beginPath(); ctx.arc(handleDist, 0, 8, 0, Math.PI*2); ctx.fill();
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.stroke();
-                        
-                        ctx.fillStyle = '#fff'; ctx.font = "10px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("↻", handleDist, 0);
-                        
-                        ctx.restore();
-                    }
-
                     if (dragGroup && dragGroup.has(p.uid) && dragGroup.get(p.uid).isSnapping) {
                         ctx.save();
                         ctx.translate(view.x + p.x * view.scale, view.y + p.y * view.scale);
@@ -1926,6 +1906,31 @@
                     }
                 });
                 
+                if (selectedPieceIds && selectedPieceIds.length > 0 && !dragGroup) {
+                    let cx = 0, cy = 0, count = 0, radius = 0;
+                    selectedPieceIds.forEach(id => {
+                        const geo = pieceExtents.find(px => px.uid === id);
+                        if (geo) { cx += geo.midX; cy += geo.midY; count++; radius += geo.hitRadius; }
+                    });
+                    if (count > 0) {
+                        cx /= count; cy /= count;
+                        const avgRadius = (radius / count) * view.scale + 30 + (count > 1 ? 30 : 0);
+                        const midWorldX = view.x + cx * view.scale;
+                        const midWorldY = view.y + cy * view.scale;
+                        ctx.save();
+                        ctx.translate(midWorldX, midWorldY);
+                        const hAngle = -Math.PI / 4;
+                        const hX = avgRadius * Math.cos(hAngle);
+                        const hY = avgRadius * Math.sin(hAngle);
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(hX, hY); ctx.stroke();
+                        ctx.fillStyle = '#0ea5e9'; ctx.beginPath(); ctx.arc(hX, hY, 14, 0, Math.PI*2); ctx.fill();
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.stroke();
+                        ctx.fillStyle = '#fff'; ctx.font = "bold 16px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("↻", hX, hY);
+                        ctx.restore();
+                    }
+                }
+
                 // PASADA 2: Dibujado de Overlays (Splines Suaves Continuos que cruzan varias piezas)
                 pieces.forEach((basePiece) => {
                     if (!basePiece) return; 
@@ -2835,24 +2840,34 @@
 
                   const rawMouse = getRawMouse(coords);
                   
-                  // 1. Check si estamos clickando el Gizmo de rotación
-                  if (selectedPieceIds.length === 1) {
-                      const singleId = selectedPieceIds[0];
-                      const selExt = piecePositions.current.find(px => px && px.uid === singleId);
-                      if (selExt) {
-                          const handleWorldX = view.x + selExt.midX * view.scale;
-                          const handleWorldY = view.y + selExt.midY * view.scale;
-                          const pxDist = selExt.hitRadius * view.scale + 20;
-                          const handleRotX = handleWorldX + pxDist * Math.cos(selExt.inAngle);
-                          const handleRotY = handleWorldY + pxDist * Math.sin(selExt.inAngle);
+                  // 1. Check si estamos clickando el Gizmo de rotación (Universal)
+                  if (selectedPieceIds.length > 0) {
+                      let cx = 0, cy = 0, count = 0, radius = 0;
+                      selectedPieceIds.forEach(id => {
+                          const geo = piecePositions.current.find(px => px && px.uid === id);
+                          if (geo) { cx += geo.midX; cy += geo.midY; count++; radius += geo.hitRadius; }
+                      });
+                      if (count > 0) {
+                          cx /= count; cy /= count;
+                          const avgRadius = (radius / count) * view.scale + 30 + (count > 1 ? 30 : 0);
+                          const midWorldX = view.x + cx * view.scale;
+                          const midWorldY = view.y + cy * view.scale;
+                          const hAngle = -Math.PI / 4;
+                          const handleRotX = midWorldX + avgRadius * Math.cos(hAngle);
+                          const handleRotY = midWorldY + avgRadius * Math.sin(hAngle);
                           
-                          if (Math.hypot(coords.x - handleRotX, coords.y - handleRotY) < 20) {
-                              const targetToRotate = pieces.find(p => p && p.uid === singleId);
-                              if (targetToRotate) {
-                                  dragMode.current = 'rotatePiece';
-                                  setDragGroup(new Map([[singleId, { ...targetToRotate, isSnapping: false }]]));
-                                  return;
-                              }
+                          if (Math.hypot(coords.x - handleRotX, coords.y - handleRotY) < 30) {
+                              dragMode.current = 'rotateGroup';
+                              const newDragGroup = new Map();
+                              selectedPieceIds.forEach(id => {
+                                  const p = pieces.find(x => x && x.uid === id);
+                                  if (p) newDragGroup.set(id, { ...p, isSnapping: false });
+                              });
+                              setDragGroup(newDragGroup);
+                              dragOffset.current = new Map();
+                              dragOffset.current.set('pivot', { x: cx, y: cy });
+                              dragOffset.current.set('startAngle', Math.atan2(rawMouse.y - cy, rawMouse.x - cx));
+                              return;
                           }
                       }
                   }
@@ -3067,18 +3082,25 @@
                           
                           setDragGroup(updatedGroup);
                       
-                      } else if (dragMode.current === 'rotatePiece') {
-                          const id = selectedPieceIds[0];
-                          const p = dragGroup.get(id);
-                          if (p) {
-                              const selExt = piecePositions.current.find(px => px && px.uid === id);
-                              if (selExt) {
-                                  const angleToMouse = Math.atan2(rawMouse.y - selExt.midY, rawMouse.x - selExt.midX);
-                                  const updatedGroup = new Map(dragGroup);
-                                  updatedGroup.set(id, { ...p, rot: angleToMouse });
-                                  setDragGroup(updatedGroup);
+                      } else if (dragMode.current === 'rotateGroup') {
+                          const pivot = dragOffset.current.get('pivot');
+                          const startAngle = dragOffset.current.get('startAngle');
+                          const currentAngle = Math.atan2(rawMouse.y - pivot.y, rawMouse.x - pivot.x);
+                          const dRot = currentAngle - startAngle;
+                          
+                          const updatedGroup = new Map();
+                          dragGroup.forEach((_, id) => {
+                              const originalPiece = pieces.find(x => x && x.uid === id);
+                              if (originalPiece) {
+                                  const tx = originalPiece.x - pivot.x;
+                                  const ty = originalPiece.y - pivot.y;
+                                  const newX = tx * Math.cos(dRot) - ty * Math.sin(dRot) + pivot.x;
+                                  const newY = tx * Math.sin(dRot) + ty * Math.cos(dRot) + pivot.y;
+                                  const newRot = originalPiece.rot + dRot;
+                                  updatedGroup.set(id, { ...originalPiece, x: newX, y: newY, rot: newRot });
                               }
-                          }
+                          });
+                          setDragGroup(updatedGroup);
                       }
                   }
                   lastPointerPos.current = coords; 
