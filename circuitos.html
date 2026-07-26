@@ -1328,6 +1328,11 @@
                         p.lane = 0;
                     }
 
+                    // Inyectar paleta de colores individual para circuitos mixtos
+                    const pBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
+                    const bDef = TRACK_DEFINITIONS[pBrandKey] || TRACK_DEFINITIONS['NINCO'];
+                    p.colorPalette = { trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2, neonColor: bDef.neonColor };
+
                     // Adjuntar geometría absoluta explícita de carriles para el 3D
                     const geo = getPieceGeometry(p);
                     if (geo) {
@@ -2220,6 +2225,20 @@
           const imageCache = useRef(new Map()); 
           const pendingFit = useRef(initDraft && initDraft.pieces ? (initDraft.pieces.length > 0) : false);
 
+          const getMixedBrandsPayload = (piecesList) => {
+              const brandsMap = {};
+              if (!piecesList) return brandsMap;
+              piecesList.forEach(p => {
+                  if (!p) return;
+                  const bKey = p.brandKey || activeBrand;
+                  if (!brandsMap[bKey]) {
+                      const bDef = TRACK_DEFINITIONS[bKey] || TRACK_DEFINITIONS['NINCO'];
+                      brandsMap[bKey] = { name: bDef.name, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2, neonColor: bDef.neonColor };
+                  }
+              });
+              return brandsMap;
+          };
+
           useEffect(() => {
               try {
                   const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
@@ -2227,6 +2246,7 @@
                   localStorage.setItem('slot_designer_draft', JSON.stringify({
                       brand: activeBrand,
                       brandColors: bColors,
+                      mixedBrands: getMixedBrandsPayload(pieces),
                       pieces: pieces,
                       boardPoints: boardPoints,
                       boardClosed: boardClosed,
@@ -2399,7 +2419,7 @@
                   const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
                   const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
                   const circuitData = { 
-                      version: "2.0", brand: activeBrand, brandColors: bColors, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, 
+                      version: "2.0", brand: activeBrand, brandColors: bColors, mixedBrands: getMixedBrandsPayload(pieces), pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, 
                       autoBorders: autoBorders, authorId: user.uid, authorName: user.displayName || 'Piloto', pieceCount: pieces.length, createdAt: serverTimestamp() 
                   };
                   const colRef = collection(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'community_circuits');
@@ -2712,7 +2732,7 @@
           const saveCircuit = () => { 
               const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
               const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
-              const blob = new Blob([JSON.stringify({ version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders }, null, 2)], { type: "application/json" }); 
+              const blob = new Blob([JSON.stringify({ version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, mixedBrands: getMixedBrandsPayload(pieces), pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders }, null, 2)], { type: "application/json" }); 
               const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `circuito_${activeBrand.toLowerCase()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); 
           };
           
@@ -3246,7 +3266,7 @@
           const getCircuitDataPayload = (piecesToSend) => {
               const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
               const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
-              return { version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, pieces: compileCircuitFor3D(piecesToSend), boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
+              return { version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, mixedBrands: getMixedBrandsPayload(piecesToSend), pieces: compileCircuitFor3D(piecesToSend), boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
           };
 
           const goToSimulation = () => {
