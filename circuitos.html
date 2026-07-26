@@ -1342,7 +1342,7 @@
                     // Limpieza final de variables exclusivas del diseñador 2D
                     delete p.groupId;
                     delete p.cat;
-                    // ELIMINADO: delete p.brandKey; -> Ahora lo conservamos para que el 3D detecte el color de la marca
+                    delete p.brandKey;
 
                     finalCompiled.push(p);
                 });
@@ -1615,13 +1615,6 @@
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; DrawEngine2D.drawRails(ctx, l, narrowLane, brand);
                             } else if (p.subtype === 'chicane_exit') {
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); const narrowLane = laneOff * 0.2; ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -narrowLane); ctx.bezierCurveTo(l*0.5, -narrowLane, l*0.5, -laneOff, l, -laneOff); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, narrowLane); ctx.bezierCurveTo(l*0.5, narrowLane, l*0.5, laneOff, l, laneOff); ctx.stroke();
-                            } else if (p.subtype === 'gap_fill') {
-                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
-                                ctx.fillStyle = 'rgba(16, 185, 129, 0.25)'; ctx.fillRect(0, -hw, l, w);
-                                ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2*(s/5); ctx.setLineDash([8*(s/5), 4*(s/5)]); ctx.strokeRect(0, -hw, l, w); ctx.setLineDash([]);
-                                drawCarreraCenterLineStraight();
-                                DrawEngine2D.drawRails(ctx, l, laneOff, brand);
-                                ctx.fillStyle = '#10b981'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("AUTO-FIX", l/2, 0);
                             } else if (p.subtype === 'adapter_ninco_scx') {
                                 const scxW = 15.6 * s; const nincoW = w; const scxLaneOff = (7.7 / 2) * s; const nincoLaneOff = laneOff;
                                 ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -nincoW/2); ctx.lineTo(l, -scxW/2); ctx.lineTo(l, scxW/2); ctx.lineTo(0, nincoW/2); ctx.closePath(); ctx.fill();
@@ -2010,31 +2003,35 @@
                             ctx.shadowBlur = 15;
                             ctx.lineCap = 'round';
                             
-                            let isDrawing = false;
-                            
-                            chain.forEach((p, idx) => {
+                            let needMoveTo = true;
+
+                            chain.forEach((p) => {
                                 const geo = p.worldGeo;
                                 if (!geo) return;
                                 
+                                const isSingle1 = p.subtype === 'single_lane_1';
+                                const isSingle2 = p.subtype === 'single_lane_2';
+                                
+                                // Si trazamos la línea 1 (Rojo) omitimos la pieza del carril 2 (Azul), y viceversa.
+                                if (startLane === 1 && isSingle2) { needMoveTo = true; return; }
+                                if (startLane === 2 && isSingle1) { needMoveTo = true; return; }
+                                
+                                let inNodeIdx = currentLane;
                                 let outLane = p.laneMapping ? p.laneMapping[currentLane] : currentLane;
+                                let outNodeIdx = outLane;
                                 
-                                // Verificar si la pieza actual soporta físicamente este carril
-                                let supportsLane = true;
-                                if (p.subtype === 'single_lane_1' && currentLane !== 1) supportsLane = false;
-                                if (p.subtype === 'single_lane_2' && currentLane !== 2) supportsLane = false;
-                                
-                                if (!supportsLane) {
-                                    isDrawing = false;
-                                    currentLane = outLane;
-                                    return; // Saltamos el dibujado en este tramo
+                                // Las pistas de 1 carril o rotondas solo tienen nodo 0 en geometría
+                                if (isSingle1 || isSingle2 || p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') {
+                                    inNodeIdx = 0;
+                                    outNodeIdx = 0;
                                 }
                                 
-                                const inNode = geo.inNodes[currentLane] || geo.inNodes[0];
-                                const outNode = geo.outNodes[outLane] || geo.outNodes[0];
+                                const inNode = geo.inNodes[inNodeIdx] || geo.inNodes[0];
+                                const outNode = geo.outNodes[outNodeIdx] || geo.outNodes[0];
                                 
-                                if (!isDrawing) {
+                                if (needMoveTo) {
                                     ctx.moveTo(view.x + inNode.x * s, view.y + inNode.y * s);
-                                    isDrawing = true;
+                                    needMoveTo = false;
                                 } else {
                                     ctx.lineTo(view.x + inNode.x * s, view.y + inNode.y * s);
                                 }
@@ -2051,48 +2048,6 @@
                             });
                             
                             ctx.stroke();
-                            
-                            // Rellenar falta de pista (Gap Fill)
-                            const lastP = chain[chain.length - 1];
-                            const firstP = chain[0];
-                            const lastGeo = lastP.worldGeo;
-                            const firstGeo = firstP.worldGeo;
-                            
-                            let lastSupports = true;
-                            if (lastP.subtype === 'single_lane_1' && currentLane !== 1) lastSupports = false;
-                            if (lastP.subtype === 'single_lane_2' && currentLane !== 2) lastSupports = false;
-
-                            let firstSupports = true;
-                            if (firstP.subtype === 'single_lane_1' && startLane !== 1) firstSupports = false;
-                            if (firstP.subtype === 'single_lane_2' && startLane !== 2) firstSupports = false;
-                            
-                            if (firstGeo && lastGeo && lastSupports && firstSupports && isDrawing) {
-                                const outNode = lastGeo.outNodes[currentLane] || lastGeo.outNodes[0];
-                                const inNode = firstGeo.inNodes[startLane] || firstGeo.inNodes[0];
-                                
-                                const dist = Math.hypot(inNode.x - outNode.x, inNode.y - outNode.y);
-                                
-                                // Limitamos el Gap Fill a pequeños huecos (<25cm) para no cruzar pistas sueltas aisladas
-                                if (dist > 1.0 && dist < 25.0) {
-                                    ctx.beginPath();
-                                    ctx.setLineDash([8 * s, 8 * s]);
-                                    ctx.strokeStyle = '#10b981'; // Verde para rellenar hueco
-                                    ctx.shadowColor = '#10b981';
-                                    
-                                    ctx.moveTo(view.x + outNode.x * s, view.y + outNode.y * s);
-                                    
-                                    const pull = dist * 0.5;
-                                    const cp1X = view.x + (outNode.x + Math.cos(outNode.angle) * pull) * s;
-                                    const cp1Y = view.y + (outNode.y + Math.sin(outNode.angle) * pull) * s;
-                                    const cp2X = view.x + (inNode.x - Math.cos(firstGeo.inAngle) * pull) * s;
-                                    const cp2Y = view.y + (inNode.y - Math.sin(firstGeo.inAngle) * pull) * s;
-                                    
-                                    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, view.x + inNode.x * s, view.y + inNode.y * s);
-                                    ctx.stroke();
-                                    ctx.setLineDash([]);
-                                }
-                            }
-                            
                             ctx.restore();
                         });
                     });
@@ -2609,53 +2564,11 @@
               // Guardamos temporalmente los atributos originales de UI que el compilador suele borrar
               const attributesMap = new Map();
               pieces.forEach(p => {
-                  if (p) attributesMap.set(p.uid, { brandKey: p.brandKey, groupId: p.groupId, cat: p.cat, lane: p.lane, label: p.label, id: p.id, type: p.type, subtype: p.subtype });
+                  if (p) attributesMap.set(p.uid, { brandKey: p.brandKey, groupId: p.groupId, cat: p.cat, lane: p.lane, label: p.label, id: p.id, type: p.type, subtype: p.subtype, direction: p.direction, invert: p.invert });
               });
               
               // Utilizamos el compilador 3D para encadenar matemáticamente y eliminar holguras
               const compiled = compileCircuitFor3D(pieces);
-              
-              // --- NUEVA LÓGICA: DETECCIÓN Y RELLENO FÍSICO DE HUECOS (GAP FILL) ---
-              const chainsMap = new Map();
-              compiled.forEach(p => {
-                  if (!chainsMap.has(p.chainIndex)) chainsMap.set(p.chainIndex, []);
-                  chainsMap.get(p.chainIndex).push(p);
-              });
-
-              const gapFillers = [];
-              chainsMap.forEach(chain => {
-                  if (chain.length < 2) return;
-                  const firstP = chain[0];
-                  const lastP = chain[chain.length - 1];
-                  const firstGeo = firstP.worldGeo;
-                  const lastGeo = lastP.worldGeo;
-
-                  if (firstGeo && lastGeo) {
-                      const inNode = firstGeo.inNodes.find(n => n.role === 'center') || firstGeo.inNodes[0];
-                      const outNode = lastGeo.outNodes.find(n => n.role === 'center') || lastGeo.outNodes[0];
-
-                      const dist = Math.hypot(inNode.x - outNode.x, inNode.y - outNode.y);
-
-                      // Rellenar huecos de hasta 45cm de forma invisible
-                      if (dist > 1.0 && dist < 45.0) {
-                          const angle = Math.atan2(inNode.y - outNode.y, inNode.x - outNode.x);
-                          gapFillers.push({
-                              uid: Date.now() + Math.random(),
-                              brandKey: activeBrand,
-                              id: 'gap_fill',
-                              label: 'Ajuste 3D',
-                              type: 'straight',
-                              subtype: 'gap_fill',
-                              length: dist,
-                              x: outNode.x,
-                              y: outNode.y,
-                              rot: angle,
-                              elevation: lastP.outZ || lastP.elevation || 0,
-                              cat: 'System'
-                          });
-                      }
-                  }
-              });
               
               const stitchedPieces = compiled.map(p => {
                   const newP = { ...p };
@@ -2676,13 +2589,14 @@
                       newP.id = original.id;
                       newP.type = original.type;
                       newP.subtype = original.subtype;
+                      newP.direction = original.direction;
+                      newP.invert = original.invert;
                   }
                   
                   return newP;
               });
-              
-              // Añadimos las piezas reparadoras al circuito
-              pushHistory([...stitchedPieces, ...gapFillers]);
+
+              pushHistory(stitchedPieces);
               
               setShowStitchOverlay(true);
               setTimeout(() => {
@@ -3728,7 +3642,12 @@
                                   <button onClick={fitToScreen} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <Crosshair size={16} className="group-hover:rotate-45 transition-transform"/> <span className="text-[9px] font-black tracking-widest uppercase">{t.actions.center}</span> </button> 
                                   <button onClick={handleZoomIn} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)] rounded-lg text-cyan-400 hover:bg-cyan-950/50 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]"> <ZoomIn size={16} className="group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest uppercase">{t.actions.zoomIn}</span> </button> 
                                   <button onClick={() => setIsMultiSelectMode(!isMultiSelectMode)} className={`shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border rounded-lg transition-all group active:scale-95 ${isMultiSelectMode ? 'border-cyan-300 text-white shadow-[0_0_20px_rgba(6,182,212,0.8)] bg-cyan-800/80' : 'border-cyan-500 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)] hover:bg-cyan-950/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.6)]'}`}> <CheckSquare size={16} className={`transition-transform ${isMultiSelectMode ? 'scale-110' : 'group-hover:scale-110'}`}/> <span className="text-[9px] font-black tracking-widest uppercase">{t.actions.multiselect}</span> </button>
-                                  <button onClick={handleNewCircuit} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)] rounded-lg text-emerald-400 hover:bg-emerald-950/50 active:scale-95 transition-all group hover:shadow-[0_0_15px_rgba(16,185,129,0.6)]" title={t.actions.new}> <FilePlus size={16} className="group-hover:scale-110 transition-transform"/> <span className="text-[9px] font-black tracking-widest uppercase">{t.actions.new}</span> </button>
+                                  
+                                  <button onClick={handleNewCircuit} className="relative shrink-0 flex items-center justify-center gap-2 px-5 h-10 bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] rounded-lg text-black hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] active:scale-95 transition-all group overflow-hidden" title={t.actions.new}>
+                                      <div className="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-out"></div>
+                                      <FilePlus size={18} className="group-hover:scale-110 transition-transform"/>
+                                      <span className="text-[10px] font-black tracking-widest uppercase">{t.actions.new}</span>
+                                  </button>
                                   
                                   <div className="w-px h-8 bg-white/10 shrink-0 mx-1 hidden md:block"></div>
                                   
