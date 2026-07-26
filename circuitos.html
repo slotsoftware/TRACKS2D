@@ -2222,8 +2222,11 @@
 
           useEffect(() => {
               try {
+                  const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
+                  const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
                   localStorage.setItem('slot_designer_draft', JSON.stringify({
                       brand: activeBrand,
+                      brandColors: bColors,
                       pieces: pieces,
                       boardPoints: boardPoints,
                       boardClosed: boardClosed,
@@ -2393,8 +2396,10 @@
               setIsPublishing(true);
               try {
                   const { collection, addDoc, serverTimestamp } = window.FirebaseAPI;
+                  const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
+                  const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
                   const circuitData = { 
-                      version: "2.0", brand: activeBrand, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, 
+                      version: "2.0", brand: activeBrand, brandColors: bColors, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, 
                       autoBorders: autoBorders, authorId: user.uid, authorName: user.displayName || 'Piloto', pieceCount: pieces.length, createdAt: serverTimestamp() 
                   };
                   const colRef = collection(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'community_circuits');
@@ -2705,7 +2710,9 @@
           };
 
           const saveCircuit = () => { 
-              const blob = new Blob([JSON.stringify({ version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders }, null, 2)], { type: "application/json" }); 
+              const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
+              const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
+              const blob = new Blob([JSON.stringify({ version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders }, null, 2)], { type: "application/json" }); 
               const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `circuito_${activeBrand.toLowerCase()}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); 
           };
           
@@ -3236,6 +3243,12 @@
               pushHistory(newPieces); setShowMultiLaneTools(false);
           };
 
+          const getCircuitDataPayload = (piecesToSend) => {
+              const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
+              const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
+              return { version: "2.0", date: new Date().toISOString(), brand: activeBrand, brandColors: bColors, pieces: compileCircuitFor3D(piecesToSend), boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
+          };
+
           const goToSimulation = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               
@@ -3259,9 +3272,7 @@
                   alert("AVISO DE INGENIERÍA:\n\nTu circuito tiene un número IMPAR de cruces (" + crossingCount + "). Físicamente, esto fusiona los carriles en un único recorrido continuo.\n\nPor este motivo, en la simulación 3D el coche 'saltará' de carril en la línea de meta (donde no hay ningún cruce) para compensar el desajuste estructural.\n\n-> SOLUCIÓN: Añade o quita 1 cruce para que el total sea PAR y ambos carriles cierren perfectamente.");
               }
               
-              const compiledPieces = compileCircuitFor3D(piecesToSend);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend))); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
           };
           const goToDecoration = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
@@ -3274,17 +3285,13 @@
                   piecesToSend = pieces.filter(p => !p.lane || p.lane === 0);
               }
               
-              const compiledPieces = compileCircuitFor3D(piecesToSend);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'deco.html'; } catch (e) { alert(t.alerts.deco); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend))); window.location.href = 'deco.html'; } catch (e) { alert(t.alerts.deco); }
           };
           const goToMulti = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               
               // Multi-lane sí envía todas las piezas (sin filtrar)
-              const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces))); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
           const goTo2DGame = () => {
@@ -3293,9 +3300,7 @@
 
           const goTo3DGame = () => {
               if (pieces.length === 0) { alert(t.alerts.emptyGame); return; }
-              const compiledPieces = compileCircuitFor3D(pieces);
-              const circuitData = { version: "2.0", date: new Date().toISOString(), brand: activeBrand, pieces: compiledPieces, boardPoints: boardPoints, boardClosed: boardClosed, autoBorders: autoBorders, carSetups: carSetups };
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(circuitData)); window.location.href = 'slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces))); window.location.href = 'slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
           const generateReport = () => { 
