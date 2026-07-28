@@ -374,12 +374,12 @@
                 const width = mountRef.current.clientWidth || 300, height = mountRef.current.clientHeight || 300; 
                 const scene = new THREE.Scene(); sceneRef.current = scene; 
                 const modelGroup = new THREE.Group(); modelGroup.name = "MODEL_CONTAINER"; scene.add(modelGroup); modelRef.current = modelGroup;
-                const camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000); camera.position.set(0, 2, 4); cameraRef.current = camera; 
+                const camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000); camera.position.set(0, 1.2, 3.5); cameraRef.current = camera; 
                 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25)); renderer.outputEncoding = THREE.sRGBEncoding; mountRef.current.appendChild(renderer.domElement); rendererRef.current = renderer; 
                 scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5)); 
                 const dirLight = new THREE.DirectionalLight(0xffffff, 2); dirLight.position.set(2, 5, 3); dirLight.castShadow = true; scene.add(dirLight); 
-                scene.add(new THREE.GridHelper(10, 10, 0x39ff14, 0x333333)); scene.add(new THREE.AxesHelper(1)); 
-                if (typeof THREE.OrbitControls !== 'undefined' && !controlsRef.current) { const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.autoRotate = true; controls.target.set(0, 0.5, 0); controlsRef.current = controls; } 
+                scene.add(new THREE.GridHelper(10, 10, 0x39ff14, 0x1f364d)); scene.add(new THREE.AxesHelper(1)); 
+                if (typeof THREE.OrbitControls !== 'undefined' && !controlsRef.current) { const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.autoRotate = true; controls.target.set(0, 0, 0); controlsRef.current = controls; } 
                 const resizeObserver = new ResizeObserver(entries => { window.requestAnimationFrame(() => { for (let entry of entries) { const { width, height } = entry.contentRect; if (width && height && renderer && camera) { camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height); } } }); }); resizeObserver.observe(mountRef.current); 
                 let frameId; const animate = () => { frameId = requestAnimationFrame(animate); if (controlsRef.current) controlsRef.current.update(); renderer.render(scene, camera); }; animate(); 
                 setViewerReady(true);
@@ -415,7 +415,7 @@
                             } 
                         });
                         const box = new THREE.Box3().setFromObject(model); const size = box.getSize(new THREE.Vector3()); const center = box.getCenter(new THREE.Vector3()); model.position.sub(center); 
-                        const maxDim = Math.max(size.x, size.y, size.z); const scale = maxDim > 0 ? 2.5 / maxDim : 1; model.scale.setScalar(scale);
+                        const maxDim = Math.max(size.x, size.y, size.z); const scale = maxDim > 0 ? 3.0 / maxDim : 1; model.scale.setScalar(scale);
                         modelGroup.userData.baseScale = new THREE.Vector3(scale, scale, scale); modelGroup.userData.loadedGlb = asset.glb; modelGroup.add(model);
                         modelGroup.rotation.set((asset.rotation ? asset.rotation[0] : 0) * Math.PI / 180, (asset.rotation ? asset.rotation[1] : 180) * Math.PI / 180, (asset.rotation ? asset.rotation[2] : 0) * Math.PI / 180);
                         if(asset.scale !== undefined) { modelGroup.scale.copy(modelGroup.userData.baseScale).multiplyScalar(asset.scale); }
@@ -574,7 +574,7 @@
                             </div>
                         )}
                     </div>
-                    <div className="flex-1 relative bg-black/50 overflow-hidden" ref={mountRef}> {showFileMenu && <div className="absolute inset-0 z-50 bg-black/20" onClick={() => setShowFileMenu(false)}></div>} <div className="absolute top-2 left-2 right-2 text-[8px] font-mono text-[#39ff14] bg-black/80 px-2 py-1 rounded pointer-events-none select-none border border-[#39ff14]/20 text-center z-10 backdrop-blur-sm"> {status} </div> </div>
+                    <div className="flex-1 relative bg-[radial-gradient(circle_at_center,_#4a7a9e_0%,_#1f364d_100%)] overflow-hidden" ref={mountRef}> {showFileMenu && <div className="absolute inset-0 z-50 bg-black/20" onClick={() => setShowFileMenu(false)}></div>} <div className="absolute top-2 left-2 right-2 text-[8px] font-mono text-[#39ff14] bg-black/80 px-2 py-1 rounded pointer-events-none select-none border border-[#39ff14]/20 text-center z-10 backdrop-blur-sm"> {status} </div> </div>
                     <input ref={inputRef} type="file" accept=".glb,.gltf" onChange={handleFileChange} className="hidden" />
                 </div> 
             ); 
@@ -671,7 +671,7 @@
             useEffect(() => { boardSettingsRef.current = boardSettings; }, [boardSettings]);
             const pathPointsRef = useRef([]);
 
-            const hasRotonda = circuitData.pieces.some(p => p.subtype === 'rotonda' || p.name === 'Rotonda');
+            const hasRotonda = circuitData.pieces.some(p => (p.subtype && p.subtype.includes('rotonda')) || (p.type && p.type.includes('rotonda')) || (p.name && p.name.toLowerCase().includes('rotonda')));
             const rallyPathRef = useRef([]);
             const rallyDistancesRef = useRef([]);
 
@@ -836,7 +836,8 @@
                     const resMult = 1.5;
 
                     circuitData.pieces.forEach((p, index) => {
-                        if (p.subtype === 'rotonda' || p.name === 'Rotonda') {
+                        const isThisRotonda = (p.subtype && p.subtype.includes('rotonda')) || (p.type && p.type.includes('rotonda')) || (p.name && p.name.toLowerCase().includes('rotonda'));
+                        if (isThisRotonda) {
                             const steps = 40; const r = p.radius || 14.5; const loopCenterX = r * 1.3; const laneOffVal = laneSpacing / 2; const startX = curX; const startZ = curZ; const startAngle = curAngle; const straightLen = 10.0;
                             const rotVertexIndex = rails.lane1.length;
                             rails.lane1.push(null); rails.lane2.push(null); rails.pit.push(null); vertexDistances.push(accumulatedDist);
@@ -874,25 +875,52 @@
                         }
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
-                        const steps = (p.type === 'curve') ? Math.max(12, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(10, Math.ceil((p.length / 3.0) * resMult));
-                        const stepLen = p.length / steps; const totalSweep = (p.type==='curve') ? (p.angle * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
-                        let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * p.radius) * (Math.abs(p.angle) / 360) / steps;
+                        
+                        // Robustez para nuevas pistas (Curvas interiores, exteriores, medias rectas, etc.)
+                        const isCurve = p.type && p.type.includes('curve');
+                        const pLen = p.length || 40;
+                        const pAng = p.angle || 45;
+                        const pRad = p.radius || 20;
 
-                        const isCrossing = p.subtype === 'crossing', isPitEntry = p.type === 'pit_entry', isPitExit = p.type === 'pit_exit', isChicaneEntry = p.subtype === 'chicane_entry', isChicaneExit = p.subtype === 'chicane_exit', pitSide = p.invert ? 'left' : 'right', pitDir = pitSide === 'right' ? 1 : -1;
+                        const steps = isCurve ? Math.max(12, Math.ceil(Math.abs(pAng) * 1.5 * resMult)) : Math.max(10, Math.ceil((pLen / 3.0) * resMult));
+                        const stepLen = pLen / steps; 
+                        const totalSweep = isCurve ? (pAng * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; 
+                        const stepAngle = totalSweep / steps;
+                        let stepPhysDist = stepLen; if (isCurve) stepPhysDist = (2 * Math.PI * pRad) * (Math.abs(pAng) / 360) / steps;
+
+                        const isCrossing = p.subtype && p.subtype.includes('crossing');
+                        const isPitEntry = (p.type && p.type.includes('pit_entry')) || (p.subtype && p.subtype.includes('pit_entry'));
+                        const isPitExit = (p.type && p.type.includes('pit_exit')) || (p.subtype && p.subtype.includes('pit_exit'));
+                        const isChicaneEntry = p.subtype && p.subtype.includes('chicane_entry');
+                        const isChicaneExit = p.subtype && p.subtype.includes('chicane_exit');
+                        const pitSide = p.invert ? 'left' : 'right';
+                        const pitDir = pitSide === 'right' ? 1 : -1;
+                        
                         let sL1 = l1Off, sL2 = l2Off, tL1 = l1Off, tL2 = l2Off;
-                        if (isCrossing) { tL1 = l2Off; tL2 = l1Off; l1Off = tL1; l2Off = tL2; } else if (isChicaneEntry) { tL1 = sL1 * 0.2; tL2 = sL2 * 0.2; l1Off = tL1; l2Off = tL2; } else if (isChicaneExit) { tL1 = (sL1 > 0 ? 1 : -1) * (laneSpacing / 2); tL2 = (sL2 > 0 ? 1 : -1) * (laneSpacing / 2); l1Off = tL1; l2Off = tL2; }
+                        if (isCrossing) { tL1 = l2Off; tL2 = l1Off; l1Off = tL1; l2Off = tL2; } 
+                        else if (isChicaneEntry) { tL1 = sL1 * 0.2; tL2 = sL2 * 0.2; l1Off = tL1; l2Off = tL2; } 
+                        else if (isChicaneExit) { tL1 = (sL1 > 0 ? 1 : -1) * (laneSpacing / 2); tL2 = (sL2 > 0 ? 1 : -1) * (laneSpacing / 2); l1Off = tL1; l2Off = tL2; }
+
+                        const isDigitalX = p.subtype && (p.subtype.includes('digital_x') || p.subtype === 'doble_cambio');
+                        const isChangeRight = p.subtype && (p.subtype.includes('change_right') || p.subtype.includes('cambio_derecha'));
+                        const isChangeLeft = p.subtype && (p.subtype.includes('change_left') || p.subtype.includes('cambio_izquierda'));
+                        const isPitDoubleX = p.subtype && p.subtype.includes('pit_parallel_double_x');
+                        const hasChange = isDigitalX || isChangeRight || isChangeLeft || isPitDoubleX;
+
+                        const isSingle1 = p.subtype && (p.subtype.includes('single_lane_1') || p.subtype.includes('single_lane_outer'));
+                        const isSingle2 = p.subtype && (p.subtype.includes('single_lane_2') || p.subtype.includes('single_lane_inner'));
 
                         const d12 = [], d21 = []; const dStartX = curX, dStartZ = curZ, dStartAngle = curAngle;
-                        if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) {
+                        if (hasChange) {
                             const perpX = Math.cos(dStartAngle + Math.PI/2); const perpZ = Math.sin(dStartAngle + Math.PI/2);
-                            if (p.subtype !== 'change_left') d12.push(new THREE.Vector3(dStartX + perpX * sL1, 0.2, dStartZ + perpZ * sL1));
-                            if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(dStartX + perpX * sL2, 0.2, dStartZ + perpZ * sL2));
+                            if (!isChangeLeft) d12.push(new THREE.Vector3(dStartX + perpX * sL1, 0.2, dStartZ + perpZ * sL1));
+                            if (!isChangeRight) d21.push(new THREE.Vector3(dStartX + perpX * sL2, 0.2, dStartZ + perpZ * sL2));
                         }
 
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps;
-                            if (p.type === 'curve') {
-                                const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2;
+                            if (isCurve) {
+                                const chordLen = 2 * pRad * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2;
                                 curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle;
                             } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
                             
@@ -903,21 +931,20 @@
                             if (isPitEntry) { const sp = pitDir * (laneSpacing/2), ep = pitDir * pitCenterDist, e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = stdHalf + (pitOuterEdge-stdHalf)*e; else cTWL = stdHalf + (pitOuterEdge-stdHalf)*e; } 
                             else if (isPitExit) { const sp = pitDir * pitCenterDist, ep = pitDir * (laneSpacing/2), e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = pitOuterEdge - (pitOuterEdge-stdHalf)*e; else cTWL = pitOuterEdge - (pitOuterEdge-stdHalf)*e; } 
                             else if (p.subtype && p.subtype.includes('pit_parallel')) { cPit = pitDir * pitCenterDist; if(pitSide==='right') cTWR = pitOuterEdge; else cTWL = pitOuterEdge; }
-                            if (p.subtype === 'single_lane_1') { cTWR = 0; } if (p.subtype === 'single_lane_2') { cTWL = 0; }
-                            addRailPoint(curX, curZ, curAngle, (p.subtype === 'single_lane_2' ? null : cL1), (p.subtype === 'single_lane_1' ? null : cL2), cPit, stepPhysDist);
+                            if (isSingle1) { cTWR = 0; } if (isSingle2) { cTWL = 0; }
+                            addRailPoint(curX, curZ, curAngle, (isSingle2 ? null : cL1), (isSingle1 ? null : cL2), cPit, stepPhysDist);
                             
-                            const isNormalCurve = p.type === 'curve';
-                            addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, isNormalCurve, isNormalCurve);
+                            addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, isCurve, isCurve);
 
-                            if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) { 
+                            if (hasChange) { 
                                 const ct = easeSine(t), o12 = sL1 + (sL2-sL1)*ct, o21 = sL2 + (sL1-sL2)*ct, px = Math.cos(curAngle+Math.PI/2), pz = Math.sin(curAngle+Math.PI/2); 
-                                if (p.subtype !== 'change_left') d12.push(new THREE.Vector3(curX+px*o12, 0.2, curZ+pz*o12)); 
-                                if (p.subtype !== 'change_right') d21.push(new THREE.Vector3(curX+px*o21, 0.2, curZ+pz*o21)); 
+                                if (!isChangeLeft) d12.push(new THREE.Vector3(curX+px*o12, 0.2, curZ+pz*o12)); 
+                                if (!isChangeRight) d21.push(new THREE.Vector3(curX+px*o21, 0.2, curZ+pz*o21)); 
                             }
                         }
                         if (d12.length > 0) rails.changes.push({ points: d12, refIdx: startVertexIdx, count: steps, type: '1to2' });
                         if (d21.length > 0) rails.changes.push({ points: d21, refIdx: startVertexIdx, count: steps, type: '2to1' });
-                        pieceMapRef.current.push({ index, distStart: accumulatedDist-p.length, distEnd: accumulatedDist, type: p.type, subtype: p.subtype, invert: p.invert, elevation: p.elevation || 0 });
+                        pieceMapRef.current.push({ index, distStart: accumulatedDist-(isCurve?stepPhysDist*steps:pLen), distEnd: accumulatedDist, type: p.type, subtype: p.subtype, invert: p.invert, elevation: p.elevation || 0 });
                     });
                     
                     const applyBridgeElevations = () => {
@@ -930,48 +957,43 @@
                         let getElevationAtDist;
 
                         if (hasManualElevation) {
-                            const MANUAL_LEVEL_HEIGHT = 10.0; 
-                            const TRACK_RESOLUTION = 1.0; 
-                            const numSamples = Math.max(10, Math.ceil(totalTrackLength / TRACK_RESOLUTION)); 
-                            const rawHeights = new Float32Array(numSamples);
-                            for (let i = 0; i < numSamples; i++) { 
-                                const dist = i * TRACK_RESOLUTION; 
-                                const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd) || pieceMapRef.current[0]; 
-                                rawHeights[i] = (piece.elevation || 0) * MANUAL_LEVEL_HEIGHT; 
-                            }
+                            const MANUAL_LEVEL_HEIGHT = 9.0; 
+                            const TRANSITION_LEN = 40.0; 
                             
-                            const applyBlur = (input, windowRadius) => { 
-                                const output = new Float32Array(numSamples); 
-                                for(let i = 0; i < numSamples; i++) { 
-                                    let sum = 0; 
-                                    let count = 0;
-                                    for(let j = -windowRadius; j <= windowRadius; j++) { 
-                                        const idx = i + j;
-                                        if (idx >= 0 && idx < numSamples) {
-                                            sum += input[idx]; 
-                                            count++;
-                                        }
-                                    } 
-                                    output[i] = sum / count; 
-                                } 
-                                return output; 
-                            };
-                            
-                            const blurRadius = Math.max(1, Math.floor(25.0 / TRACK_RESOLUTION)); 
-                            let smoothHeights = rawHeights; 
-                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
-                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
-                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
-                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
-                            
-                            getElevationAtDist = (queryDist) => { 
-                                if (queryDist < 0) queryDist = 0; 
-                                if (queryDist >= totalTrackLength) queryDist = totalTrackLength - 0.01; 
-                                const exactIndex = queryDist / TRACK_RESOLUTION; 
-                                const index0 = Math.floor(exactIndex); 
-                                const index1 = Math.min(numSamples - 1, index0 + 1); 
-                                const ratio = exactIndex - index0; 
-                                return smoothHeights[index0] * (1 - ratio) + smoothHeights[index1] * ratio; 
+                            getElevationAtDist = (queryDist) => {
+                                let safeDist = queryDist;
+                                if (safeDist < 0) safeDist += totalTrackLength;
+                                if (safeDist >= totalTrackLength) safeDist -= totalTrackLength;
+
+                                let currentPieceIdx = pieceMapRef.current.findIndex(p => safeDist >= p.distStart && safeDist <= p.distEnd);
+                                if (currentPieceIdx === -1) currentPieceIdx = pieceMapRef.current.length - 1;
+                                
+                                const piece = pieceMapRef.current[currentPieceIdx];
+                                const targetH = (piece.elevation || 0) * MANUAL_LEVEL_HEIGHT;
+                                
+                                const distToStart = safeDist - piece.distStart;
+                                if (distToStart < TRANSITION_LEN / 2) {
+                                    const prevPiece = pieceMapRef.current[currentPieceIdx > 0 ? currentPieceIdx - 1 : pieceMapRef.current.length - 1];
+                                    const prevH = (prevPiece.elevation || 0) * MANUAL_LEVEL_HEIGHT;
+                                    if (prevH !== targetH) {
+                                        const t = (distToStart + TRANSITION_LEN / 2) / TRANSITION_LEN;
+                                        const smoothT = t * t * (3 - 2 * t);
+                                        return prevH + (targetH - prevH) * smoothT;
+                                    }
+                                }
+                                
+                                const distToEnd = piece.distEnd - safeDist;
+                                if (distToEnd < TRANSITION_LEN / 2) {
+                                    const nextPiece = pieceMapRef.current[currentPieceIdx < pieceMapRef.current.length - 1 ? currentPieceIdx + 1 : 0];
+                                    const nextH = (nextPiece.elevation || 0) * MANUAL_LEVEL_HEIGHT;
+                                    if (nextH !== targetH) {
+                                        const t = (TRANSITION_LEN / 2 - distToEnd) / TRANSITION_LEN;
+                                        const smoothT = t * t * (3 - 2 * t);
+                                        return targetH + (nextH - targetH) * smoothT;
+                                    }
+                                }
+                                
+                                return targetH;
                             };
                         } else {
                             const centerPoints = [];
@@ -986,7 +1008,7 @@
 
                             const flatZones = [];
                             pieceMapRef.current.forEach(p => {
-                                const isSpecial = [ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'rotonda' ].includes(p.subtype) || ['pit_entry', 'pit_exit'].includes(p.type);
+                                const isSpecial = p.subtype && ([ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'rotonda', 'doble_cambio' ].some(s => p.subtype.includes(s))) || (p.type && ['pit_entry', 'pit_exit'].includes(p.type));
                                 if (isSpecial) flatZones.push({ start: p.distStart - 15.0, end: p.distEnd + 15.0 });
                             });
 
@@ -1024,17 +1046,19 @@
 
                             for(let i=0; i<testPoints.length; i++) {
                                 const tp1 = testPoints[i];
-                                const isSpecial1 = tp1.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp1.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp1.piece.type));
+                                const isSpecial1 = tp1.piece && (tp1.piece.subtype && ['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid', 'doble_cambio'].some(s => tp1.piece.subtype.includes(s)) || (tp1.piece.type && ['pit_entry', 'pit_exit'].includes(tp1.piece.type)));
                                 
                                 for(let j=i+1; j<testPoints.length; j++) {
                                     const tp2 = testPoints[j];
-                                    const isSpecial2 = tp2.piece && (['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid'].includes(tp2.piece.subtype) || ['pit_entry', 'pit_exit'].includes(tp2.piece.type));
+                                    const isSpecial2 = tp2.piece && (tp2.piece.subtype && ['crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'chicane_entry', 'chicane_exit', 'analog_connect', 'connection', 'digital_console', 'starting_grid', 'doble_cambio'].some(s => tp2.piece.subtype.includes(s)) || (tp2.piece.type && ['pit_entry', 'pit_exit'].includes(tp2.piece.type)));
                                     
                                     if (tp1.piece && tp2.piece) {
                                         const idxDiff = Math.abs(tp1.piece.index - tp2.piece.index);
                                         const maxIdx = pieceMapRef.current.length;
                                         if (idxDiff <= 1 || idxDiff >= maxIdx - 1) continue; 
-                                        if (tp1.piece.subtype === 'rotonda' || tp2.piece.subtype === 'rotonda') {
+                                        const isRot1 = tp1.piece.isRotonda || (tp1.piece.subtype && tp1.piece.subtype.includes('rotonda')) || (tp1.piece.type && tp1.piece.type.includes('rotonda'));
+                                        const isRot2 = tp2.piece.isRotonda || (tp2.piece.subtype && tp2.piece.subtype.includes('rotonda')) || (tp2.piece.type && tp2.piece.type.includes('rotonda'));
+                                        if (isRot1 || isRot2) {
                                             if (idxDiff <= 8 || idxDiff >= maxIdx - 8) continue;
                                         }
                                     }
@@ -1073,10 +1097,12 @@
                                                     else if (elev2 > 0 || elev1 < 0) goesUpIdx = tp2.idx;
                                                     else {
                                                         const type1 = tp1.piece?.type || 'straight'; const type2 = tp2.piece?.type || 'straight';
-                                                        if (type1 === 'straight' && type2 === 'curve') goesUpIdx = tp1.idx;
-                                                        else if (type1 === 'curve' && type2 === 'straight') goesUpIdx = tp2.idx;
+                                                        const isCurve1 = type1.includes('curve'); const isCurve2 = type2.includes('curve');
+                                                        
+                                                        if (!isCurve1 && isCurve2) goesUpIdx = tp1.idx;
+                                                        else if (isCurve1 && !isCurve2) goesUpIdx = tp2.idx;
                                                         else {
-                                                            if (type1 === 'curve' && type2 === 'curve') {
+                                                            if (isCurve1 && isCurve2) {
                                                                 const r1 = tp1.piece?.radius || 0; const r2 = tp2.piece?.radius || 0;
                                                                 if (r1 > r2) goesUpIdx = tp1.idx;
                                                                 else if (r2 > r1) goesUpIdx = tp2.idx;
@@ -1181,125 +1207,88 @@
                                 });
                             }
                         });
-
-                        let passes = 8; 
-                        for (let p = 0; p < passes; p++) {
-                            const smoothSpline = (arr) => {
-                                const temp = arr.map(v => v ? v.y : null);
-                                for (let i = 1; i < arr.length - 1; i++) {
-                                    if (arr[i] && arr[i-1] && arr[i+1]) {
-                                        arr[i].y = (temp[i-1] + temp[i] * 2 + temp[i+1]) / 4.0;
-                                    }
-                                }
-                            };
-                            smoothSpline(rails.lane1); smoothSpline(rails.lane2); smoothSpline(rails.pit);
-                            smoothSpline(borders.inner); smoothSpline(borders.outer);
-                            smoothSpline(guardrails.inner); smoothSpline(guardrails.outer);
-                            
-                            const tempAsp = new Float32Array(asphaltVerts.length);
-                            for(let i=0; i<asphaltVerts.length; i++) tempAsp[i] = asphaltVerts[i];
-                            for (let i = 6; i < aspVertCount * 6 - 6; i += 6) {
-                                asphaltVerts[i+1] = (tempAsp[i-5] + tempAsp[i+1]*2 + tempAsp[i+7]) / 4.0; 
-                                asphaltVerts[i+4] = (tempAsp[i-2] + tempAsp[i+4]*2 + tempAsp[i+10]) / 4.0; 
-                            }
-                        }
                     };
                     applyBridgeElevations();
 
-                    const buildWallsAndTunnels = () => {
-                        const wallVerts = []; const wallIndices = []; const wallUVs = [];
-                        const bottomVerts = []; const bottomIndices = []; const bottomUVs = [];
+                    const buildBridgeSupports = () => {
+                        const supportGeo = new THREE.BoxGeometry(trackWidth + 2.0, 1.5, 3.5); 
+                        const legGeo = new THREE.BoxGeometry(3.5, 1, 3.5);      
 
-                        let tunnelRadius = 16.0; 
-                        let tunnelClearance = 6.5; 
-                        let depthOffset = 1.5; 
-                        const floorY = 0.0; 
+                        const stoneTex = createStoneTexture();
+                        const bridgeMat = new THREE.MeshStandardMaterial({ map: stoneTex, color: 0xcccccc, roughness: 0.9, metalness: 0.0 }); 
+                        const pillarMat = new THREE.MeshStandardMaterial({ map: stoneTex, color: 0xaaaaaa, roughness: 0.9, metalness: 0.0 }); 
+                        
+                        const supportGroup = new THREE.Group();
+                        let lastSupportDist = -999;
+                        
+                        for (let i = 0; i < aspVertCount; i++) { 
+                            const dist = asphaltDistances[i];
+                            
+                            const xL = asphaltVerts[i * 6], yL = asphaltVerts[i * 6 + 1], zL = asphaltVerts[i * 6 + 2];
+                            const xR = asphaltVerts[i * 6 + 3], yR = asphaltVerts[i * 6 + 4], zR = asphaltVerts[i * 6 + 5];
+                            
+                            const cx = (xL + xR) / 2;
+                            const cy = (yL + yR) / 2;
+                            const cz = (zL + zR) / 2;
 
-                        const getTunnelBottomY = (x, z, currentY, currentDist) => {
-                            let bottomY = floorY; 
-                            if (currentY > 2.0) {
-                                for (let i = 0; i < aspVertCount; i += 3) { 
-                                    if (Math.abs(asphaltDistances[i] - currentDist) > 40.0) {
-                                        const cx = (asphaltVerts[i * 6] + asphaltVerts[i * 6 + 3]) / 2;
-                                        const cz = (asphaltVerts[i * 6 + 2] + asphaltVerts[i * 6 + 5]) / 2;
-                                        const cy = (asphaltVerts[i * 6 + 1] + asphaltVerts[i * 6 + 4]) / 2;
+                            if (cy > 2.5 && (dist - lastSupportDist) > 25.0) {
+                                let collision = false;
+                                for (let j = 0; j < aspVertCount; j += 2) {
+                                    if (Math.abs(asphaltDistances[j] - dist) > 50) {
+                                        const ox = (asphaltVerts[j * 6] + asphaltVerts[j * 6 + 3]) / 2;
+                                        const oz = (asphaltVerts[j * 6 + 2] + asphaltVerts[j * 6 + 5]) / 2;
+                                        const oy = (asphaltVerts[j * 6 + 1] + asphaltVerts[j * 6 + 4]) / 2;
                                         
-                                        if (cy < currentY - 3.0) {
-                                            const d2 = (cx - x)**2 + (cz - z)**2;
-                                            if (d2 < tunnelRadius**2) {
-                                                const dist2d = Math.sqrt(d2);
-                                                const arch = Math.cos((dist2d / tunnelRadius) * (Math.PI / 2)); 
-                                                const localH = cy + (tunnelClearance * arch);
-                                                if (localH > bottomY) bottomY = localH;
+                                        if (oy < cy - 2.5) {
+                                            const d2 = (cx - ox)**2 + (cz - oz)**2;
+                                            if (d2 < 144) { 
+                                                collision = true;
+                                                break;
                                             }
                                         }
                                     }
                                 }
-                            }
-                            return Math.min(bottomY, currentY - depthOffset);
-                        };
 
-                        for (let s = 0; s < aspVertCount; s++) {
-                            const xL = asphaltVerts[s * 6], yL = asphaltVerts[s * 6 + 1], zL = asphaltVerts[s * 6 + 2];
-                            const xR = asphaltVerts[s * 6 + 3], yR = asphaltVerts[s * 6 + 4], zR = asphaltVerts[s * 6 + 5];
-                            const dist = asphaltDistances[s];
-                            
-                            let bottomL = yL > 0.5 ? getTunnelBottomY(xL, zL, yL, dist) : floorY;
-                            let bottomR = yR > 0.5 ? getTunnelBottomY(xR, zR, yR, dist) : floorY;
-                            
-                            bottomL = Math.max(floorY, bottomL);
-                            bottomR = Math.max(floorY, bottomR);
-                            
-                            wallVerts.push(xL, yL, zL); wallVerts.push(xL, bottomL, zL); 
-                            wallUVs.push(dist * 0.1, yL * 0.1); wallUVs.push(dist * 0.1, bottomL * 0.1);
-                            
-                            wallVerts.push(xR, yR, zR); wallVerts.push(xR, bottomR, zR);
-                            wallUVs.push(dist * 0.1, yR * 0.1); wallUVs.push(dist * 0.1, bottomR * 0.1);
-                            
-                            bottomVerts.push(xL, bottomL, zL); bottomVerts.push(xR, bottomR, zR);
-                            bottomUVs.push(0, dist * 0.1); bottomUVs.push(1, dist * 0.1);
-                            
-                            if (s > 0) {
-                                const cur = s * 4, prev = (s - 1) * 4;
-                                wallIndices.push(prev, prev + 1, cur); wallIndices.push(prev + 1, cur + 1, cur);
-                                wallIndices.push(prev + 2, cur + 2, prev + 3); wallIndices.push(prev + 3, cur + 2, cur + 3);
-                                
-                                const curB = s * 2, prevB = (s - 1) * 2;
-                                bottomIndices.push(prevB, curB, prevB + 1);
-                                bottomIndices.push(prevB + 1, curB, curB + 1);
+                                if (!collision) {
+                                    const dx = xR - xL;
+                                    const dz = zR - zL;
+                                    const angle = Math.atan2(dz, dx); 
+                                    
+                                    const crossbar = new THREE.Mesh(supportGeo, bridgeMat);
+                                    crossbar.position.set(cx, cy - 1.0, cz);
+                                    crossbar.rotation.y = -angle; 
+                                    
+                                    const height = cy - 1.0; 
+                                    
+                                    const legL = new THREE.Mesh(legGeo, pillarMat);
+                                    const lx = cx - Math.cos(angle) * (trackWidth/2 - 1.5);
+                                    const lz = cz - Math.sin(angle) * (trackWidth/2 - 1.5);
+                                    legL.position.set(lx, height / 2, lz);
+                                    legL.scale.y = height;
+                                    legL.rotation.y = -angle;
+
+                                    const legR = new THREE.Mesh(legGeo, pillarMat);
+                                    const rx = cx + Math.cos(angle) * (trackWidth/2 - 1.5);
+                                    const rz = cz + Math.sin(angle) * (trackWidth/2 - 1.5);
+                                    legR.position.set(rx, height / 2, rz);
+                                    legR.scale.y = height;
+                                    legR.rotation.y = -angle;
+
+                                    crossbar.castShadow = true; crossbar.receiveShadow = true;
+                                    legL.castShadow = true; legL.receiveShadow = true;
+                                    legR.castShadow = true; legR.receiveShadow = true;
+                                    
+                                    supportGroup.add(crossbar);
+                                    supportGroup.add(legL);
+                                    supportGroup.add(legR);
+
+                                    lastSupportDist = dist;
+                                }
                             }
                         }
-
-                        const wallGeom = new THREE.BufferGeometry();
-                        wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallVerts, 3));
-                        wallGeom.setAttribute('uv', new THREE.Float32BufferAttribute(wallUVs, 2));
-                        wallGeom.setIndex(wallIndices);
-                        wallGeom.computeVertexNormals();
-
-                        const bottomGeom = new THREE.BufferGeometry();
-                        bottomGeom.setAttribute('position', new THREE.Float32BufferAttribute(bottomVerts, 3));
-                        bottomGeom.setAttribute('uv', new THREE.Float32BufferAttribute(bottomUVs, 2));
-                        bottomGeom.setIndex(bottomIndices);
-                        bottomGeom.computeVertexNormals();
-
-                        const stoneTex = createStoneTexture();
-                        const structMat = new THREE.MeshLambertMaterial({ 
-                            map: stoneTex,
-                            color: 0xaaaaaa, 
-                            side: THREE.DoubleSide 
-                        });
-
-                        const wallMesh = new THREE.Mesh(wallGeom, structMat);
-                        wallMesh.receiveShadow = true; 
-                        wallMesh.castShadow = true;
-                        trackGroup.add(wallMesh);
-
-                        const bottomMesh = new THREE.Mesh(bottomGeom, structMat);
-                        bottomMesh.receiveShadow = true; 
-                        bottomMesh.castShadow = true;
-                        trackGroup.add(bottomMesh);
+                        trackGroup.add(supportGroup);
                     };
-                    buildWallsAndTunnels();
+                    buildBridgeSupports();
 
                     const buildContinuousLane = (laneArray, distArray) => {
                         const pts = []; const dst = [];
@@ -2080,7 +2069,7 @@
                                 // LÓGICA DE DETECCIÓN DE ENTRADA A BOXES
                                 if (!car.isChanging && ci === myCarIdx && pitPressedRef.current) {
                                     const currentPiece = pieceMapRef.current.find(p => car.distance >= p.distStart && car.distance < p.distEnd);
-                                    if (currentPiece && currentPiece.type === 'pit_entry') {
+                                    if (currentPiece && currentPiece.type && currentPiece.type.includes('pit_entry')) {
                                         const pitSide = currentPiece.invert ? 'left' : 'right';
                                         const targetMainLane = pitSide === 'right' ? 1 : 0;
                                         if (car.currentLane === targetMainLane && (car.distance - currentPiece.distStart < 15.0)) {
@@ -2092,12 +2081,12 @@
                                 // LÓGICA DE SALIDA DE BOXES (AUTOMÁTICA)
                                 if (car.currentLane === 2) {
                                     const currentPiece = pieceMapRef.current.find(p => car.distance >= p.distStart && car.distance < p.distEnd);
-                                    if (currentPiece && currentPiece.type === 'pit_exit') {
+                                    if (currentPiece && currentPiece.type && currentPiece.type.includes('pit_exit')) {
                                         if (car.distance >= currentPiece.distEnd - 5.0) { 
                                             const pitSide = currentPiece.invert ? 'left' : 'right';
                                             car.currentLane = pitSide === 'right' ? 1 : 0;
                                         }
-                                    } else if (currentPiece && currentPiece.type !== 'pit_entry' && currentPiece.type !== 'pit_exit' && (!currentPiece.subtype || !currentPiece.subtype.includes('pit'))) {
+                                    } else if (currentPiece && (!currentPiece.type || (!currentPiece.type.includes('pit_entry') && !currentPiece.type.includes('pit_exit'))) && (!currentPiece.subtype || !currentPiece.subtype.includes('pit'))) {
                                         car.currentLane = 1; // Failsafe para devolverlo a un carril válido si la pista se corta
                                     }
                                 }
@@ -2105,11 +2094,13 @@
                                 // LÓGICA DE DETECCIÓN Y CAMBIO DE CARRIL
                                 if (!car.isChanging && ci === myCarIdx && laneChangePressedRef.current) {
                                     const currentPiece = pieceMapRef.current.find(p => car.distance >= p.distStart && car.distance < p.distEnd);
-                                    if (currentPiece && currentPiece.type === 'straight') {
-                                        const isX = currentPiece.subtype === 'digital_x';
-                                        const isCR = currentPiece.subtype === 'change_right';
-                                        const isCL = currentPiece.subtype === 'change_left';
-                                        const isDoubleX = currentPiece.subtype === 'pit_parallel_double_x';
+                                    
+                                    // Generalizado para cualquier tipo de recta o curva que contenga cambios de carril
+                                    if (currentPiece && ((currentPiece.type && currentPiece.type.includes('straight')) || (currentPiece.type && currentPiece.type.includes('curve')))) {
+                                        const isX = currentPiece.subtype && (currentPiece.subtype.includes('digital_x') || currentPiece.subtype === 'doble_cambio');
+                                        const isCR = currentPiece.subtype && (currentPiece.subtype.includes('change_right') || currentPiece.subtype.includes('cambio_derecha'));
+                                        const isCL = currentPiece.subtype && (currentPiece.subtype.includes('change_left') || currentPiece.subtype.includes('cambio_izquierda'));
+                                        const isDoubleX = currentPiece.subtype && currentPiece.subtype.includes('pit_parallel_double_x');
                                         
                                         let canChange = false;
                                         let targetLane = car.currentLane;
@@ -2420,14 +2411,6 @@
                             <button onClick={() => { if (showHomoViewer && targetId === 1) setShowHomoViewer(false); else { setTargetId(1); setShowHomoViewer(true); setShowBoardMenu(false); } }} className={`group relative w-16 h-14 flex flex-col items-center justify-center rounded-xl transition-all border ${showHomoViewer && targetId === 1 ? 'bg-red-500/20 border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-black/60 border-red-500/30 hover:border-red-400 hover:bg-red-500/10 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]'}`}>
                                 <span className="text-xl mb-0.5 group-hover:scale-110 transition-transform drop-shadow-md">🏎️</span>
                                 <span className="text-[7px] font-black uppercase tracking-widest text-red-400 group-hover:text-red-300">{t.car}</span>
-                            </button>
-                            <button onClick={() => { if (showHomoViewer && targetId === 2) setShowHomoViewer(false); else { setTargetId(2); setShowHomoViewer(true); setShowBoardMenu(false); } }} className={`group relative w-16 h-14 flex flex-col items-center justify-center rounded-xl transition-all border ${showHomoViewer && targetId === 2 ? 'bg-cyan-500/20 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.5)]' : 'bg-black/60 border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)]'}`}>
-                                <User size={18} className={`${showHomoViewer && targetId === 2 ? 'text-cyan-300' : 'text-cyan-500'} group-hover:scale-110 transition-transform mb-1`}/>
-                                <span className="text-[7px] font-black uppercase tracking-widest text-cyan-400 group-hover:text-cyan-300">{t.objects}</span>
-                            </button>
-                            <button onClick={() => { setShowBoardMenu(!showBoardMenu); setShowHomoViewer(false); }} className={`group relative w-16 h-14 flex flex-col items-center justify-center rounded-xl transition-all border ${showBoardMenu ? 'bg-emerald-500/20 border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]' : 'bg-black/60 border-emerald-500/30 hover:border-emerald-400 hover:bg-emerald-500/10 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)]'}`}>
-                                <LayoutTemplate size={18} className={`${showBoardMenu ? 'text-emerald-300' : 'text-emerald-500'} group-hover:scale-110 transition-transform mb-1`}/>
-                                <span className="text-[7px] font-black uppercase tracking-widest text-emerald-400 group-hover:text-emerald-300">{t.board}</span>
                             </button>
                             <button onClick={() => setShowTrees(!showTrees)} className={`group relative w-16 h-14 flex flex-col items-center justify-center rounded-xl transition-all border ${showTrees ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_15px_rgba(57,255,20,0.5)]' : 'bg-black/60 border-[#39ff14]/30 hover:border-[#39ff14] hover:bg-[#39ff14]/10 hover:shadow-[0_0_15px_rgba(57,255,20,0.4)]'}`}>
                                 <TreePine size={18} className={`${showTrees ? 'text-[#39ff14]' : 'text-green-600'} group-hover:scale-110 transition-transform mb-1`}/>
