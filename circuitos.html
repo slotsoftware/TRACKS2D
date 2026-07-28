@@ -183,11 +183,7 @@
               { id: 'c_pt55', label: 'Entrada Chicane (PT55)', type: 'straight', length: 35.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
               { id: 'c_pt61', label: 'Recta Chicane (PT61)', type: 'straight', length: 35.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
               { id: 'c_pt56', label: 'Salida Chicane (PT56)', type: 'straight', length: 35.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
-              { id: 'c_macro_chicane2', label: 'Gran Chicane PT74', type: 'straight', isMacro: true, cat: 'Cruces', pieces: [ 
-                  { id: 'c_pt74_in', label: 'Chicane In (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_entry', cat: 'Cruces' }, 
-                  { id: 'c_pt74_mid', label: 'Chicane Med (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_middle', cat: 'Cruces' }, 
-                  { id: 'c_pt74_out', label: 'Chicane Out (PT74)', type: 'straight', length: 35.0, subtype: 'chicane3_exit', cat: 'Cruces' } 
-              ] },
+              { id: 'c_macro_chicane2', label: 'Gran Chicane PT74', type: 'straight', length: 105.0, subtype: 'full_chicane', cat: 'Cruces' },
               { id: 'c_pt57', label: 'Curva Chicane (PT57)', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, 
               { id: 'c_pt52', label: 'Curva R1 (PT52)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
               { id: 'c_pt53', label: 'Curva R2 (PT53)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
@@ -212,11 +208,7 @@
               { id: 's_chicane_in', label: 'Entrada Chicane', type: 'straight', length: 36.0, subtype: 'chicane_entry', cat: 'Cruces' }, 
               { id: 's_chicane_mid', label: 'Recta Chicane', type: 'straight', length: 36.0, subtype: 'chicane_middle', cat: 'Cruces' }, 
               { id: 's_chicane_out', label: 'Salida Chicane', type: 'straight', length: 36.0, subtype: 'chicane_exit', cat: 'Cruces' }, 
-              { id: 's_macro_chicane', label: 'Gran Chicane', type: 'straight', isMacro: true, cat: 'Cruces', pieces: [ 
-                  { id: 's_chicane3_in', label: 'Chicane In (360)', type: 'straight', length: 36.0, subtype: 'chicane3_entry', cat: 'Cruces' }, 
-                  { id: 's_chicane3_mid', label: 'Chicane Med (360)', type: 'straight', length: 36.0, subtype: 'chicane3_middle', cat: 'Cruces' }, 
-                  { id: 's_chicane3_out', label: 'Chicane Out (360)', type: 'straight', length: 36.0, subtype: 'chicane3_exit', cat: 'Cruces' } 
-              ] },
+              { id: 's_macro_chicane', label: 'Gran Chicane', type: 'straight', length: 108.0, subtype: 'full_chicane', cat: 'Cruces' },
               { id: 's_chicane_curve', label: 'Curva Chicane', type: 'curve', radius: 30.6, angle: 45, subtype: 'chicane_curve', cat: 'Curvas' }, 
               { id: 's_r1', label: 'R1 (Int)', type: 'curve', radius: 15.0, angle: 45, cat: 'Curvas' }, 
               { id: 's_r2', label: 'R2 (Std)', type: 'curve', radius: 30.6, angle: 45, cat: 'Curvas' }, 
@@ -235,11 +227,7 @@
               { id: 'adv_80', label: 'Cierre 80', type: 'straight', length: 8.0, cat: 'Rectas' }, 
               { id: 'adv_connect', label: 'Bluetooth', type: 'straight', length: 36.0, subtype: 'connection', cat: 'Digital' }, 
               { id: 'adv_x', label: 'Cambio Recta', type: 'straight', length: 36.0, subtype: 'digital_x', cat: 'Digital' }, 
-              { id: 'adv_macro_chicane', label: 'Gran Chicane Advance', type: 'straight', isMacro: true, cat: 'Cruces', pieces: [ 
-                  { id: 'adv_chicane_in', label: 'Entrada Chicane (LC)', type: 'straight', length: 36.0, subtype: 'chicane3_entry', cat: 'Cruces' }, 
-                  { id: 'adv_chicane_mid', label: 'Recta Chicane (1C)', type: 'straight', length: 36.0, subtype: 'chicane3_middle', cat: 'Cruces' }, 
-                  { id: 'adv_chicane_out', label: 'Salida Chicane (LC)', type: 'straight', length: 36.0, subtype: 'chicane3_exit', cat: 'Cruces' } 
-              ] },
+              { id: 'adv_macro_chicane', label: 'Gran Chicane Advance', type: 'straight', length: 108.0, subtype: 'full_chicane', cat: 'Cruces' },
               { id: 'adv_pit_in', label: 'Entrada Pit', type: 'pit_entry', length: 36.0, cat: 'Boxes' }, 
               { id: 'adv_pit_fuel', label: 'Recta Fuel', type: 'straight', length: 36.0, subtype: 'pit_parallel', cat: 'Boxes' }, 
               { id: 'adv_pit_box_x', label: 'Boxes + Cambio X', type: 'straight', length: 36.0, subtype: 'pit_parallel_double_x', cat: 'Boxes' }, 
@@ -310,8 +298,8 @@
               { id: 'car_x', label: 'Cambio X (69)', type: 'straight', length: 69.0, subtype: 'digital_x', cat: 'Digital' },
               { id: 'car_ch_l', label: 'Cambio Izq (69)', type: 'straight', length: 69.0, subtype: 'change_left', cat: 'Digital' },
               { id: 'car_ch_r', label: 'Cambio Der (69)', type: 'straight', length: 69.0, subtype: 'change_right', cat: 'Digital' },
-              { id: 'car_macro_ch_curve_in', label: 'Cambio Curva In', type: 'curve', isMacro: true, cat: 'Digital', pieces: [ { id: 'car_ch_curve_str_in', label: 'Recta Cambio In', type: 'straight', length: 34.5, subtype: 'digital_str_curve_in', cat: 'Digital' }, { id: 'car_ch_curve_arc_in', label: 'Curva Cambio In', type: 'curve', radius: 30.0, angle: 60, subtype: 'digital_arc_curve_in', cat: 'Digital' } ] },
-              { id: 'car_macro_ch_curve_out', label: 'Cambio Curva Out', type: 'curve', isMacro: true, cat: 'Digital', pieces: [ { id: 'car_ch_curve_str_out', label: 'Recta Cambio Out', type: 'straight', length: 34.5, subtype: 'digital_str_curve_out', cat: 'Digital' }, { id: 'car_ch_curve_arc_out', label: 'Curva Cambio Out', type: 'curve', radius: 30.0, angle: 60, subtype: 'digital_arc_curve_out', cat: 'Digital' } ] },
+              { id: 'car_macro_ch_curve_in', label: 'Cambio Curva In', type: 'compound_curve_change', length: 34.5, radius: 30.0, angle: 60, subtype: 'in', cat: 'Digital' },
+              { id: 'car_macro_ch_curve_out', label: 'Cambio Curva Out', type: 'compound_curve_change', length: 34.5, radius: 30.0, angle: 60, subtype: 'out', cat: 'Digital' },
               { id: 'car_pit_in', label: 'Entrada Pit Carrera', type: 'pit_entry', length: 34.5, cat: 'Boxes' },
               { id: 'car_pit_straight', label: 'Recta Pit 34.5', type: 'straight', length: 34.5, subtype: 'pit_parallel', cat: 'Boxes' },
               { id: 'car_pit_out', label: 'Salida Pit Carrera', type: 'pit_exit', length: 34.5, cat: 'Boxes' },
@@ -1128,6 +1116,7 @@
             rawPieces.forEach(rawP => {
                 if (!rawP) return;
                 const p = JSON.parse(JSON.stringify(rawP));
+                p.originalUid = rawP.uid; // INYECCIÓN: Protegemos la referencia original para evitar que los bloques se rompan
                 // Clave basada en posición con precisión de 1mm
                 const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
                 uniquePiecesMap.set(key, p);
@@ -1369,7 +1358,7 @@
                 const isSingle = isSingle1 || isSingle2;
                 const laneOff = (brand.laneSpacing / 2) * s;
                 
-                if (p.type.includes('pit') || p.type === 'rotonda' || p.subtype === 'rotonda' || (p.subtype && p.subtype.startsWith('chicane3_'))) return; 
+                if (p.type.includes('pit') || p.type === 'rotonda' || p.subtype === 'rotonda' || (p.subtype && (p.subtype.startsWith('chicane3_') || p.subtype === 'full_chicane'))) return; 
                 ctx.beginPath();
                 
                 let effectiveTrueR = trueR;
@@ -1483,6 +1472,7 @@
                                 if (p.subtype !== 'change_left') { ctx.moveTo(0, -laneOff); ctx.bezierCurveTo(l*0.4, -laneOff, l*0.6, laneOff, l, laneOff); } if (p.subtype !== 'change_right') { ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.4, laneOff, l*0.6, -laneOff, l, -laneOff); } ctx.stroke();
                                 if (p.subtype !== 'change_left') DrawEngine2D.drawDigitalWedge(ctx, l, -laneOff, 1, s); if (p.subtype !== 'change_right') DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, -1, s);
                             } else if (p.subtype && p.subtype.startsWith('chicane3_')) {
+                                // Soporte legado por si el usuario carga un circuito guardado anteriormente
                                 const narrowHW = hw * 0.5;
                                 const c1 = hw - narrowHW;
                                 const narrowLaneOff = laneOff * 0.35;
@@ -1526,6 +1516,61 @@
                                 
                                 ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, railStartL); ctx.bezierCurveTo(l*0.4, railStartL, l*0.6, railEndL, l, railEndL); ctx.stroke();
                                 ctx.beginPath(); ctx.moveTo(0, railStartR); ctx.bezierCurveTo(l*0.4, railStartR, l*0.6, railEndR, l, railEndR); ctx.stroke();
+                            } else if (p.subtype === 'full_chicane') {
+                                // MACRO SÓLIDA GRAN CHICANE PT74: RECORRIDO DIAGONAL EXACTO
+                                const sl = l / 3;
+                                const c1 = hw * 0.5;
+                                const narrowLaneOff = laneOff * 0.35;
+
+                                const drawChicanePath = (ctx, startY, yAt1, yAt2, endY) => {
+                                    ctx.moveTo(0, startY);
+                                    ctx.bezierCurveTo(sl*0.4, startY, sl*0.6, yAt1, sl, yAt1);
+                                    ctx.bezierCurveTo(sl + sl*0.4, yAt1, sl + sl*0.6, yAt2, 2*sl, yAt2);
+                                    ctx.bezierCurveTo(2*sl + sl*0.4, yAt2, 2*sl + sl*0.6, endY, l, endY);
+                                };
+
+                                ctx.fillStyle = brand.trackColor;
+                                ctx.beginPath();
+                                // Borde Izquierdo (Superior)
+                                ctx.moveTo(0, -hw);
+                                ctx.bezierCurveTo(sl*0.4, -hw, sl*0.6, 0, sl, 0);
+                                ctx.bezierCurveTo(sl + sl*0.4, 0, sl + sl*0.6, -hw, 2*sl, -hw);
+                                ctx.bezierCurveTo(2*sl + sl*0.4, -hw, 2*sl + sl*0.6, -hw, l, -hw);
+                                // Borde Derecho (Inferior) trazado a la inversa
+                                ctx.lineTo(l, hw);
+                                ctx.bezierCurveTo(2*sl + sl*0.6, hw, 2*sl + sl*0.4, 0, 2*sl, 0);
+                                ctx.bezierCurveTo(sl + sl*0.6, 0, sl + sl*0.4, hw, sl, hw);
+                                ctx.bezierCurveTo(sl*0.6, hw, sl*0.4, hw, 0, hw);
+                                ctx.closePath();
+                                ctx.fill();
+
+                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                ctx.moveTo(0, -hw);
+                                ctx.bezierCurveTo(sl*0.4, -hw, sl*0.6, 0, sl, 0);
+                                ctx.bezierCurveTo(sl + sl*0.4, 0, sl + sl*0.6, -hw, 2*sl, -hw);
+                                ctx.bezierCurveTo(2*sl + sl*0.4, -hw, 2*sl + sl*0.6, -hw, l, -hw);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(0, hw);
+                                ctx.bezierCurveTo(sl*0.4, hw, sl*0.6, hw, sl, hw);
+                                ctx.bezierCurveTo(sl + sl*0.4, hw, sl + sl*0.6, 0, 2*sl, 0);
+                                ctx.bezierCurveTo(2*sl + sl*0.4, 0, 2*sl + sl*0.6, hw, l, hw);
+                                ctx.stroke();
+
+                                const rl0 = -laneOff, rr0 = laneOff;
+                                const rl1 = c1 - narrowLaneOff, rr1 = c1 + narrowLaneOff;
+                                const rl2 = -c1 - narrowLaneOff, rr2 = -c1 + narrowLaneOff;
+                                const rl3 = -laneOff, rr3 = laneOff;
+
+                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
+                                ctx.beginPath(); drawChicanePath(ctx, rl0, rl1, rl2, rl3); ctx.stroke();
+                                ctx.beginPath(); drawChicanePath(ctx, rr0, rr1, rr2, rr3); ctx.stroke();
+
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1;
+                                ctx.beginPath(); drawChicanePath(ctx, rl0, rl1, rl2, rl3); ctx.stroke();
+                                ctx.beginPath(); drawChicanePath(ctx, rr0, rr1, rr2, rr3); ctx.stroke();
                             } else if (p.subtype && p.subtype.includes('single_lane')) {
                                 const slWidth = hw;
                                 const laneColor = p.subtype === 'single_lane_1' ? '#ef4444' : '#3b82f6';
@@ -2596,10 +2641,10 @@
           const handleCoserPista = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               
-              // Guardamos temporalmente los atributos originales de UI que el compilador suele borrar
+              // Guardamos temporalmente los atributos originales de UI
               const attributesMap = new Map();
               pieces.forEach(p => {
-                  if (p) attributesMap.set(p.uid, { brandKey: p.brandKey, groupId: p.groupId, cat: p.cat, lane: p.lane, label: p.label, id: p.id, type: p.type, subtype: p.subtype, direction: p.direction, invert: p.invert });
+                  if (p) attributesMap.set(p.uid, p);
               });
               
               // Utilizamos el compilador 3D para encadenar matemáticamente y eliminar holguras
@@ -2613,21 +2658,21 @@
                   delete newP.chainOrder;
                   delete newP.laneMapping;
                   
-                  // Restauramos los valores originales del UI 2D
-                  const original = attributesMap.get(newP.uid);
+                  // Restauramos los atributos estructurales y de grupo desde la pieza original
+                  const original = attributesMap.get(newP.originalUid);
                   if (original) {
                       newP.brandKey = original.brandKey;
-                      newP.groupId = original.groupId;
+                      // Mantenemos el bloque indivisible. Si era un Squeeze que se partió, usamos su uid original como grupo.
+                      newP.groupId = original.groupId || (original.subtype === 'squeeze' ? original.uid : undefined);
                       newP.cat = original.cat;
                       newP.lane = original.lane;
                       newP.label = original.label;
-                      newP.id = original.id;
-                      newP.type = original.type;
-                      newP.subtype = original.subtype;
-                      newP.direction = original.direction;
-                      newP.invert = original.invert;
+                      
+                      if (original.subtype !== 'squeeze') {
+                          newP.id = original.id;
+                      }
                   }
-                  
+                  delete newP.originalUid;
                   return newP;
               });
 
@@ -2661,29 +2706,6 @@
               } else {
                   newX = ((windowSize.w/2) - view.x) / view.scale;
                   newY = ((windowSize.h/2) - view.y) / view.scale;
-              }
-              
-              if (p.isMacro) {
-                  let currentX = newX, currentY = newY, currentRot = newRot;
-                  const newPieces = [...pieces];
-                  const addedIds = [];
-                  const newGroupId = 'macro_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-                  
-                  p.pieces.forEach((subP, index) => {
-                      const newPiece = { ...subP, brandKey: p.brandKey || activeBrand, direction: d, uid: Date.now() + Math.random() + index, groupId: newGroupId, elevation: workingElevation, x: currentX, y: currentY, rot: currentRot, invert: false, cat: p.cat || subP.cat };
-                      newPieces.push(newPiece);
-                      addedIds.push(newPiece.uid);
-                      
-                      const geo = getPieceGeometry(newPiece);
-                      if (geo) {
-                          currentX = geo.outX;
-                          currentY = geo.outY;
-                          currentRot = geo.outAngle;
-                      }
-                  });
-                  pushHistory(newPieces);
-                  setSelectedPieceIds(addedIds);
-                  return;
               }
 
               const newPiece = { ...p, direction: d, uid: Date.now() + Math.random(), elevation: workingElevation, x: newX, y: newY, rot: newRot, invert: false };
@@ -3335,6 +3357,19 @@
               
               try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend))); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
           };
+          const goToDecoration = () => {
+              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
+              
+              let piecesToSend = pieces;
+              const hasMultiLane = pieces.some(p => p.lane && p.lane > 0);
+              
+              if (hasMultiLane) {
+                  alert(t.alerts.decoMulti);
+                  piecesToSend = pieces.filter(p => !p.lane || p.lane === 0);
+              }
+              
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend))); window.location.href = 'deco.html'; } catch (e) { alert(t.alerts.deco); }
+          };
           const goToMulti = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               
@@ -3737,6 +3772,9 @@
                                   
                                   <button onClick={goToSimulation} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-[#39ff14] shadow-[0_0_10px_rgba(57,255,20,0.4)] rounded-lg text-[#39ff14] hover:bg-[#39ff14]/20 active:scale-95 transition-all group hover:shadow-[0_0_20px_rgba(57,255,20,0.6)]"> 
                                       <Play size={16} className="group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest uppercase">{t.actions.sim}</span> 
+                                  </button> 
+                                  <button onClick={goToDecoration} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.4)] rounded-lg text-pink-400 hover:bg-pink-500/20 active:scale-95 transition-all group hover:shadow-[0_0_20px_rgba(236,72,153,0.6)]"> 
+                                      <ImageIcon size={16} className="group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest uppercase">{t.actions.deco}</span> 
                                   </button> 
                                   <button onClick={goToMulti} className="shrink-0 flex items-center justify-center gap-2 px-4 h-10 bg-gray-900/90 border border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)] rounded-lg text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all group hover:shadow-[0_0_20px_rgba(245,158,11,0.6)]"> 
                                       <Flag size={16} className="group-hover:scale-110 transition-transform"/><span className="text-[9px] font-black tracking-widest uppercase">{t.actions.clubs}</span> 
