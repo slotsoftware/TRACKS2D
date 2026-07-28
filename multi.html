@@ -3196,10 +3196,11 @@
                             const data = await res.json();
                             if (!Array.isArray(data)) return;
 
-                            // Excluir cualquier archivo que contenga "dunlop" (cámara, puente, etc.)
+                            // Excluir cualquier archivo que contenga "dunlop" o "arbusto"
                             const glbFiles = data.filter(f => 
                                 (f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf')) &&
-                                !f.name.toLowerCase().includes('dunlop')
+                                !f.name.toLowerCase().includes('dunlop') &&
+                                !f.name.toLowerCase().includes('arbusto')
                             );
 
                             if (glbFiles.length === 0) return;
