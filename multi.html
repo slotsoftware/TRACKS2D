@@ -150,8 +150,8 @@
             const [tag, attrs, children = []] = iconData;
             return <svg {...attrs} width={size} height={size} className={className} {...props}>{Array.isArray(children) && children.map(([childTag, childAttrs], index) => React.createElement(childTag, { ...childAttrs, key: index }))}</svg>;
         };
-        const icons = ['Trash2','Image','Fuel','Move','Zap','Bluetooth','RotateCw','RotateCcw','X','Repeat','PenTool','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Square','FolderOpen','Save','FileText','Activity','Play','Pause','Flag','GitCommit','ZoomIn','ZoomOut','Crosshair','Undo2','Redo2','Layers','Clock','Hash','Plus','Minus','AlertTriangle', 'Cloud', 'CloudUpload', 'CloudDownload', 'Settings', 'Battery', 'Scale', 'Trophy', 'Timer', 'Gauge', 'Maximize', 'Minimize', 'User', 'Users', 'ChevronDown', 'Mic', 'MicOff', 'Volume2', 'VolumeX', 'Move3d', 'Video', 'Eye', 'Tv'].reduce((acc, name) => { acc[name] = (p) => <IconWrapper name={name} {...p} />; return acc; }, {});
-        const { Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, RotateCcw, X, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Trophy, Timer, Gauge, Maximize, Minimize, User, Users, ChevronDown, Mic, MicOff, Volume2, VolumeX, Move3d, Video, Eye, Tv } = icons;
+        const icons = ['Trash2','Image','Fuel','Move','Zap','Bluetooth','RotateCw','RotateCcw','X','Repeat','PenTool','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Square','FolderOpen','Save','FileText','Activity','Play','Pause','Flag','GitCommit','ZoomIn','ZoomOut','Crosshair','Undo2','Redo2','Layers','Clock','Hash','Plus','Minus','AlertTriangle', 'Cloud', 'CloudUpload', 'CloudDownload', 'Settings', 'Battery', 'Scale', 'Trophy', 'Timer', 'Gauge', 'Maximize', 'Minimize', 'User', 'Users', 'ChevronDown', 'Mic', 'MicOff', 'Volume2', 'VolumeX', 'Move3d', 'Video', 'Eye', 'Tv', 'TreePine'].reduce((acc, name) => { acc[name] = (p) => <IconWrapper name={name} {...p} />; return acc; }, {});
+        const { Trash2, Image: ImageIcon, Fuel, Move, Zap, Bluetooth, RotateCw, RotateCcw, X, Repeat, PenTool, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Square, FolderOpen, Save, FileText, Activity, Play, Pause, Flag, GitCommit, ZoomIn, ZoomOut, Crosshair, Undo2, Redo2, Layers, Clock, Hash, Plus, Minus, AlertTriangle, Cloud, CloudUpload, CloudDownload, Settings, Battery, Scale, Trophy, Timer, Gauge, Maximize, Minimize, User, Users, ChevronDown, Mic, MicOff, Volume2, VolumeX, Move3d, Video, Eye, Tv, TreePine } = icons;
 
         /* --- SISTEMA DE IDIOMAS (NUEVO) --- */
         const TRANSLATIONS = {
@@ -1539,6 +1539,18 @@
             const [manualThrottle, setManualThrottle] = useState(0);
             const [sceneReady, setSceneReady] = useState(false);
             
+            // --- NUEVO: ESTADO DE BOSQUE ---
+            const [showVegetation, setShowVegetation] = useState(true);
+            const showVegetationRef = useRef(showVegetation);
+            const forestGroupRef = useRef(null);
+
+            useEffect(() => {
+                showVegetationRef.current = showVegetation;
+                if (forestGroupRef.current) {
+                    forestGroupRef.current.visible = showVegetation;
+                }
+            }, [showVegetation]);
+
             // --- NUEVO: ESTADO DE NIVEL IA ---
             const [aiLevel, setAiLevel] = useState(3);
             const aiLevelRef = useRef(aiLevel);
@@ -3156,7 +3168,7 @@
                         const boardH = 2.0;
 
                         // Textura asfalto verde (Material granular exacto de Ninco aplicado al tablero)
-                        const greenAsphaltTex = createAsphaltTexture(renderer, '#073b14'); // Verde tapete MUY oscuro
+                        const greenAsphaltTex = createAsphaltTexture(renderer, '#021a08'); // Verde tapete AÚN MÁS oscuro
                         greenAsphaltTex.repeat.set(boardW / 10, boardD / 10); // Misma escala de grano que la pista original
 
                         // Materiales para cada cara del cubo (Multi-material)
@@ -3175,6 +3187,114 @@
                         scene.add(boardMesh);
                     } 
                     scene.add(trackGroup);
+
+                    // --- IA: GENERACIÓN AUTOMÁTICA DE BOSQUES / DECORACIÓN ---
+                    const generateForest = async () => {
+                        try {
+                            const res = await fetch('https://api.github.com/repos/slotsoftware/Telemetria/contents/decora');
+                            if (!res.ok) return;
+                            const data = await res.json();
+                            if (!Array.isArray(data)) return;
+
+                            // Excluir cualquier archivo que contenga "dunlop" (cámara, puente, etc.)
+                            const glbFiles = data.filter(f => 
+                                (f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf')) &&
+                                !f.name.toLowerCase().includes('dunlop')
+                            );
+
+                            if (glbFiles.length === 0) return;
+
+                            const loader = getSharedGLTFLoader();
+                            const models = [];
+                            
+                            // Cargar modelos de decoración
+                            for (const file of glbFiles) {
+                                const url = `https://raw.githubusercontent.com/slotsoftware/Telemetria/main/decora/${encodeURIComponent(file.name)}`;
+                                try {
+                                    const gltf = await new Promise((resolve, reject) => {
+                                        loader.load(url, resolve, undefined, reject);
+                                    });
+                                    const model = gltf.scene;
+                                    
+                                    model.traverse(child => {
+                                        if (child.isMesh) {
+                                            child.castShadow = true;
+                                            child.receiveShadow = true;
+                                        }
+                                    });
+
+                                    const box = new THREE.Box3().setFromObject(model);
+                                    const center = box.getCenter(new THREE.Vector3());
+                                    model.position.set(-center.x, -box.min.y, -center.z);
+                                    
+                                    const wrapper = new THREE.Group();
+                                    wrapper.add(model);
+                                    
+                                    // Normalizar tamaño de los árboles/decoración
+                                    const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
+                                    if (maxDim > 50) wrapper.scale.setScalar(50 / maxDim);
+                                    else if (maxDim < 5) wrapper.scale.setScalar(15 / maxDim);
+                                    
+                                    models.push(wrapper);
+                                } catch (err) {
+                                    console.warn('Error cargando decoración:', file.name);
+                                }
+                            }
+
+                            if (models.length === 0) return;
+
+                            const numTrees = 100; // Densidad del bosque
+                            const validPositions = [];
+                            
+                            // Recopilar TODOS los puntos de TODOS los carriles para una colisión perfecta
+                            const allTrackPts = [];
+                            for(let j=0; j<numLanes; j++) {
+                                if(rails.lanes[j]) allTrackPts.push(...rails.lanes[j].filter(p => p !== null));
+                            }
+
+                            // Buscar posiciones aleatorias en el tapete verde, lejos del asfalto
+                            for (let i = 0; i < numTrees * 20; i++) { // Aumentados los intentos masivamente
+                                if (validPositions.length >= numTrees) break;
+                                
+                                const x = b.min.x - 20 + Math.random() * (b.max.x - b.min.x + 40);
+                                const z = b.min.z - 20 + Math.random() * (b.max.z - b.min.z + 40);
+
+                                let minDistSq = Infinity;
+                                // Revisar TODOS los puntos de la pista exhaustivamente (sin saltos) para máxima precisión
+                                for (let j = 0; j < allTrackPts.length; j++) {
+                                    const p = allTrackPts[j];
+                                    const distSq = (p.x - x)**2 + (p.z - z)**2;
+                                    if (distSq < minDistSq) minDistSq = distSq;
+                                }
+
+                                // Distancia ultra-segura (45 unidades) para evitar colisiones
+                                // Garantiza que ni una hoja asome a la pista
+                                if (minDistSq > 45 * 45) {
+                                    validPositions.push({ x, z });
+                                }
+                            }
+
+                            const forestGroup = new THREE.Group();
+                            forestGroup.name = "FOREST";
+                            validPositions.forEach(pos => {
+                                const randomModel = models[Math.floor(Math.random() * models.length)].clone();
+                                randomModel.position.set(pos.x, -0.2, pos.z); // -0.2 es el nivel superior del tapete
+                                randomModel.rotation.y = Math.random() * Math.PI * 2;
+                                const s = 0.6 + Math.random() * 0.8; // Variación de escala entre 0.6 y 1.4
+                                randomModel.scale.multiplyScalar(s);
+                                forestGroup.add(randomModel);
+                            });
+                            
+                            forestGroupRef.current = forestGroup;
+                            forestGroup.visible = showVegetationRef.current; // Sincroniza con el estado UI
+                            trackGroup.add(forestGroup);
+
+                        } catch (err) {
+                            console.error("Error al generar el bosque:", err);
+                        }
+                    };
+
+                    generateForest();
 
                     carMeshesRef.current = [];
                     if (rails.lanes[0].length > 2) { 
@@ -3998,11 +4118,17 @@
                                 {/* Botones Garaje y Cámaras */}
                                 <div className="flex gap-2 items-center">
                                     <div className="flex flex-col gap-1 items-center justify-center">
-                                        <span className="text-[6px] font-bold text-gray-400 uppercase tracking-widest leading-none">AJUSTES 3D</span>
-                                        <button onClick={() => setShowHomoViewer(!showHomoViewer)} className={`px-2.5 h-8 flex items-center justify-center gap-1.5 rounded-lg border transition-all ${showHomoViewer ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`} title={t('garage')}>
-                                            <User size={12}/>
-                                            <span className="text-[8px] font-black tracking-wider whitespace-nowrap">{t('garage')}</span>
-                                        </button>
+                                        <span className="text-[6px] font-bold text-gray-400 uppercase tracking-widest leading-none">ENTORNO</span>
+                                        <div className="flex gap-1.5">
+                                            <button onClick={() => setShowHomoViewer(!showHomoViewer)} className={`px-2.5 h-8 flex items-center justify-center gap-1.5 rounded-lg border transition-all ${showHomoViewer ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`} title={t('garage')}>
+                                                <User size={12}/>
+                                                <span className="text-[8px] font-black tracking-wider whitespace-nowrap">{t('garage')}</span>
+                                            </button>
+                                            <button onClick={() => setShowVegetation(!showVegetation)} className={`px-2.5 h-8 flex items-center justify-center gap-1.5 rounded-lg border transition-all ${showVegetation ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-gray-900 border-gray-700 text-gray-400 hover:text-white hover:border-gray-500'}`} title="Ocultar/Mostrar Bosque">
+                                                <TreePine size={12}/>
+                                                <span className="text-[8px] font-black tracking-wider whitespace-nowrap">BOSQUE</span>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {/* Selector de Cámaras Expandido */}
