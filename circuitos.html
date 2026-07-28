@@ -1131,9 +1131,22 @@
                 const currentBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
                 const brandDef = TRACK_DEFINITIONS[currentBrandKey] || TRACK_DEFINITIONS['NINCO'];
 
+                const getDef = (subtype, fallbackBrand) => {
+                    let def = brandDef.pieces.find(x => x.subtype === subtype);
+                    let bKey = currentBrandKey;
+                    if (!def) {
+                        bKey = fallbackBrand;
+                        def = TRACK_DEFINITIONS[fallbackBrand].pieces.find(x => x.subtype === subtype);
+                    }
+                    return { id: def?.id, brandKey: bKey };
+                };
+
                 if (p.subtype === 'squeeze') {
-                    const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
-                    const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_out', subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
+                    const inDef = getDef('chicane_entry', 'SCX_CLASSIC');
+                    const outDef = getDef('chicane_exit', 'SCX_CLASSIC');
+
+                    const p1 = { ...p, uid: p.uid + "_1", id: inDef.id, subtype: 'chicane_entry', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: inDef.brandKey };
+                    const p2 = { ...p, uid: p.uid + "_2", id: outDef.id, subtype: 'chicane_exit', length: p.length / 2, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: outDef.brandKey };
                     p2.x = p1.x + (p.length / 2) * Math.cos(p.rot || 0);
                     p2.y = p1.y + (p.length / 2) * Math.sin(p.rot || 0);
                     expandedPieces.push(p1, p2);
@@ -1142,31 +1155,27 @@
 
                 if (p.subtype === 'full_chicane') {
                     const partLength = p.length / 3;
-                    const p1 = { ...p, uid: p.uid + "_1", id: 'n_chicane_in', subtype: 'chicane_entry', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
-                    const p2 = { ...p, uid: p.uid + "_2", id: 'n_chicane_mid', subtype: 'chicane_middle', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
-                    const p3 = { ...p, uid: p.uid + "_3", id: 'n_chicane_out', subtype: 'chicane_exit', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey };
+                    
+                    const inDef = getDef('chicane_entry', 'SCX_ANALOG');
+                    const midDef = getDef('chicane_middle', 'SCX_ANALOG');
+                    const outDef = getDef('chicane_exit', 'SCX_ANALOG');
+
+                    const p1 = { ...p, uid: p.uid + "_1", id: inDef.id, subtype: 'chicane_entry', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: inDef.brandKey };
+                    const p2 = { ...p, uid: p.uid + "_2", id: midDef.id, subtype: 'chicane_middle', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: midDef.brandKey };
+                    const p3 = { ...p, uid: p.uid + "_3", id: outDef.id, subtype: 'chicane_exit', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: outDef.brandKey };
+                    
                     p2.x = p1.x + partLength * Math.cos(p.rot || 0);
                     p2.y = p1.y + partLength * Math.sin(p.rot || 0);
                     p3.x = p2.x + partLength * Math.cos(p.rot || 0);
                     p3.y = p2.y + partLength * Math.sin(p.rot || 0);
+                    
                     expandedPieces.push(p1, p2, p3);
                     return;
                 }
 
-                if (p.subtype === 'chicane_entry') {
-                    p.id = 'n_chicane_in'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane3_entry') {
-                    p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane_middle') {
-                    p.id = 'n_chicane_mid'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane3_middle') {
-                    p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane_exit') {
-                    p.id = 'n_chicane_out'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'chicane3_exit') {
-                    p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
-                } else if (p.subtype === 'crossing') {
-                    p.id = 'n_cross'; p.width = brandDef.width; p.laneSpacing = brandDef.laneSpacing;
+                if (p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry' || p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle' || p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit' || p.subtype === 'crossing') {
+                    p.width = brandDef.width; 
+                    p.laneSpacing = brandDef.laneSpacing;
                 }
 
                 if (p.subtype === 'digital_str_curve_in' || p.subtype === 'digital_str_curve_out') {
@@ -1268,10 +1277,24 @@
                             }
                             const tmpL = nextPiece.borderLeft; nextPiece.borderLeft = nextPiece.borderRight; nextPiece.borderRight = tmpL;
                             
-                            if (nextPiece.subtype === 'chicane_entry') { nextPiece.subtype = 'chicane_exit'; if (nextPiece.id === 'n_chicane_in') nextPiece.id = 'n_chicane_out'; } 
-                            else if (nextPiece.subtype === 'chicane_exit') { nextPiece.subtype = 'chicane_entry'; if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in'; }
+                            if (nextPiece.subtype === 'chicane_entry') { 
+                                nextPiece.subtype = 'chicane_exit'; 
+                                if (nextPiece.id === 'n_chicane_in') nextPiece.id = 'n_chicane_out'; 
+                                else if (nextPiece.id === 'c_pt55') nextPiece.id = 'c_pt56';
+                                else if (nextPiece.id === 's_chicane_in') nextPiece.id = 's_chicane_out';
+                                else if (nextPiece.id === 'suk_chicane_in') nextPiece.id = 'suk_chicane_out';
+                            } 
+                            else if (nextPiece.subtype === 'chicane_exit') { 
+                                nextPiece.subtype = 'chicane_entry'; 
+                                if (nextPiece.id === 'n_chicane_out') nextPiece.id = 'n_chicane_in'; 
+                                else if (nextPiece.id === 'c_pt56') nextPiece.id = 'c_pt55';
+                                else if (nextPiece.id === 's_chicane_out') nextPiece.id = 's_chicane_in';
+                                else if (nextPiece.id === 'suk_chicane_out') nextPiece.id = 'suk_chicane_in';
+                            }
                             else if (nextPiece.subtype === 'chicane3_entry') { nextPiece.subtype = 'chicane3_exit'; }
                             else if (nextPiece.subtype === 'chicane3_exit') { nextPiece.subtype = 'chicane3_entry'; }
+                            else if (nextPiece.subtype === 'jump_up') { nextPiece.subtype = 'jump_down'; if (nextPiece.id === 'suk_pack2_1') nextPiece.id = 'suk_pack2_2'; }
+                            else if (nextPiece.subtype === 'jump_down') { nextPiece.subtype = 'jump_up'; if (nextPiece.id === 'suk_pack2_2') nextPiece.id = 'suk_pack2_1'; }
                             else if (nextPiece.subtype === 'single_lane_1') { nextPiece.subtype = 'single_lane_2'; }
                             else if (nextPiece.subtype === 'single_lane_2') { nextPiece.subtype = 'single_lane_1'; }
                             
