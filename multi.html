@@ -2377,16 +2377,32 @@
                     renderer.setPixelRatio(1.0); // OPTIMIZACIÓN EXTREMA: Forzar a 1 para evitar asfixiar gráficas móviles o Retina
                     renderer.shadowMap.enabled = true;
                     renderer.shadowMap.type = THREE.BasicShadowMap; // Sombras básicas sin difuminado suave (libera muchísimo cálculo)
+                    
+                    // MEJORA DE COLOR Y CONTRASTE PARA MODELOS 3D
+                    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                    renderer.toneMappingExposure = 1.1;
+                    renderer.outputEncoding = THREE.sRGBEncoding;
+
                     while(containerRef.current.firstChild) containerRef.current.removeChild(containerRef.current.firstChild); containerRef.current.appendChild(renderer.domElement);
-                    scene.add(new THREE.AmbientLight(0xffffff, 0.8)); 
-                    const dl = new THREE.DirectionalLight(0xffffff, 1.2); 
-                    dl.position.set(100, 300, 50); 
+                    
+                    // LUZ HEMISFÉRICA: Da volumen (cielo claro, suelo oscuro) en vez de luz ambiental plana
+                    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+                    scene.add(hemiLight);
+                    
+                    // LUZ PRINCIPAL (SOL)
+                    const dl = new THREE.DirectionalLight(0xffffff, 1.8); 
+                    dl.position.set(150, 300, 100); 
                     dl.castShadow = true; 
-                    dl.shadow.mapSize.width = 512; // Menos resolución de sombra, más FPS
-                    dl.shadow.mapSize.height = 512;
+                    dl.shadow.mapSize.width = 1024; // Sombra más definida
+                    dl.shadow.mapSize.height = 1024;
                     dl.shadow.camera.left = -300; dl.shadow.camera.right = 300; dl.shadow.camera.top = 300; dl.shadow.camera.bottom = -300; dl.shadow.camera.far = 1500;
-                    dl.shadow.bias = -0.0005; // Eliminar artifacts sin cargar CPU
+                    dl.shadow.bias = -0.0005; // Eliminar artifacts
                     scene.add(dl);
+                    
+                    // LUZ DE RELLENO: Ilumina los laterales oscuros
+                    const fillLight = new THREE.DirectionalLight(0x90b0d0, 0.5); 
+                    fillLight.position.set(-150, 100, -100); 
+                    scene.add(fillLight);
                     
                     // Cálculo de Ancho de Asfalto y Offsets Dinámicos
                     let currentOffsets = [];
