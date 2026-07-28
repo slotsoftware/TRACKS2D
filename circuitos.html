@@ -1156,13 +1156,26 @@
                 if (p.subtype === 'full_chicane') {
                     const partLength = p.length / 3;
                     
-                    const inDef = getDef('chicane_entry', 'SCX_ANALOG');
-                    const midDef = getDef('chicane_middle', 'SCX_ANALOG');
-                    const outDef = getDef('chicane_exit', 'SCX_ANALOG');
+                    let prefix = 'n_';
+                    if (currentBrandKey === 'SCX_CLASSIC') prefix = 'c_';
+                    else if (currentBrandKey === 'SCX_ANALOG') prefix = 's_';
+                    else if (currentBrandKey === 'SCX_ADVANCE') prefix = 'adv_';
+                    else if (currentBrandKey === 'SCALEXTRIC_UK') prefix = 'suk_';
+                    else if (currentBrandKey === 'CARRERA') prefix = 'car_';
 
-                    const p1 = { ...p, uid: p.uid + "_1", id: inDef.id, subtype: 'chicane_entry', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: inDef.brandKey };
-                    const p2 = { ...p, uid: p.uid + "_2", id: midDef.id, subtype: 'chicane_middle', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: midDef.brandKey };
-                    const p3 = { ...p, uid: p.uid + "_3", id: outDef.id, subtype: 'chicane_exit', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: outDef.brandKey };
+                    const isSCX = currentBrandKey.startsWith('SCX');
+
+                    let inId = isSCX ? `${prefix}pt74_in` : `${prefix}chicane_in`;
+                    let midId = isSCX ? `${prefix}pt74_mid` : `${prefix}chicane_mid`;
+                    let outId = isSCX ? `${prefix}pt74_out` : `${prefix}chicane_out`;
+                    
+                    const subIn = isSCX ? 'chicane3_entry' : 'chicane_entry';
+                    const subMid = isSCX ? 'chicane3_middle' : 'chicane_middle';
+                    const subOut = isSCX ? 'chicane3_exit' : 'chicane_exit';
+
+                    const p1 = { ...p, uid: p.uid + "_1", id: inId, label: isSCX ? "Chicane In (PT74)" : "Chicane In", subtype: subIn, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                    const p2 = { ...p, uid: p.uid + "_2", id: midId, label: isSCX ? "Chicane Med (PT74)" : "Chicane Med", subtype: subMid, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                    const p3 = { ...p, uid: p.uid + "_3", id: outId, label: isSCX ? "Chicane Out (PT74)" : "Chicane Out", subtype: subOut, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
                     
                     p2.x = p1.x + partLength * Math.cos(p.rot || 0);
                     p2.y = p1.y + partLength * Math.sin(p.rot || 0);
@@ -1291,8 +1304,18 @@
                                 else if (nextPiece.id === 's_chicane_out') nextPiece.id = 's_chicane_in';
                                 else if (nextPiece.id === 'suk_chicane_out') nextPiece.id = 'suk_chicane_in';
                             }
-                            else if (nextPiece.subtype === 'chicane3_entry') { nextPiece.subtype = 'chicane3_exit'; }
-                            else if (nextPiece.subtype === 'chicane3_exit') { nextPiece.subtype = 'chicane3_entry'; }
+                            else if (nextPiece.subtype === 'chicane3_entry') { 
+                                nextPiece.subtype = 'chicane3_exit'; 
+                                if (nextPiece.id === 'c_pt74_in') nextPiece.id = 'c_pt74_out';
+                                else if (nextPiece.id === 's_pt74_in') nextPiece.id = 's_pt74_out';
+                                else if (nextPiece.id === 'adv_pt74_in') nextPiece.id = 'adv_pt74_out';
+                            }
+                            else if (nextPiece.subtype === 'chicane3_exit') { 
+                                nextPiece.subtype = 'chicane3_entry'; 
+                                if (nextPiece.id === 'c_pt74_out') nextPiece.id = 'c_pt74_in';
+                                else if (nextPiece.id === 's_pt74_out') nextPiece.id = 's_pt74_in';
+                                else if (nextPiece.id === 'adv_pt74_out') nextPiece.id = 'adv_pt74_in';
+                            }
                             else if (nextPiece.subtype === 'jump_up') { nextPiece.subtype = 'jump_down'; if (nextPiece.id === 'suk_pack2_1') nextPiece.id = 'suk_pack2_2'; }
                             else if (nextPiece.subtype === 'jump_down') { nextPiece.subtype = 'jump_up'; if (nextPiece.id === 'suk_pack2_2') nextPiece.id = 'suk_pack2_1'; }
                             else if (nextPiece.subtype === 'single_lane_1') { nextPiece.subtype = 'single_lane_2'; }
