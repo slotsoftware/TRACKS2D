@@ -1725,18 +1725,56 @@
                         const stepCount = rails.lane1.length;
                         const totalTrackLength = vertexDistances[vertexDistances.length - 1] || 1;
                         
-                        let BRIDGE_TOP_H = 10.5, RAMP_LENGTH = 130.0, FLAT_TOP_LEN = 40.0, SEARCH_GAP = 50.0, INTERSECTION_MERGE_RADIUS = 100.0, BLEND_DIST = 70.0;
+                        // LÓGICA DE ARCO: Más altura, cima casi inexistente (2.0) para formar arco, y rampas largas
+                        let BRIDGE_TOP_H = 19.5, RAMP_LENGTH = 130.0, FLAT_TOP_LEN = 2.0, SEARCH_GAP = 50.0, INTERSECTION_MERGE_RADIUS = 80.0, BLEND_DIST = 60.0;
 
                         const hasManualElevation = pieceMapRef.current.some(p => (p.elevation || 0) !== 0);
                         let getElevationAtDist;
 
                         if (hasManualElevation) {
-                            const MANUAL_LEVEL_HEIGHT = 12.0; const TRACK_RESOLUTION = 1.0; const numSamples = Math.max(10, Math.ceil(totalTrackLength / TRACK_RESOLUTION)); const rawHeights = new Float32Array(numSamples);
-                            for (let i = 0; i < numSamples; i++) { const dist = i * TRACK_RESOLUTION; const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist < p.distEnd) || pieceMapRef.current[0]; rawHeights[i] = (piece.elevation || 0) * MANUAL_LEVEL_HEIGHT; }
-                            const applyBlur = (input, windowRadius) => { const output = new Float32Array(numSamples); for(let i = 0; i < numSamples; i++) { let sum = 0; for(let j = -windowRadius; j <= windowRadius; j++) { const idx = (i + j + numSamples) % numSamples; sum += input[idx]; } output[i] = sum / (windowRadius * 2 + 1); } return output; };
+                            const MANUAL_LEVEL_HEIGHT = 10.0; 
+                            const TRACK_RESOLUTION = 1.0; 
+                            const numSamples = Math.max(10, Math.ceil(totalTrackLength / TRACK_RESOLUTION)); 
+                            const rawHeights = new Float32Array(numSamples);
+                            for (let i = 0; i < numSamples; i++) { 
+                                const dist = i * TRACK_RESOLUTION; 
+                                const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd) || pieceMapRef.current[0]; 
+                                rawHeights[i] = (piece.elevation || 0) * MANUAL_LEVEL_HEIGHT; 
+                            }
+                            
+                            const applyBlur = (input, windowRadius) => { 
+                                const output = new Float32Array(numSamples); 
+                                for(let i = 0; i < numSamples; i++) { 
+                                    let sum = 0; 
+                                    let count = 0;
+                                    for(let j = -windowRadius; j <= windowRadius; j++) { 
+                                        const idx = i + j;
+                                        if (idx >= 0 && idx < numSamples) {
+                                            sum += input[idx]; 
+                                            count++;
+                                        }
+                                    } 
+                                    output[i] = sum / count; 
+                                } 
+                                return output; 
+                            };
+                            
                             const blurRadius = Math.max(1, Math.floor(25.0 / TRACK_RESOLUTION)); 
-                            let smoothHeights = rawHeights; smoothHeights = applyBlur(smoothHeights, blurRadius); smoothHeights = applyBlur(smoothHeights, blurRadius); smoothHeights = applyBlur(smoothHeights, blurRadius); smoothHeights = applyBlur(smoothHeights, blurRadius);
-                            getElevationAtDist = (queryDist) => { if (queryDist < 0) queryDist += totalTrackLength; queryDist = queryDist % totalTrackLength; const exactIndex = queryDist / TRACK_RESOLUTION; const index0 = Math.floor(exactIndex) % numSamples; const index1 = (index0 + 1) % numSamples; const ratio = exactIndex - Math.floor(exactIndex); return smoothHeights[index0] * (1 - ratio) + smoothHeights[index1] * ratio; };
+                            let smoothHeights = rawHeights; 
+                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
+                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
+                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
+                            smoothHeights = applyBlur(smoothHeights, blurRadius); 
+                            
+                            getElevationAtDist = (queryDist) => { 
+                                if (queryDist < 0) queryDist = 0; 
+                                if (queryDist >= totalTrackLength) queryDist = totalTrackLength - 0.01; 
+                                const exactIndex = queryDist / TRACK_RESOLUTION; 
+                                const index0 = Math.floor(exactIndex); 
+                                const index1 = Math.min(numSamples - 1, index0 + 1); 
+                                const ratio = exactIndex - index0; 
+                                return smoothHeights[index0] * (1 - ratio) + smoothHeights[index1] * ratio; 
+                            };
                         } else {
                             const centerPoints = [];
                             for(let i=0; i<stepCount; i++) {
@@ -1808,7 +1846,7 @@
 
                                     if(travelDist > SEARCH_GAP) {
                                         const dist2D = Math.sqrt((tp1.x - tp2.x)**2 + (tp1.z - tp2.z)**2);
-                                        if(dist2D < 18.0) { 
+                                        if(dist2D < 24.0) { 
                                             if (tp1.type === 'normal' && tp2.type === 'normal') {
                                                 const p1Next = centerPoints[tp1.idx+1]; const p2Next = centerPoints[tp2.idx+1];
                                                 if(p1Next && p2Next) {
@@ -1817,7 +1855,7 @@
                                                     const len1 = Math.sqrt(dx1*dx1 + dz1*dz1); const len2 = Math.sqrt(dx2*dx2 + dz2*dz2);
                                                     if(len1 > 0 && len2 > 0) {
                                                         const dot = (dx1*dx2 + dz1*dz2) / (len1 * len2);
-                                                        if(Math.abs(dot) > 0.95) continue; 
+                                                        if(Math.abs(dot) > 0.92) continue; 
                                                     }
                                                 }
                                             }
@@ -1836,20 +1874,20 @@
                                                     if (elev1 > 0 || elev2 < 0) goesUpIdx = tp1.idx;
                                                     else if (elev2 > 0 || elev1 < 0) goesUpIdx = tp2.idx;
                                                     else {
+                                                        const room1 = getRoom(tp1.dist); const room2 = getRoom(tp2.dist);
                                                         const type1 = tp1.piece?.type || 'straight'; const type2 = tp2.piece?.type || 'straight';
-                                                        if (type1 === 'straight' && type2 === 'curve') goesUpIdx = tp1.idx;
+                                                        
+                                                        if (room1 > room2 + 40) goesUpIdx = tp1.idx;
+                                                        else if (room2 > room1 + 40) goesUpIdx = tp2.idx;
+                                                        else if (type1 === 'straight' && type2 === 'curve') goesUpIdx = tp1.idx;
                                                         else if (type1 === 'curve' && type2 === 'straight') goesUpIdx = tp2.idx;
                                                         else {
                                                             if (type1 === 'curve' && type2 === 'curve') {
                                                                 const r1 = tp1.piece?.radius || 0; const r2 = tp2.piece?.radius || 0;
-                                                                if (r1 > r2) goesUpIdx = tp1.idx;
-                                                                else if (r2 > r1) goesUpIdx = tp2.idx;
-                                                                else {
-                                                                    const room1 = getRoom(tp1.dist); const room2 = getRoom(tp2.dist);
-                                                                    goesUpIdx = room1 >= room2 ? tp1.idx : tp2.idx;
-                                                                }
+                                                                if (r1 > r2 + 5) goesUpIdx = tp1.idx;
+                                                                else if (r2 > r1 + 5) goesUpIdx = tp2.idx;
+                                                                else goesUpIdx = room1 >= room2 ? tp1.idx : tp2.idx;
                                                             } else {
-                                                                const room1 = getRoom(tp1.dist); const room2 = getRoom(tp2.dist);
                                                                 goesUpIdx = room1 >= room2 ? tp1.idx : tp2.idx;
                                                             }
                                                         }
@@ -1924,11 +1962,16 @@
                                 if (guardrails.outer[s]) guardrails.outer[s].y += y;
                             }
                         }
-                        
+
                         rails.changes.forEach(changeItem => {
                             if (!changeItem.points) return;
                             if (changeItem.isRotonda) {
-                                return;
+                                changeItem.points.forEach((pt, pi) => {
+                                    const fraction = pi / (changeItem.points.length - 1 || 1);
+                                    const ptDist = changeItem.baseDist + (fraction * changeItem.totalLen);
+                                    const y = getElevationAtDist(ptDist);
+                                    if (Math.abs(y) > 0.001) pt.y += y;
+                                });
                             } else {
                                 const dStart = vertexDistances[changeItem.refIdx] || 0;
                                 const dEnd = vertexDistances[changeItem.refIdx + changeItem.count] || (dStart + 50);
@@ -1941,32 +1984,26 @@
                             }
                         });
 
-                        // Laplacian Smoothing
-                        let passes = 2; // OPTIMIZADO: De 8 a 2 pasadas. Suficiente para suavizar sin matar la CPU
-                        if (passes > 0) {
-                            for (let p = 0; p < passes; p++) {
-                                const smoothSpline = (arr) => {
-                                    const temp = arr.map(v => v ? v.y : null);
-                                    for (let i = 1; i < arr.length - 1; i++) {
-                                        if (arr[i] && arr[i-1] && arr[i+1]) {
-                                            arr[i].y = (temp[i-1] + temp[i] * 2 + temp[i+1]) / 4.0;
-                                        }
+                        // 8 Pasadas garantizan que todo se redondee y forme un arco, sin picos.
+                        let passes = 8; 
+                        for (let p = 0; p < passes; p++) {
+                            const smoothSpline = (arr) => {
+                                const temp = arr.map(v => v ? v.y : null);
+                                for (let i = 1; i < arr.length - 1; i++) {
+                                    if (arr[i] && arr[i-1] && arr[i+1]) {
+                                        arr[i].y = (temp[i-1] + temp[i] * 2 + temp[i+1]) / 4.0;
                                     }
-                                };
-                                smoothSpline(rails.lane1);
-                                smoothSpline(rails.lane2);
-                                smoothSpline(rails.pit);
-                                smoothSpline(borders.inner);
-                                smoothSpline(borders.outer);
-                                smoothSpline(guardrails.inner);
-                                smoothSpline(guardrails.outer);
-                                
-                                const tempAsp = new Float32Array(asphaltVerts.length);
-                                for(let i=0; i<asphaltVerts.length; i++) tempAsp[i] = asphaltVerts[i];
-                                for (let i = 6; i < aspVertCount * 6 - 6; i += 6) {
-                                    asphaltVerts[i+1] = (tempAsp[i-5] + tempAsp[i+1]*2 + tempAsp[i+7]) / 4.0; 
-                                    asphaltVerts[i+4] = (tempAsp[i-2] + tempAsp[i+4]*2 + tempAsp[i+10]) / 4.0; 
                                 }
+                            };
+                            smoothSpline(rails.lane1); smoothSpline(rails.lane2); smoothSpline(rails.pit);
+                            smoothSpline(borders.inner); smoothSpline(borders.outer);
+                            smoothSpline(guardrails.inner); smoothSpline(guardrails.outer);
+                            
+                            const tempAsp = new Float32Array(asphaltVerts.length);
+                            for(let i=0; i<asphaltVerts.length; i++) tempAsp[i] = asphaltVerts[i];
+                            for (let i = 6; i < aspVertCount * 6 - 6; i += 6) {
+                                asphaltVerts[i+1] = (tempAsp[i-5] + tempAsp[i+1]*2 + tempAsp[i+7]) / 4.0; 
+                                asphaltVerts[i+4] = (tempAsp[i-2] + tempAsp[i+4]*2 + tempAsp[i+10]) / 4.0; 
                             }
                         }
                     };
@@ -1976,9 +2013,10 @@
                         const wallVerts = []; const wallIndices = []; const wallUVs = [];
                         const bottomVerts = []; const bottomIndices = []; const bottomUVs = [];
 
-                        let tunnelRadius = 16.0; 
-                        let tunnelClearance = 6.5; 
-                        let depthOffset = 1.5; 
+                        // TÚNELES MÁS AMPLIOS Y MENOS MATERIAL (Evita choques)
+                        let tunnelRadius = 30.0; // Antes 16.0 - Agujero mucho más ancho
+                        let tunnelClearance = 16.5; // Antes 6.5 - Altura libre para los coches
+                        let depthOffset = 0.3; // Antes 1.5 - Grosor de los muros muy fino
                         const floorY = 0.0; 
 
                         const getTunnelBottomY = (x, z, currentY, currentDist) => {
@@ -1990,7 +2028,8 @@
                                         const cz = (asphaltVerts[i * 6 + 2] + asphaltVerts[i * 6 + 5]) / 2;
                                         const cy = (asphaltVerts[i * 6 + 1] + asphaltVerts[i * 6 + 4]) / 2;
                                         
-                                        if (cy < currentY - 3.0) {
+                                        // Tolerancia más baja para crear huecos más fácilmente (1.0)
+                                        if (cy < currentY - 1.0) {
                                             const d2 = (cx - x)**2 + (cz - z)**2;
                                             if (d2 < tunnelRadius**2) {
                                                 const dist2d = Math.sqrt(d2);
@@ -2218,7 +2257,8 @@
                         else if (Array.isArray(changeItem)) createRailMesh(changeItem); 
                     });
 
-                    const solidVerts = [...asphaltVerts]; const solidUVs = [...asphaltUVs]; const solidIndices = [...asphaltIndices]; const TRACK_THICKNESS = 0.8; const totalTopVerts = aspVertCount * 2;
+                    // GROSOR DEL ASFALTO REDUCIDO (0.3 en lugar de 0.8)
+                    const solidVerts = [...asphaltVerts]; const solidUVs = [...asphaltUVs]; const solidIndices = [...asphaltIndices]; const TRACK_THICKNESS = 0.3; const totalTopVerts = aspVertCount * 2;
                     for (let i = 0; i < asphaltVerts.length; i += 3) { solidVerts.push(asphaltVerts[i], asphaltVerts[i+1] - TRACK_THICKNESS, asphaltVerts[i+2]); }
                     for (let i = 0; i < asphaltUVs.length; i++) { solidUVs.push(asphaltUVs[i]); }
                     for (let i = 0; i < asphaltIndices.length; i += 3) { solidIndices.push( asphaltIndices[i+2] + totalTopVerts, asphaltIndices[i+1] + totalTopVerts, asphaltIndices[i] + totalTopVerts ); }
@@ -2253,7 +2293,8 @@
                         const padding = 70; // Margen muy ajustado alrededor de la pista (35 por lado)
                         const baseW = size.x + padding; 
                         const baseD = size.z + padding;
-                        const terrainGeo = new THREE.PlaneGeometry(baseW, baseD, 24, 24); // OPTIMIZADO: Mitad de subdivisiones (4x menos polígonos)
+                        // Aumentamos resolución geométrica para que la zona plana siga exactamente el contorno de la pista
+                        const terrainGeo = new THREE.PlaneGeometry(baseW, baseD, 45, 45); 
                         terrainGeo.rotateX(-Math.PI / 2);
                         
                         const posAttr = terrainGeo.attributes.position;
@@ -2261,23 +2302,38 @@
                         const colorGrass = new THREE.Color('#2d4c1e'); // Hierba realista
                         const colorRock = new THREE.Color('#5c5346');  // Gris piedra
                         const tempColor = new THREE.Color();
-                        const trackRadius = Math.max(size.x, size.z) / 2 + 5; // Radio ceñido
+                        const trackRadius = Math.max(size.x, size.z) / 2 + 5; // Mantenido por compatibilidad
                         
-                        // Fórmula matemática de colinas suaves para tablero (OPTIMIZADA)
-                        const getTerrainHeight = (vx, vz, dist) => {
-                            if (dist <= trackRadius) return 0;
-                            const blend = dist - trackRadius > 10.0 ? 1.0 : (dist - trackRadius) * 0.1;
-                            // OPTIMIZADO: Un solo cálculo de ruido en lugar de dos reduce la carga matemática un 50%
+                        // Fórmula matemática de colinas: AHORA RESPETA EL TRAZADO EXACTO DE LA PISTA
+                        const getTerrainHeight = (vx, vz, distIgnored) => {
+                            let minDistSq = Infinity;
+                            // Medir distancia al punto más cercano de la pista real, no al centro del mundo
+                            for (let i = 0; i < pathPoints.length; i += 4) {
+                                const p = pathPoints[i];
+                                const dx = vx - p.x;
+                                const dz = vz - p.z;
+                                const dSq = dx*dx + dz*dz;
+                                if (dSq < minDistSq) minDistSq = dSq;
+                            }
+                            
+                            const safeRadius = 26.0; // Margen de seguridad totalmente plano alrededor de la pista
+                            const safeRadiusSq = safeRadius * safeRadius;
+                            
+                            if (minDistSq <= safeRadiusSq) return 0;
+                            
+                            const distToTrack = Math.sqrt(minDistSq);
+                            const blend = Math.min(1.0, (distToTrack - safeRadius) / 12.0); // Transición suave a la colina
+                            
+                            // Ruido y elevación progresiva
                             const noise = Math.sin(vx * 0.15) * Math.cos(vz * 0.15) * 2.5;
-                            const valleyRise = (dist - trackRadius) * 0.15;
+                            const valleyRise = (distToTrack - safeRadius) * 0.08;
                             return (noise + valleyRise) * blend;
                         };
 
                         for (let i = 0; i < posAttr.count; i++) {
                             const vx = posAttr.getX(i);
                             const vz = posAttr.getZ(i);
-                            const distFromCenter = Math.sqrt(vx*vx + vz*vz);
-                            const vy = getTerrainHeight(vx, vz, distFromCenter);
+                            const vy = getTerrainHeight(vx, vz, 0); // El tercer parámetro ya no se usa
                             
                             posAttr.setY(i, vy);
                             
