@@ -124,7 +124,12 @@
 
         <!-- HISTORIAL -->
         <div class="glass p-5 rounded-xl border border-emerald-700/50 shadow-lg">
-            <h3 class="text-xs font-bold text-emerald-300 uppercase mb-4">Licencias Generadas</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xs font-bold text-emerald-300 uppercase">Licencias Generadas</h3>
+                <button onclick="copyAllEmails()" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 text-[10px] px-3 py-1 rounded shadow border border-emerald-600 transition flex items-center gap-1" title="Copiar todos los correos sin las claves">
+                    <i class="fas fa-copy"></i> Copiar Correos
+                </button>
+            </div>
             <div class="overflow-x-auto">
                 <table class="history-table">
                     <thead><tr><th>EMAIL</th><th>CÓDIGO</th><th>ESTADO</th><th></th></tr></thead>
@@ -287,29 +292,50 @@
         // 1. Contador de interesados corregido
         function initStats() {
             try {
-                onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'stats', 'general'), (docSnap) => {
+                // NOTA: Si el contador no sube, asegúrate de que la ruta 
+                // coincida EXACTAMENTE con lo que usas en la página de clientes.
+                const statsRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'stats', 'general');
+                
+                onSnapshot(statsRef, (docSnap) => {
                     if (docSnap.exists()) {
-                        document.getElementById('clicks-counter').textContent = docSnap.data()?.purchase_clicks || 0;
+                        const data = docSnap.data();
+                        console.log("Datos del contador recibidos de Firebase:", data);
+                        
+                        // Busca diferentes variaciones del nombre del campo por si acaso
+                        const totalClicks = data.purchase_clicks || data.clicks || data.contador || 0;
+                        document.getElementById('clicks-counter').textContent = totalClicks;
                     } else {
+                        console.warn("El documento de estadísticas aún no existe en Firebase.");
                         document.getElementById('clicks-counter').textContent = "0";
                     }
                 }, (error) => {
-                    console.error("Error cargando estadísticas:", error);
+                    console.error("Error de permisos o conexión cargando estadísticas:", error);
                     document.getElementById('clicks-counter').textContent = "Err";
                 });
             } catch(e) {
                 console.error("Excepción en initStats:", e);
+                document.getElementById('clicks-counter').textContent = "Err";
             }
         }
 
         // 2. Historial de licencias añadido
+        window.allEmails = []; // Array para guardar todos los emails
+
         function loadHistory() {
             try {
                 onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), (snap) => {
                     const body = document.getElementById('history-body');
                     body.innerHTML = "";
+                    window.allEmails = []; // Reiniciamos el array en cada recarga
+                    
                     snap.docs.forEach(d => {
                         const data = d.data();
+                        
+                        // Guardar email si existe (para poder copiarlos luego)
+                        if (data.email) {
+                            window.allEmails.push(data.email);
+                        }
+
                         body.innerHTML += `<tr>
                             <td>${data.email}</td>
                             <td class="font-mono text-emerald-400 font-bold">${data.code}</td>
@@ -321,10 +347,41 @@
                             </td>
                         </tr>`;
                     });
+                    
+                    // Eliminamos duplicados por si un cliente compró varias veces
+                    window.allEmails = [...new Set(window.allEmails)];
                 });
             } catch(e) {
                 console.error("Error cargando historial:", e);
             }
+        }
+
+        // Nueva función para copiar emails al portapapeles
+        window.copyAllEmails = function() {
+            if (!window.allEmails || window.allEmails.length === 0) {
+                showAlert("No hay correos registrados para copiar.");
+                return;
+            }
+            // Separamos por coma para pegarlos fácilmente en los clientes de correo
+            const emailsString = window.allEmails.join(', ');
+            
+            // Usamos textarea oculto y execCommand para asegurar compatibilidad en el panel
+            const textArea = document.createElement("textarea");
+            textArea.value = emailsString;
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showAlert(`✅ ¡Se han copiado ${window.allEmails.length} correos al portapapeles!\\n\\nListos para pegar en CCO (Copia Oculta).`);
+            } catch (err) {
+                console.error('Error al copiar:', err);
+                showAlert("❌ No se pudo copiar automáticamente.");
+            }
+            document.body.removeChild(textArea);
         }
 
         window.sendPaymentRequest = function() {
