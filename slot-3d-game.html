@@ -2290,7 +2290,7 @@
                         const grassTex = createGrassTexture(); const woodTex = createWoodTexture();
                         
                         // --- 1. TERRENO TIPO MAQUETA AJUSTADO ---
-                        const padding = 70; // Margen muy ajustado alrededor de la pista (35 por lado)
+                        const padding = 150; // Margen reducido (75 por lado) para acercar el entorno
                         const baseW = size.x + padding; 
                         const baseD = size.z + padding;
                         // Aumentamos resolución geométrica para que la zona plana siga exactamente el contorno de la pista
@@ -3347,8 +3347,8 @@
                                 const tSize = tempBox.getSize(new THREE.Vector3());
                                 const maxD = Math.max(tSize.x, tSize.y, tSize.z);
                                 
-                                // Escala ajustada a tamaño maqueta (árboles realistas para slot, no gigantes)
-                                const baseTreeScale = maxD > 0 ? 25.0 / maxD : 1; 
+                                // Escala ajustada a tamaño maqueta (REDUCIDA MÁS DE LA MITAD)
+                                const baseTreeScale = maxD > 0 ? 50.0 / maxD : 2; 
                                 const baseBushScale = maxD > 0 ? 8.0 / maxD : 0.25;
 
                                 // Replicamos exactamente las mallas y materiales del GLB original
@@ -3371,18 +3371,32 @@
 
                                 const dummy = new THREE.Object3D();
                                 const getH = sceneRef.current.userData.getTerrainHeight;
+                                const trackCenters = pathPointsRef.current || []; // Puntos exactos de la pista
 
-                                // 1. Plantar Árboles Grandes (OPTIMIZADO)
+                                // 1. Plantar Árboles Grandes (OPTIMIZADO Y ALEJADO)
                                 let validTreeCount = 0;
-                                for (let i = 0; i < treeCount * 4 && validTreeCount < treeCount; i++) {
+                                for (let i = 0; i < treeCount * 15 && validTreeCount < treeCount; i++) { // Más intentos
                                     const rx = (Math.random() - 0.5) * baseW;
                                     const rz = (Math.random() - 0.5) * baseD;
-                                    const dist = Math.sqrt(rx*rx + rz*rz);
 
-                                    if (dist < trackRadius + 12) continue; // Mantener lejos de la pista
+                                    // CÁLCULO DE DISTANCIA EXACTA A LA PISTA REAL (NO AL CENTRO)
+                                    let minDistSq = Infinity;
+                                    for (let j = 0; j < trackCenters.length; j += 4) {
+                                        const c = trackCenters[j];
+                                        if (!c) continue;
+                                        const dx = rx - c.x;
+                                        const dz = rz - c.z;
+                                        const dSq = dx*dx + dz*dz;
+                                        if (dSq < minDistSq) minDistSq = dSq;
+                                    }
+                                    const distToTrack = Math.sqrt(minDistSq);
 
-                                    const ry = getH(rx, rz, dist) - 0.5; // Ajustar nivel de raíz
-                                    if (ry > 0.5) { 
+                                    // Margen de 30 unidades para acercarlos de forma segura a la pista
+                                    if (distToTrack < 30.0) continue; 
+
+                                    const ry = getH(rx, rz, 0) - 0.5; // Ajustar nivel de raíz
+                                    // Solo plantamos si está en el césped/colina
+                                    if (ry > 0.1) { 
                                         const scaleVar = baseTreeScale * (0.8 + Math.random() * 0.6); // Variación de escala real
                                         dummy.position.set(rx, ry, rz);
                                         dummy.rotation.y = Math.random() * Math.PI * 2;
@@ -3401,16 +3415,27 @@
                                     im.instanceMatrix.needsUpdate = true;
                                 });
                                 
-                                // 2. Plantar Arbustos Pequeños (OPTIMIZADO)
+                                // 2. Plantar Arbustos Pequeños (OPTIMIZADO Y ALEJADO)
                                 let validBushCount = 0;
-                                for (let i = 0; i < bushCount * 4 && validBushCount < bushCount; i++) {
+                                for (let i = 0; i < bushCount * 8 && validBushCount < bushCount; i++) {
                                     const rx = (Math.random() - 0.5) * baseW;
                                     const rz = (Math.random() - 0.5) * baseD;
-                                    const dist = Math.sqrt(rx*rx + rz*rz);
+                                    
+                                    let minDistSq = Infinity;
+                                    for (let j = 0; j < trackCenters.length; j += 4) {
+                                        const c = trackCenters[j];
+                                        if (!c) continue;
+                                        const dx = rx - c.x;
+                                        const dz = rz - c.z;
+                                        const dSq = dx*dx + dz*dz;
+                                        if (dSq < minDistSq) minDistSq = dSq;
+                                    }
+                                    const distToTrack = Math.sqrt(minDistSq);
 
-                                    if (dist < trackRadius + 3) continue; // Los arbustos pueden pegarse mucho más a la pista
+                                    // Margen de 15 unidades para que los arbustos bordeen la pista
+                                    if (distToTrack < 15.0) continue; 
 
-                                    const ry = getH(rx, rz, dist);
+                                    const ry = getH(rx, rz, 0);
                                     if (ry > 0.1) { 
                                         const scaleVar = baseBushScale * (0.6 + Math.random() * 0.8); 
                                         // Hundir la malla en el suelo y achatarla para crear el aspecto de un arbusto redondo
@@ -3612,7 +3637,8 @@
                 if (count <= 1) { 
                     container.add(templateGroup); 
                 } else {
-                    const bRef = boardSettingsRef.current; const centers = pathPointsRef.current || []; const minSafeDistSq = 24.0 * 24.0; 
+                    const bRef = boardSettingsRef.current; const centers = pathPointsRef.current || []; 
+                    const minSafeDistSq = isDecor ? (30.0 * 30.0) : (24.0 * 24.0); // 30 unidades para árboles reducidos
                     for(let i=0; i<count; i++) {
                         const clone = templateGroup.clone(); let validPos = false; let attempts = 0; let rX = 0, rZ = 0;
                         while(!validPos && attempts < 150) { 
@@ -4788,34 +4814,16 @@
                           }
                       }
 
-                      const resDecor = await fetch('https://api.github.com/repos/slotsoftware/Telemetria/contents/decora');
                       let decorUpdates = {};
-                      if (resDecor.ok) {
-                          const data = await resDecor.json();
-                          let decorGlbs = data.filter(f => f.name.toLowerCase().endsWith('.glb') || f.name.toLowerCase().endsWith('.gltf'));
-                          
-                          // FILTRO: Solo Álamos, Robles, Pinos, y Arbustos si los subes en el futuro
-                          const targetTrees = ['alamo', 'roble', 'pino', 'arbusto', 'matorral', 'seto'];
-                          const filteredTrees = decorGlbs.filter(f => {
-                              const nameLower = f.name.toLowerCase();
-                              return targetTrees.some(t => nameLower.includes(t));
-                          });
-                          
-                          if (filteredTrees.length > 0) {
-                              decorGlbs = filteredTrees;
-                          }
-                          
-                          const decorSlots = [3, 4, 5, 6, 7, 8];
-                          decorSlots.forEach((slotId, index) => {
-                              if (decorGlbs.length > 0) {
-                                  // Se reparten usando módulo para repetir árboles si hay menos de 6
-                                  const decorFile = decorGlbs[index % decorGlbs.length];
-                                  const decorUrl = `https://slotsoftware.github.io/Telemetria/decora/${decorFile.name}`;
-                                  const randomScatter = Math.floor(Math.random() * 11) + 5; 
-                                  decorUpdates[slotId] = { glb: decorUrl, glbName: decorFile.name, isDecor: true, scatterCount: randomScatter, setup: null, rotation: [0, 0, 0], yOffset: 0 };
-                              }
-                          });
-                      }
+                      // Asignación directa de los archivos solicitados a los slots de decoración
+                      const targetTrees = ['Alamo.glb', 'Pino.glb', 'Roble.glb'];
+                      const decorSlots = [3, 4, 5, 6, 7, 8];
+                      decorSlots.forEach((slotId, index) => {
+                          const fileName = targetTrees[index % targetTrees.length];
+                          const decorUrl = `https://slotsoftware.github.io/Telemetria/decora/${fileName}`;
+                          const randomScatter = Math.floor(Math.random() * 11) + 5; 
+                          decorUpdates[slotId] = { glb: decorUrl, glbName: fileName, isDecor: true, scatterCount: randomScatter, setup: null, rotation: [0, 0, 0], yOffset: 0 };
+                      });
 
                       setCustomCarAssets(prev => {
                           const nextState = { ...prev };
