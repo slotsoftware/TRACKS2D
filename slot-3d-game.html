@@ -1725,8 +1725,8 @@
                         const stepCount = rails.lane1.length;
                         const totalTrackLength = vertexDistances[vertexDistances.length - 1] || 1;
                         
-                        // LÓGICA DE ARCO: Más altura, cima casi inexistente (2.0) para formar arco, y rampas largas
-                        let BRIDGE_TOP_H = 19.5, RAMP_LENGTH = 130.0, FLAT_TOP_LEN = 2.0, SEARCH_GAP = 50.0, INTERSECTION_MERGE_RADIUS = 80.0, BLEND_DIST = 60.0;
+                        // LÓGICA DE PUENTE REALISTA: Altura moderada, rampas proporcionales al slot
+                        let BRIDGE_TOP_H = 14.5, RAMP_LENGTH = 100.0, FLAT_TOP_LEN = 5.0, SEARCH_GAP = 50.0, INTERSECTION_MERGE_RADIUS = 80.0, BLEND_DIST = 60.0;
 
                         const hasManualElevation = pieceMapRef.current.some(p => (p.elevation || 0) !== 0);
                         let getElevationAtDist;
@@ -2013,10 +2013,10 @@
                         const wallVerts = []; const wallIndices = []; const wallUVs = [];
                         const bottomVerts = []; const bottomIndices = []; const bottomUVs = [];
 
-                        // TÚNELES MÁS AMPLIOS Y MENOS MATERIAL (Evita choques)
-                        let tunnelRadius = 30.0; // Antes 16.0 - Agujero mucho más ancho
-                        let tunnelClearance = 16.5; // Antes 6.5 - Altura libre para los coches
-                        let depthOffset = 0.3; // Antes 1.5 - Grosor de los muros muy fino
+                        // PUENTES REALISTAS TIPO SLOT: Arco normal, ancho justo y muros sólidos
+                        let tunnelRadius = 16.0; 
+                        let tunnelClearance = 8.5; 
+                        let depthOffset = 1.0; 
                         const floorY = 0.0; 
 
                         const getTunnelBottomY = (x, z, currentY, currentDist) => {
