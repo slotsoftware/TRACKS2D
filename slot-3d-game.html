@@ -31,6 +31,14 @@
     <script src="https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
+    <!-- POST-PROCESADO ESTILO PS3 (Efecto Bloom / Glow) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
     <style>
         /* ESTILOS GLOBALES */
         script { display: none !important; }
@@ -137,6 +145,7 @@
                 case 'MED': return { pr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 0.9) : 0.9, aa: false, shadow: false };
                 case 'LOW': return { pr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 0.7) : 0.7, aa: false, shadow: false };
                 case 'MIN': return { pr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 0.5) : 0.5, aa: false, shadow: false };
+                case 'PS2': return { pr: 0.35, aa: false, shadow: false };
                 default: return { pr: 1.0, aa: false, shadow: false };
             }
         };
@@ -971,6 +980,13 @@
             useEffect(() => {
                 if(rendererRef.current) {
                     rendererRef.current.setPixelRatio(Math.min(getQualitySettings(qualityMode).pr, 1.0));
+                    if (qualityMode === 'PS2') {
+                        rendererRef.current.domElement.style.imageRendering = 'pixelated';
+                        if(sceneRef.current) sceneRef.current.fog.density = 0.08;
+                    } else {
+                        rendererRef.current.domElement.style.imageRendering = 'auto';
+                        if(sceneRef.current) sceneRef.current.fog.density = 0.025;
+                    }
                 }
             }, [qualityMode]);
 
@@ -1481,7 +1497,7 @@
                 const _rallyPos = new THREE.Vector3();
                 const _rallyTangent = new THREE.Vector3();
 
-                let renderer, scene, camera, animationId; 
+                let renderer, scene, camera, animationId, composer, bloomPass; 
                 let spherical = new THREE.Spherical(250, Math.PI/3, Math.PI/4);
                 let cameraTarget = new THREE.Vector3(0, 0, 0);
                 const brandData = TRACK_DEFINITIONS[circuitData.brand] || TRACK_DEFINITIONS.NINCO;
@@ -1497,6 +1513,7 @@
                         camera.updateProjectionMatrix(); 
                         renderer.setSize(window.innerWidth, window.innerHeight); 
                         renderer.setPixelRatio(getQualitySettings(qualityMode).pr);
+                        if (composer) composer.setSize(window.innerWidth, window.innerHeight);
                     } 
                 };
                 
@@ -1548,18 +1565,45 @@
                         skyCtx.fillStyle = skyGrad;
                         skyCtx.fillRect(0, 0, 2048, 1024);
                         
-                        skyCtx.beginPath();
-                        skyCtx.arc(1024, night ? 300 : 490, night ? 15 : 25, 0, Math.PI * 2);
-                        skyCtx.fillStyle = night ? '#e2e8f0' : '#ffffff';
-                        skyCtx.shadowColor = night ? '#e2e8f0' : '#fcd34d';
-                        skyCtx.shadowBlur = night ? 30 : 80;
-                        skyCtx.fill(); skyCtx.fill(); 
-                        
                         if (night) {
-                            for(let i=0; i<300; i++) {
-                                skyCtx.fillStyle = `rgba(255,255,255,${Math.random() * 0.8 + 0.2})`;
-                                skyCtx.fillRect(Math.random() * 2048, Math.random() * 1024, Math.random() * 2.5, Math.random() * 2.5);
+                            // MAGIA 1: Estrellas realistas aleatorias
+                            for(let i=0; i<1200; i++) {
+                                skyCtx.fillStyle = `rgba(255,255,255,${Math.random() * 0.9 + 0.1})`;
+                                skyCtx.beginPath();
+                                skyCtx.arc(Math.random() * 2048, Math.random() * 600, Math.random() * 1.5, 0, Math.PI*2);
+                                skyCtx.fill();
                             }
+                            
+                            // MAGIA 2: Luna llena hiperrealista con cráteres
+                            const moonX = 1600, moonY = 300, moonR = 45;
+                            // Resplandor lunar
+                            skyCtx.beginPath(); skyCtx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+                            skyCtx.fillStyle = '#f8fafc';
+                            skyCtx.shadowColor = '#ffffff'; skyCtx.shadowBlur = 60; 
+                            skyCtx.fill(); skyCtx.fill(); // Doble fill para extra resplandor
+                            skyCtx.shadowBlur = 0; // Reset
+                            
+                            // Cráteres procedimentales con sombras falsas
+                            skyCtx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+                            const drawCrater = (cx, cy, cr) => {
+                                skyCtx.beginPath(); skyCtx.arc(cx, cy, cr, 0, Math.PI*2); skyCtx.fill();
+                                skyCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; skyCtx.lineWidth = 1;
+                                skyCtx.beginPath(); skyCtx.arc(cx - 1, cy - 1, cr, Math.PI, Math.PI*1.5); skyCtx.stroke();
+                            };
+                            drawCrater(moonX - 10, moonY - 15, 12);
+                            drawCrater(moonX + 18, moonY + 8, 16);
+                            drawCrater(moonX - 5,  moonY + 20, 8);
+                            drawCrater(moonX + 5,  moonY - 25, 5);
+                            drawCrater(moonX + 22, moonY - 10, 7);
+                        } else {
+                            // MAGIA 3: Sol de atardecer
+                            skyCtx.beginPath();
+                            skyCtx.arc(1024, 490, 35, 0, Math.PI * 2);
+                            skyCtx.fillStyle = '#ffffff';
+                            skyCtx.shadowColor = '#fcd34d';
+                            skyCtx.shadowBlur = 100;
+                            skyCtx.fill(); skyCtx.fill(); 
+                            skyCtx.shadowBlur = 0;
                         }
                         
                         skyTex.needsUpdate = true;
@@ -1583,6 +1627,15 @@
                     rendererRef.current = renderer;
                     while(containerRef.current.firstChild) containerRef.current.removeChild(containerRef.current.firstChild); containerRef.current.appendChild(renderer.domElement);
                     
+                    // CONFIGURACIÓN DE POST-PROCESADO (ESTILO PS3)
+                    const renderScene = new THREE.RenderPass(scene, camera);
+                    composer = new THREE.EffectComposer(renderer);
+                    composer.addPass(renderScene);
+
+                    // Parámetros: resolucion, intensidad, radio, umbral
+                    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.5, 0.8);
+                    composer.addPass(bloomPass);
+
                     const ambLight = new THREE.AmbientLight(0xffedd5, 0.4);
                     scene.add(ambLight); 
                     scene.userData.ambientLight = ambLight;
@@ -1721,6 +1774,8 @@
                         pieceMapRef.current.push({ index, distStart: accumulatedDist-p.length, distEnd: accumulatedDist, type: p.type, subtype: p.subtype, invert: p.invert, elevation: p.elevation || 0 });
                     });
                     
+                    let getElevationAtDist = (queryDist) => 0;
+
                     const applyBridgeElevations = () => {
                         const stepCount = rails.lane1.length;
                         const totalTrackLength = vertexDistances[vertexDistances.length - 1] || 1;
@@ -1729,7 +1784,6 @@
                         let BRIDGE_TOP_H = 14.5, RAMP_LENGTH = 100.0, FLAT_TOP_LEN = 5.0, SEARCH_GAP = 50.0, INTERSECTION_MERGE_RADIUS = 80.0, BLEND_DIST = 60.0;
 
                         const hasManualElevation = pieceMapRef.current.some(p => (p.elevation || 0) !== 0);
-                        let getElevationAtDist;
 
                         if (hasManualElevation) {
                             const MANUAL_LEVEL_HEIGHT = 10.0; 
@@ -2289,26 +2343,38 @@
                         
                         const grassTex = createGrassTexture(); const woodTex = createWoodTexture();
                         
-                        // --- 1. TERRENO TIPO MAQUETA AJUSTADO ---
-                        const padding = 150; // Margen reducido (75 por lado) para acercar el entorno
+                        // --- 1. TERRENO ESTILO NFS (OPTIMIZADO EXTREMO) ---
+                        const padding = 500; // Tamaño grande, pero manejable
                         const baseW = size.x + padding; 
                         const baseD = size.z + padding;
-                        // Aumentamos resolución geométrica para que la zona plana siga exactamente el contorno de la pista
-                        const terrainGeo = new THREE.PlaneGeometry(baseW, baseD, 45, 45); 
+                        
+                        // TRUCO NFS #1: Menos polígonos (de 120x120 bajamos a 50x50).
+                        // ¡Pasamos de 14.400 vértices a solo 2.500! El rendimiento sube drásticamente.
+                        const terrainGeo = new THREE.PlaneGeometry(baseW, baseD, 50, 50); 
                         terrainGeo.rotateX(-Math.PI / 2);
                         
                         const posAttr = terrainGeo.attributes.position;
                         const colors = [];
-                        const colorGrass = new THREE.Color('#2d4c1e'); // Hierba realista
-                        const colorRock = new THREE.Color('#5c5346');  // Gris piedra
-                        const tempColor = new THREE.Color();
-                        const trackRadius = Math.max(size.x, size.z) / 2 + 5; // Mantenido por compatibilidad
                         
-                        // Fórmula matemática de colinas: AHORA RESPETA EL TRAZADO EXACTO DE LA PISTA
+                        const colorGrass = new THREE.Color('#2d4c1e'); 
+                        const colorDirt = new THREE.Color('#4b3d2a');  
+                        const colorRock = new THREE.Color('#4a4a4a');  
+                        const colorSnow = new THREE.Color('#f8f9fa');  
+                        const tempColor = new THREE.Color();
+                        const trackRadius = Math.max(size.x, size.z) / 2 + 5; 
+                        
+                        // Ruido matemático simplificado (más rápido de calcular)
+                        const noise = (x, z) => {
+                            return Math.sin(x * 0.02) * Math.cos(z * 0.02) * 15 +
+                                   Math.sin(x * 0.05 + z * 0.05) * 3;
+                        };
+
                         const getTerrainHeight = (vx, vz, distIgnored) => {
                             let minDistSq = Infinity;
-                            // Medir distancia al punto más cercano de la pista real, no al centro del mundo
-                            for (let i = 0; i < pathPoints.length; i += 4) {
+                            // TRUCO NFS #2: Muestreo Escaso (Sparse Sampling). 
+                            // En lugar de comprobar TODOS los puntos de la pista, comprobamos 1 de cada 12.
+                            // Esto hace que la carga del circuito sea casi instantánea.
+                            for (let i = 0; i < pathPoints.length; i += 12) {
                                 const p = pathPoints[i];
                                 const dx = vx - p.x;
                                 const dz = vz - p.z;
@@ -2316,33 +2382,39 @@
                                 if (dSq < minDistSq) minDistSq = dSq;
                             }
                             
-                            const safeRadius = 26.0; // Margen de seguridad totalmente plano alrededor de la pista
+                            const safeRadius = 35.0; 
                             const safeRadiusSq = safeRadius * safeRadius;
                             
                             if (minDistSq <= safeRadiusSq) return 0;
                             
                             const distToTrack = Math.sqrt(minDistSq);
-                            const blend = Math.min(1.0, (distToTrack - safeRadius) / 12.0); // Transición suave a la colina
+                            const blend = Math.min(1.0, (distToTrack - safeRadius) / 30.0); 
                             
-                            // Ruido y elevación progresiva
-                            const noise = Math.sin(vx * 0.15) * Math.cos(vz * 0.15) * 2.5;
-                            const valleyRise = (distToTrack - safeRadius) * 0.08;
-                            return (noise + valleyRise) * blend;
+                            const terrainNoise = noise(vx, vz);
+                            const valleyRise = Math.pow(Math.max(0, distToTrack - safeRadius) * 0.1, 1.2);
+                            
+                            return (terrainNoise + valleyRise) * blend;
                         };
 
                         for (let i = 0; i < posAttr.count; i++) {
                             const vx = posAttr.getX(i);
                             const vz = posAttr.getZ(i);
-                            const vy = getTerrainHeight(vx, vz, 0); // El tercer parámetro ya no se usa
+                            const vy = getTerrainHeight(vx, vz, 0); 
                             
                             posAttr.setY(i, vy);
                             
-                            if (vy < 2.5) { // Colinas bajas son verdes
+                            if (vy < 2.0) { 
                                 tempColor.copy(colorGrass);
                                 tempColor.offsetHSL(0, 0, (Math.random()-0.5)*0.04); 
+                            } else if (vy < 10.0) {
+                                const mix = (vy - 2.0) / 8.0;
+                                tempColor.copy(colorGrass).lerp(colorDirt, mix);
+                            } else if (vy < 25.0) {
+                                const mix = (vy - 10.0) / 15.0;
+                                tempColor.copy(colorDirt).lerp(colorRock, mix);
                             } else {
-                                const mix = Math.min(1, (vy - 2.5) / 8.0); // Transición suave a roca
-                                tempColor.copy(colorGrass).lerp(colorRock, mix);
+                                const mix = Math.min(1.0, (vy - 25.0) / 10.0);
+                                tempColor.copy(colorRock).lerp(colorSnow, mix);
                             }
                             colors.push(tempColor.r, tempColor.g, tempColor.b);
                         }
@@ -2350,7 +2422,6 @@
                         terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
                         terrainGeo.computeVertexNormals(); 
                         
-                        // Guardamos datos para el bosque instanciado
                         scene.userData.getTerrainHeight = getTerrainHeight;
                         scene.userData.terrainW = baseW;
                         scene.userData.terrainD = baseD;
@@ -2363,7 +2434,7 @@
 
                         const terrainMat = new THREE.MeshLambertMaterial({ 
                             map: grassTex, 
-                            vertexColors: true, // Lee colores Pintados (Splatting)
+                            vertexColors: true,
                             side: THREE.DoubleSide
                         });
                         terrainMat.userData.grassMap = grassTex; 
@@ -2372,12 +2443,101 @@
                         const boardMesh = new THREE.Mesh(terrainGeo, terrainMat); 
                         boardMesh.scale.set(baseW, 1.0, baseD); 
                         boardMesh.position.y = -0.5; 
-                        boardMesh.receiveShadow = true; 
+                        // TRUCO NFS #3: El terreno gigante no recibe sombras dinámicas de los coches (ahorra GPU)
+                        boardMesh.receiveShadow = false; 
                         scene.add(boardMesh); 
                         boardMeshRef.current = boardMesh; 
                         
                         setBoardSettings(prev => ({ ...prev, width: baseW, depth: baseD, x: 0, z: 0, material: 'grass' }));
                         const maxDim = Math.max(size.x, size.z); spherical.radius = maxDim * 1.5; spherical.phi = Math.PI / 6; 
+
+                        // --- 2. EL AGUA NO ES AGUA (Shaders y planos) ---
+                        // Creamos un plano gigante que simula el océano o un gran lago de fondo
+                        const waterGeo = new THREE.PlaneGeometry(baseW * 2, baseD * 2, 64, 64);
+                        waterGeo.rotateX(-Math.PI / 2);
+                        const waterMat = new THREE.MeshPhongMaterial({
+                            color: 0x0088ff,
+                            transparent: true,
+                            opacity: 0.7,
+                            shininess: 90
+                        });
+                        const water = new THREE.Mesh(waterGeo, waterMat);
+                        water.position.y = -2.5; // Nivel del mar, por debajo del terreno
+                        water.receiveShadow = false;
+                        scene.add(water);
+                        scene.userData.water = water;
+
+                        // --- 3. EDIFICIOS COMO PIEZAS DE LEGO (Diseño Modular y Decals) ---
+                        // Usamos un Canvas invisible para dibujar las "pegatinas" de las ventanas iluminadas
+                        const canvasCity = document.createElement('canvas');
+                        canvasCity.width = 128; canvasCity.height = 128;
+                        const ctxC = canvasCity.getContext('2d');
+                        ctxC.fillStyle = '#1a1a2e'; ctxC.fillRect(0,0,128,128); // Color del muro del edificio
+                        ctxC.fillStyle = '#eab308'; // Color de luz de las ventanas (amarillo/naranja)
+                        
+                        for(let wx=8; wx<128; wx+=20) {
+                            for(let wy=8; wy<128; wy+=25) {
+                                // Encendemos ventanas al azar (Ilusión óptica de que hay gente dentro)
+                                if(Math.random() > 0.4) ctxC.fillRect(wx, wy, 10, 15); 
+                            }
+                        }
+                        const buildingTex = new THREE.CanvasTexture(canvasCity);
+                        buildingTex.wrapS = THREE.RepeatWrapping; buildingTex.wrapT = THREE.RepeatWrapping;
+                        buildingTex.repeat.set(3, 8); // Repetimos la pegatina para que parezcan pisos altos
+                        
+                        // Clonación Mágica: Hasta 200 edificios dibujados de golpe (Instancing)
+                        const buildingCount = 200;
+                        const buildGeo = new THREE.BoxGeometry(1, 1, 1);
+                        const buildMat = new THREE.MeshLambertMaterial({ map: buildingTex, color: 0x888888 });
+                        const cityMesh = new THREE.InstancedMesh(buildGeo, buildMat, buildingCount);
+                        
+                        const dummyB = new THREE.Object3D();
+                        let bCount = 0;
+                        for(let i = 0; i < buildingCount * 4 && bCount < buildingCount; i++) {
+                            const bx = (Math.random() - 0.5) * baseW * 0.9;
+                            const bz = (Math.random() - 0.5) * baseD * 0.9;
+                            
+                            // Aseguramos que la ciudad se construya lejos de nuestra pista (fondo escénico)
+                            if (Math.abs(bx) < maxDim * 1.5 && Math.abs(bz) < maxDim * 1.5) continue;
+                            
+                            const by = getTerrainHeight(bx, bz, 0) - 0.5;
+                            
+                            // Construimos la ciudad en las zonas llanas (valles o costa)
+                            if (by > -3.0 && by < 15.0) { 
+                                const bw = 15 + Math.random() * 25; // Ancho aleatorio
+                                const bd = 15 + Math.random() * 25; // Profundidad aleatoria
+                                const bh = 40 + Math.random() * 120; // Rascacielos altos
+                                
+                                dummyB.position.set(bx, by + bh/2, bz);
+                                dummyB.scale.set(bw, bh, bd);
+                                dummyB.updateMatrix();
+                                cityMesh.setMatrixAt(bCount, dummyB.matrix);
+                                bCount++;
+                            }
+                        }
+                        cityMesh.count = bCount;
+                        scene.add(cityMesh);
+
+                        // --- 6. ANIMALES (Bandadas de Pájaros Geométricos) ---
+                        // Unos simples triángulos oscuros volando a gran altura engañan al cerebro perfectamente
+                        const birdGeo = new THREE.ConeGeometry(0.5, 2, 3); 
+                        birdGeo.rotateX(Math.PI / 2); // Para que el pico mire hacia adelante
+                        const birdMat = new THREE.MeshBasicMaterial({color: 0x050505});
+                        const numBirds = 35;
+                        const imBirds = new THREE.InstancedMesh(birdGeo, birdMat, numBirds);
+                        const birdData = [];
+                        for(let i=0; i<numBirds; i++) {
+                            birdData.push({
+                                cx: (Math.random() - 0.5) * baseW * 0.6,
+                                cz: (Math.random() - 0.5) * baseD * 0.6,
+                                cy: 40 + Math.random() * 50,
+                                radius: 30 + Math.random() * 40,
+                                speed: 0.6 + Math.random() * 0.8,
+                                offset: Math.random() * Math.PI * 2
+                            });
+                        }
+                        scene.add(imBirds);
+                        scene.userData.birds = { mesh: imBirds, data: birdData };
                     } 
                     scene.add(trackGroup);
 
@@ -3078,6 +3238,50 @@
 
                         const avgRaceTime = raceStateRef.current.laps > 0 ? (raceStateRef.current.completedLapsTotalTime / raceStateRef.current.laps) : 0;
 
+                        // --- MAGIA DEL AGUA: Animamos las olas matemáticamente ---
+                        if (sceneRef.current && sceneRef.current.userData.water) {
+                            const time = nowTime * 2.0; // Velocidad del mar
+                            const w = sceneRef.current.userData.water;
+                            const posA = w.geometry.attributes.position;
+                            for (let i = 0; i < posA.count; i++) {
+                                const u = posA.getX(i);
+                                const v = posA.getZ(i);
+                                // Seno y Coseno levantan y hunden la geometría engañando a tus ojos
+                                posA.setY(i, Math.sin(u * 0.05 + time) * 0.4 + Math.cos(v * 0.05 + time) * 0.4);
+                            }
+                            w.geometry.attributes.position.needsUpdate = true;
+                        }
+
+                        // --- MAGIA ANIMAL: Aves volando de fondo ---
+                        if (sceneRef.current && sceneRef.current.userData.birds) {
+                            const bMesh = sceneRef.current.userData.birds.mesh;
+                            const bData = sceneRef.current.userData.birds.data;
+                            const dummyBird = new THREE.Object3D();
+                            
+                            for(let i=0; i<bData.length; i++) {
+                                const bd = bData[i];
+                                const angle = nowTime * bd.speed + bd.offset;
+                                // Posición circular
+                                const bx = bd.cx + Math.cos(angle) * bd.radius;
+                                const bz = bd.cz + Math.sin(angle) * bd.radius;
+                                // Aleteo vertical combinado con la oscilación del viento
+                                const by = bd.cy + Math.sin(nowTime * 4 + bd.offset) * 1.5; 
+                                
+                                // Calcular hacia dónde miran
+                                const nx = bd.cx + Math.cos(angle + 0.1) * bd.radius;
+                                const nz = bd.cz + Math.sin(angle + 0.1) * bd.radius;
+                                
+                                dummyBird.position.set(bx, by, bz);
+                                dummyBird.lookAt(nx, by, nz);
+                                // Inclinación natural al tomar la curva
+                                dummyBird.rotateZ(Math.sin(nowTime * 8 + bd.offset) * 0.3 - 0.2); 
+                                
+                                dummyBird.updateMatrix();
+                                bMesh.setMatrixAt(i, dummyBird.matrix);
+                            }
+                            bMesh.instanceMatrix.needsUpdate = true;
+                        }
+
                         if (raceStateRef.current.finished) {
                             if (telemetryRefs.finishOverlay.current) {
                                 telemetryRefs.finishOverlay.current.style.opacity = "1";
@@ -3158,8 +3362,12 @@
                         if (telemetryRefs.avgTime.current) telemetryRefs.avgTime.current.textContent = formatTime(avgRaceTime);
                         if (telemetryRefs.bestTime.current) telemetryRefs.bestTime.current.textContent = raceStateRef.current.bestTime < 999999 ? formatTime(raceStateRef.current.bestTime) : '--.--';
                         
-                        // ¡LÍNEAS RESTAURADAS! Dibuja el fotograma 3D en pantalla
-                        renderer.render(scene, camera); 
+                        // ¡LÍNEAS RESTAURADAS! Dibuja el fotograma 3D en pantalla (Con o sin Post-Procesado)
+                        if (qualityMode === 'ULTRA') {
+                            composer.render(); // Modo Estilo PS3 con Bloom activo
+                        } else {
+                            renderer.render(scene, camera); // Render normal optimizado
+                        }
                     };
                     
                     // Inicia el bucle de animación
@@ -3214,6 +3422,16 @@
                     const qs = getQualitySettings(qualityMode);
                     rendererRef.current.setPixelRatio(qs.pr);
                     rendererRef.current.shadowMap.enabled = qs.shadow;
+                    
+                    // TRUCO PS2: Píxeles crudos y niebla densa
+                    if (qualityMode === 'PS2') {
+                        rendererRef.current.domElement.style.imageRendering = 'pixelated';
+                        sceneRef.current.fog.density = isNightModeRef.current ? 0.025 : 0.015;
+                    } else {
+                        rendererRef.current.domElement.style.imageRendering = 'auto';
+                        sceneRef.current.fog.density = isNightModeRef.current ? 0.003 : 0.0015;
+                    }
+
                     if (dirLightRef.current) dirLightRef.current.castShadow = qs.shadow;
                     sceneRef.current.traverse(child => {
                         if (child.isMesh && child.material) {
@@ -3327,139 +3545,12 @@
                                 } 
                             });
 
-                            // --- NUEVO: BOSQUE MASIVO USANDO TUS PROPIOS MODELOS GLB ---
-                            if (isDecor && sceneRef.current && sceneRef.current.userData.getTerrainHeight && !sceneRef.current.userData.hasMassiveForest) {
-                                sceneRef.current.userData.hasMassiveForest = true;
-                                
-                                const baseW = sceneRef.current.userData.terrainW;
-                                const baseD = sceneRef.current.userData.terrainD;
-                                const trackRadius = sceneRef.current.userData.trackRadius;
-                                const area = baseW * baseD;
-                                
-                                // CANTIDADES DINÁMICAS: Dependen de los m2 del tablero maqueta
-                                const treeCount = Math.min(80, Math.max(5, Math.floor(area / 2500))); // OPTIMIZADO: Menos árboles
-                                const bushCount = Math.min(150, Math.max(10, Math.floor(area / 800))); // OPTIMIZADO: Menos arbustos
-                                
-                                const treeMeshes = [];
-                                const bushMeshes = [];
-                                
-                                const tempBox = new THREE.Box3().setFromObject(model);
-                                const tSize = tempBox.getSize(new THREE.Vector3());
-                                const maxD = Math.max(tSize.x, tSize.y, tSize.z);
-                                
-                                // Escala ajustada a tamaño maqueta (REDUCIDA MÁS DE LA MITAD)
-                                const baseTreeScale = maxD > 0 ? 50.0 / maxD : 2; 
-                                const baseBushScale = maxD > 0 ? 8.0 / maxD : 0.25;
-
-                                // Replicamos exactamente las mallas y materiales del GLB original
-                                model.traverse((c) => {
-                                    if (c.isMesh) {
-                                        const iTree = new THREE.InstancedMesh(c.geometry, c.material, treeCount);
-                                        // APAGAMOS SOMBRAS (Principal asesino de FPS)
-                                        iTree.receiveShadow = false;
-                                        iTree.castShadow = false; 
-                                        sceneRef.current.add(iTree);
-                                        treeMeshes.push(iTree);
-                                        
-                                        const iBush = new THREE.InstancedMesh(c.geometry, c.material, bushCount);
-                                        iBush.receiveShadow = false;
-                                        iBush.castShadow = false; 
-                                        sceneRef.current.add(iBush);
-                                        bushMeshes.push(iBush);
-                                    }
-                                });
-
-                                const dummy = new THREE.Object3D();
-                                const getH = sceneRef.current.userData.getTerrainHeight;
-                                const trackCenters = pathPointsRef.current || []; // Puntos exactos de la pista
-
-                                // 1. Plantar Árboles Grandes (OPTIMIZADO Y ALEJADO)
-                                let validTreeCount = 0;
-                                for (let i = 0; i < treeCount * 15 && validTreeCount < treeCount; i++) { // Más intentos
-                                    const rx = (Math.random() - 0.5) * baseW;
-                                    const rz = (Math.random() - 0.5) * baseD;
-
-                                    // CÁLCULO DE DISTANCIA EXACTA A LA PISTA REAL (NO AL CENTRO)
-                                    let minDistSq = Infinity;
-                                    for (let j = 0; j < trackCenters.length; j += 4) {
-                                        const c = trackCenters[j];
-                                        if (!c) continue;
-                                        const dx = rx - c.x;
-                                        const dz = rz - c.z;
-                                        const dSq = dx*dx + dz*dz;
-                                        if (dSq < minDistSq) minDistSq = dSq;
-                                    }
-                                    const distToTrack = Math.sqrt(minDistSq);
-
-                                    // Margen de 30 unidades para acercarlos de forma segura a la pista
-                                    if (distToTrack < 30.0) continue; 
-
-                                    const ry = getH(rx, rz, 0) - 0.5; // Ajustar nivel de raíz
-                                    // Solo plantamos si está en el césped/colina
-                                    if (ry > 0.1) { 
-                                        const scaleVar = baseTreeScale * (0.8 + Math.random() * 0.6); // Variación de escala real
-                                        dummy.position.set(rx, ry, rz);
-                                        dummy.rotation.y = Math.random() * Math.PI * 2;
-                                        // Inclinación orgánica
-                                        dummy.rotation.x = (Math.random() - 0.5) * 0.1;
-                                        dummy.rotation.z = (Math.random() - 0.5) * 0.1;
-                                        dummy.scale.set(scaleVar, scaleVar, scaleVar);
-                                        dummy.updateMatrix();
-
-                                        treeMeshes.forEach(im => im.setMatrixAt(validTreeCount, dummy.matrix));
-                                        validTreeCount++;
-                                    }
-                                }
-                                treeMeshes.forEach(im => {
-                                    im.count = validTreeCount;
-                                    im.instanceMatrix.needsUpdate = true;
-                                });
-                                
-                                // 2. Plantar Arbustos Pequeños (OPTIMIZADO Y ALEJADO)
-                                let validBushCount = 0;
-                                for (let i = 0; i < bushCount * 8 && validBushCount < bushCount; i++) {
-                                    const rx = (Math.random() - 0.5) * baseW;
-                                    const rz = (Math.random() - 0.5) * baseD;
-                                    
-                                    let minDistSq = Infinity;
-                                    for (let j = 0; j < trackCenters.length; j += 4) {
-                                        const c = trackCenters[j];
-                                        if (!c) continue;
-                                        const dx = rx - c.x;
-                                        const dz = rz - c.z;
-                                        const dSq = dx*dx + dz*dz;
-                                        if (dSq < minDistSq) minDistSq = dSq;
-                                    }
-                                    const distToTrack = Math.sqrt(minDistSq);
-
-                                    // Margen de 15 unidades para que los arbustos bordeen la pista
-                                    if (distToTrack < 15.0) continue; 
-
-                                    const ry = getH(rx, rz, 0);
-                                    if (ry > 0.1) { 
-                                        const scaleVar = baseBushScale * (0.6 + Math.random() * 0.8); 
-                                        // Hundir la malla en el suelo y achatarla para crear el aspecto de un arbusto redondo
-                                        dummy.position.set(rx, ry - (scaleVar * maxD * 0.2), rz);
-                                        dummy.rotation.set((Math.random() - 0.5) * 0.4, Math.random() * Math.PI * 2, (Math.random() - 0.5) * 0.4);
-                                        dummy.scale.set(scaleVar, scaleVar * 0.7, scaleVar); 
-                                        dummy.updateMatrix();
-
-                                        bushMeshes.forEach(im => im.setMatrixAt(validBushCount, dummy.matrix));
-                                        validBushCount++;
-                                    }
-                                }
-                                bushMeshes.forEach(im => {
-                                    im.count = validBushCount;
-                                    im.instanceMatrix.needsUpdate = true;
-                                });
-                            }
-
-                            container.userData.originalModel = model.clone(); applyScatter(container, model, count, isDecor);
+                            container.userData.originalModel = model.clone(); applyScatter(container, model, count, isDecor, asset.glbName);
                         }, undefined, (err) => {
                             container.userData.isLoading = false;
                             console.warn("Error loading GLB in main scene", err);
                         });
-                    } else if (needsScatter && container.userData.originalModel) { applyScatter(container, container.userData.originalModel.clone(), count, isDecor); }
+                    } else if (needsScatter && container.userData.originalModel) { applyScatter(container, container.userData.originalModel.clone(), count, isDecor, asset.glbName); }
                 });
                 
                 return () => { isActive = false; };
@@ -3498,10 +3589,12 @@
                 });
             }, [isNightMode]);
 
-            const applyScatter = (container, rawModel, count, isDecor) => {
+            const applyScatter = (container, rawModel, count, isDecor, glbName = '') => {
                 while(container.children.length > 0){ container.remove(container.children[0]); }
                 
-                // Reset de base
+                const isPrado = glbName.toLowerCase().includes('prado');
+
+                // Reset de base y cálculo de caja
                 rawModel.position.set(0,0,0);
                 rawModel.rotation.set(0,0,0);
                 rawModel.scale.set(1,1,1);
@@ -3518,7 +3611,14 @@
                 } else { 
                     const maxDim = Math.max(size.z, size.x, size.y);
                     scale = maxDim > 0 ? 45.0 / maxDim : 1;
-                    if (size.z > size.y * 1.5) rawModel.rotation.x = -Math.PI / 2; else rawModel.rotation.y = Math.PI; 
+                    
+                    if (isPrado) {
+                        rawModel.rotation.set(0, 0, 0); 
+                    } else if (size.z > size.y * 1.5) { 
+                        rawModel.rotation.x = -Math.PI / 2; 
+                    } else { 
+                        rawModel.rotation.y = Math.PI; 
+                    }
                 }
                 
                 rawModel.scale.setScalar(scale); 
@@ -3533,145 +3633,204 @@
 
                 if (!isDecor) {
                     const smartBottomY = getSmartBottomY(rawModel);
-                    rawModel.position.y -= smartBottomY; // Las ruedas tocan la moqueta exactamente
+                    rawModel.position.y -= smartBottomY;
                     rawModel.position.z -= finalSize.z * 0.25;
                 } else {
                     rawModel.position.y -= finalBox.min.y; 
                 }
 
-                // WRAPPER PARA INDEPENDIZAR LA SOMBRA DE LAS ROTACIONES DEL MODELO
-                const templateGroup = new THREE.Group();
-                const fakeTex = getFakeShadowTexture();
+                // COCHES Y OBJETOS ÚNICOS
+                if (!isDecor || count <= 1) { 
+                    const templateGroup = new THREE.Group();
+                    const fakeTex = getFakeShadowTexture();
 
-                if (isDecor) {
-                    // --- SOMBRA FALSA OPTIMIZADA: PLANO CON TEXTURA (Cero cálculos de geometría) ---
-                    const shadowW = finalSize.x * 2.0;
-                    const shadowL = finalSize.z * 2.0;
-                    const shadowGeo = new THREE.PlaneGeometry(shadowW, shadowL);
-                    shadowGeo.rotateX(-Math.PI / 2);
-                    
-                    const shadowMat = new THREE.MeshBasicMaterial({ 
-                        map: fakeTex, 
-                        transparent: true, 
-                        opacity: 0.8, 
-                        depthWrite: false, 
-                        color: 0x000000,
-                        clippingPlanes: shadowClippingPlanesRef.current
-                    });
-                    
-                    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-                    shadowMesh.position.set(0, 0.55, 0);  // Sobre el suelo
-                    shadowMesh.name = "FAKE_SHADOW";
-                    templateGroup.add(shadowMesh);
+                    if (isDecor) {
+                        rawModel.name = "REAL_MODEL";
+                        rawModel.position.y += isPrado ? 0 : 0.5;
+                        rawModel.traverse(child => { if (child.isMesh) { child.castShadow = false; child.receiveShadow = false; } });
+                        templateGroup.add(rawModel);
+                    } else {
+                        templateGroup.add(rawModel);
 
-                    rawModel.name = "REAL_MODEL";
-                    rawModel.position.y += 0.5;
-                    // Apagar sombras reales
-                    rawModel.traverse(child => { if (child.isMesh) { child.castShadow = false; child.receiveShadow = false; } });
-                    templateGroup.add(rawModel);
+                        const shadowGeo = new THREE.PlaneGeometry(finalSize.x * 1.4, finalSize.z * 1.3);
+                        shadowGeo.rotateX(-Math.PI / 2);
+                        const shadowMat = new THREE.MeshBasicMaterial({ map: fakeTex, transparent: true, opacity: 0.9, depthWrite: false, color: 0x000000 });
+                        const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+                        shadowMesh.position.set(0, 0.1, -finalSize.z * 0.25);
+                        templateGroup.add(shadowMesh);
 
-                } else {
-                    // --- SOMBRA FALSA PARA COCHES ---
-                    templateGroup.add(rawModel);
+                        const lightsGroup = new THREE.Group();
+                        lightsGroup.name = "CarLightsGroup";
 
-                    const shadowW = finalSize.x * 1.4;
-                    const shadowL = finalSize.z * 1.3;
-                    const shadowGeo = new THREE.PlaneGeometry(shadowW, shadowL);
-                    shadowGeo.rotateX(-Math.PI / 2);
-                    const shadowMat = new THREE.MeshBasicMaterial({ map: fakeTex, transparent: true, opacity: 0.9, depthWrite: false, color: 0x000000 });
-                    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-                    
-                    shadowMesh.position.set(0, 0.1, -finalSize.z * 0.25);
-                    templateGroup.add(shadowMesh);
+                        const isNight = isNightModeRef.current;
+                        const hlIntensity = isNight ? 3.0 : 0;
+                        const tlIntensity = isNight ? 1.5 : 0;
 
-                    // --- LUCES PARA LOS COCHES (FAROS Y FRENOS) ---
-                    const lightsGroup = new THREE.Group();
-                    lightsGroup.name = "CarLightsGroup";
+                        // Faro delantero derecho
+                        const hl1 = new THREE.SpotLight(0xffffee, hlIntensity, 80, Math.PI/5, 0.6, 1.5);
+                        hl1.position.set(finalSize.x * 0.35, finalSize.y * 0.35, -finalSize.z * 0.45);
+                        hl1.name = "HEADLIGHT";
+                        hl1.target = new THREE.Object3D(); hl1.target.position.set(finalSize.x * 0.35, 0, -finalSize.z * 4.0);
+                        lightsGroup.add(hl1); lightsGroup.add(hl1.target);
 
-                    const isNight = isNightModeRef.current;
-                    const hlIntensity = isNight ? 3.0 : 0;
-                    const tlIntensity = isNight ? 1.5 : 0;
+                        // Faro delantero izquierdo
+                        const hl2 = new THREE.SpotLight(0xffffee, hlIntensity, 80, Math.PI/5, 0.6, 1.5);
+                        hl2.position.set(-finalSize.x * 0.35, finalSize.y * 0.35, -finalSize.z * 0.45);
+                        hl2.name = "HEADLIGHT";
+                        hl2.target = new THREE.Object3D(); hl2.target.position.set(-finalSize.x * 0.35, 0, -finalSize.z * 4.0);
+                        lightsGroup.add(hl2); lightsGroup.add(hl2.target);
 
-                    // Focos Delanteros (SpotLight para iluminar la pista)
-                    const hl1 = new THREE.SpotLight(0xffffee, hlIntensity, 80, Math.PI/5, 0.6, 1.5);
-                    hl1.position.set(finalSize.x * 0.35, finalSize.y * 0.4, -finalSize.z * 0.4);
-                    hl1.name = "HEADLIGHT";
-                    const t1 = new THREE.Object3D(); t1.position.set(finalSize.x * 0.35, 0, -finalSize.z * 4.0);
-                    hl1.target = t1;
-                    lightsGroup.add(hl1); lightsGroup.add(t1);
+                        // Foco trasero (Luz general roja)
+                        const tl = new THREE.PointLight(0xff0000, tlIntensity, 8);
+                        tl.position.set(0, finalSize.y * 0.4, finalSize.z * 0.4);
+                        tl.name = "TAILLIGHT";
+                        lightsGroup.add(tl);
 
-                    const hl2 = new THREE.SpotLight(0xffffee, hlIntensity, 80, Math.PI/5, 0.6, 1.5);
-                    hl2.position.set(-finalSize.x * 0.35, finalSize.y * 0.4, -finalSize.z * 0.4);
-                    hl2.name = "HEADLIGHT";
-                    const t2 = new THREE.Object3D(); t2.position.set(-finalSize.x * 0.35, 0, -finalSize.z * 4.0);
-                    hl2.target = t2;
-                    lightsGroup.add(hl2); lightsGroup.add(t2);
+                        // Esferas emisivas (Las "bombillas" visuales)
+                        const glowGeo = new THREE.SphereGeometry(0.1, 8, 8);
+                        const headGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: isNight ? 0.9 : 0 });
+                        headGlowMat.name = "GLOW_HEAD";
+                        const tailGlowMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: isNight ? 0.9 : 0 });
+                        tailGlowMat.name = "GLOW_TAIL";
+                        
+                        // Posicionar bombillas delanteras
+                        const hg1 = new THREE.Mesh(glowGeo, headGlowMat); hg1.position.copy(hl1.position); lightsGroup.add(hg1);
+                        const hg2 = new THREE.Mesh(glowGeo, headGlowMat); hg2.position.copy(hl2.position); lightsGroup.add(hg2);
+                        
+                        // Posicionar bombillas traseras
+                        const tg1 = new THREE.Mesh(glowGeo, tailGlowMat); tg1.position.set(finalSize.x * 0.35, finalSize.y * 0.35, finalSize.z * 0.48); lightsGroup.add(tg1);
+                        const tg2 = new THREE.Mesh(glowGeo, tailGlowMat); tg2.position.set(-finalSize.x * 0.35, finalSize.y * 0.35, finalSize.z * 0.48); lightsGroup.add(tg2);
 
-                    // Luz Trasera (PointLight roja)
-                    const tl = new THREE.PointLight(0xff0000, tlIntensity, 8);
-                    tl.position.set(0, finalSize.y * 0.5, finalSize.z * 0.4);
-                    tl.name = "TAILLIGHT";
-                    lightsGroup.add(tl);
-
-                    // Pilotos brillantes visuales (esferitas emisivas)
-                    const glowGeo = new THREE.SphereGeometry(0.08, 8, 8);
-                    const headGlowMat = new THREE.MeshBasicMaterial({ color: 0xffffee, transparent: true, opacity: isNight ? 0.9 : 0 });
-                    headGlowMat.name = "GLOW_HEAD";
-                    const tailGlowMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: isNight ? 0.9 : 0 });
-                    tailGlowMat.name = "GLOW_TAIL";
-                    
-                    const hg1 = new THREE.Mesh(glowGeo, headGlowMat); hg1.position.copy(hl1.position); lightsGroup.add(hg1);
-                    const hg2 = new THREE.Mesh(glowGeo, headGlowMat); hg2.position.copy(hl2.position); lightsGroup.add(hg2);
-                    
-                    const tg1 = new THREE.Mesh(glowGeo, tailGlowMat); tg1.position.set(finalSize.x * 0.35, tl.position.y, tl.position.z); lightsGroup.add(tg1);
-                    const tg2 = new THREE.Mesh(glowGeo, tailGlowMat); tg2.position.set(-finalSize.x * 0.35, tl.position.y, tl.position.z); lightsGroup.add(tg2);
-
-                    templateGroup.add(lightsGroup);
-
-                    rawModel.traverse(child => { if (child.isMesh) { child.castShadow = false; child.receiveShadow = false; } });
+                        templateGroup.add(lightsGroup);
+                    }
+                    container.add(templateGroup); 
+                    return;
                 }
 
-                templateGroup.userData.baseScale = new THREE.Vector3(1, 1, 1);
-                templateGroup.userData.carSize = finalSize;
+                // ==========================================
+                // SISTEMA DE DECORACIÓN DE ALTO RENDIMIENTO (INSTANCED MESH)
+                // Cero lag y efectos visuales booleanos
+                // ==========================================
                 
-                if (count <= 1) { 
-                    container.add(templateGroup); 
-                } else {
-                    const bRef = boardSettingsRef.current; const centers = pathPointsRef.current || []; 
-                    const minSafeDistSq = isDecor ? (30.0 * 30.0) : (24.0 * 24.0); // 30 unidades para árboles reducidos
-                    for(let i=0; i<count; i++) {
-                        const clone = templateGroup.clone(); let validPos = false; let attempts = 0; let rX = 0, rZ = 0;
-                        while(!validPos && attempts < 150) { 
-                            rX = bRef.x + (Math.random() - 0.5) * bRef.width; rZ = bRef.z + (Math.random() - 0.5) * bRef.depth; validPos = true;
-                            for (let j = 0; j < centers.length; j += 5) { const c = centers[j]; if (!c) continue; const dx = rX - c.x; const dz = rZ - c.z; if (dx * dx + dz * dz < minSafeDistSq) { validPos = false; break; } }
-                            attempts++;
+                // Preparar las mallas para instanciado masivo sin coste de CPU
+                const meshesToInstance = [];
+                rawModel.traverse(c => {
+                    if (c.isMesh) {
+                        c.updateMatrixWorld(true);
+                        meshesToInstance.push({
+                            geometry: c.geometry,
+                            material: c.material,
+                            localMatrix: c.matrixWorld.clone()
+                        });
+                    }
+                });
+
+                const maxInstances = isPrado ? 600 : Math.min(count * 5, 250);
+                const instancedGroups = meshesToInstance.map(m => {
+                    const im = new THREE.InstancedMesh(m.geometry, m.material, maxInstances);
+                    im.castShadow = false; im.receiveShadow = false;
+                    container.add(im);
+                    return { im, localMatrix: m.localMatrix };
+                });
+
+                // Sombra falsa instanciada (solo para árboles/arbustos)
+                let shadowIm = null;
+                if (!isPrado) {
+                    const fakeTex = getFakeShadowTexture();
+                    const shadowGeo = new THREE.PlaneGeometry(finalSize.x * 2.0, finalSize.z * 2.0);
+                    shadowGeo.rotateX(-Math.PI / 2);
+                    const shadowMat = new THREE.MeshBasicMaterial({ map: fakeTex, transparent: true, opacity: 0.8, depthWrite: false, color: 0x000000 });
+                    shadowIm = new THREE.InstancedMesh(shadowGeo, shadowMat, maxInstances);
+                    container.add(shadowIm);
+                }
+
+                const dummy = new THREE.Object3D();
+                const dummyShadow = new THREE.Object3D();
+                const bRef = boardSettingsRef.current;
+                const centers = pathPointsRef.current || [];
+                let placed = 0;
+
+                if (isPrado) {
+                    // EFECTO BOOLEANA: Forramos el tablero y lo ocultamos debajo de la pista
+                    const pradoScale = 1.0;
+                    const tileW = finalSize.x * pradoScale * 0.95; // 5% solapamiento para evitar costuras
+                    const tileD = finalSize.z * pradoScale * 0.95;
+                    
+                    const cols = Math.ceil(bRef.width / tileW);
+                    const rows = Math.ceil(bRef.depth / tileD);
+                    const startX = - (cols * tileW) / 2;
+                    const startZ = - (rows * tileD) / 2;
+
+                    for(let cx = 0; cx < cols; cx++) {
+                        for(let cz = 0; cz < rows; cz++) {
+                            if (placed >= maxInstances) break;
+                            
+                            const rX = startX + cx * tileW;
+                            const rZ = startZ + cz * tileD;
+                            
+                            // Ajuste crítico: La pista está en Y=0.8 y su grosor baja a 0.5. 
+                            // Colocamos el césped en 0.72. La pista se dibuja POR ENCIMA, "recortando" el césped visualmente.
+                            dummy.position.set(rX, 0.72 - finalSize.y, rZ); 
+                            dummy.rotation.set(0, 0, 0);
+                            dummy.scale.setScalar(pradoScale);
+                            dummy.updateMatrix();
+
+                            instancedGroups.forEach(g => {
+                                const instanceMatrix = new THREE.Matrix4().multiplyMatrices(dummy.matrix, g.localMatrix);
+                                g.im.setMatrixAt(placed, instanceMatrix);
+                            });
+                            placed++;
                         }
-                        if(validPos) { 
-                            clone.position.x = rX; 
-                            clone.position.z = rZ; 
-                            
-                            const randRot = Math.random() * Math.PI * 2;
-                            
-                            if (isDecor) {
-                                // Gira el árbol real para dar variación visual al bosque
-                                const treeMesh = clone.children.find(c => c.name === "REAL_MODEL");
-                                if (treeMesh) treeMesh.rotation.y = randRot;
-                                
-                                // Gira el interior de la sombra para que coincida exactamente con la postura del árbol
-                                // (Pero el contenedor de sombra FAKE_SHADOW no gira, para que TODAS apunten hacia el mismo sol)
-                                const shadowGrp = clone.children.find(c => c.name === "FAKE_SHADOW");
-                                if (shadowGrp && shadowGrp.children[0]) {
-                                    shadowGrp.children[0].rotation.y = randRot; 
-                                }
-                            } else {
-                                clone.rotation.y = randRot; 
+                    }
+                } else {
+                    // BOSQUES Y ARBUSTOS: Repartidos usando Grid de maqueta y alejados de la pista
+                    const safeDistSq = 14.0 * 14.0; // Distancia segura al asfalto
+                    
+                    for(let i=0; i < maxInstances * 10 && placed < maxInstances; i++) {
+                        const rX = (Math.random() - 0.5) * bRef.width;
+                        const rZ = (Math.random() - 0.5) * bRef.depth;
+
+                        // Comprobar que no invade la pista (Radar ultra rápido)
+                        let isSafe = true;
+                        for (let j = 0; j < centers.length; j += 4) {
+                            if (!centers[j]) continue;
+                            if ((rX - centers[j].x)**2 + (rZ - centers[j].z)**2 < safeDistSq) {
+                                isSafe = false; break;
+                            }
+                        }
+
+                        if (isSafe) {
+                            let ry = 0;
+                            if (sceneRef.current && sceneRef.current.userData.getTerrainHeight) {
+                                ry = sceneRef.current.userData.getTerrainHeight(rX, rZ, 0);
                             }
                             
-                            clone.userData.baseScale = new THREE.Vector3(1, 1, 1); 
-                            container.add(clone); 
+                            const s = 0.7 + Math.random() * 0.5; // Escala variable
+                            dummy.position.set(rX, ry, rZ);
+                            dummy.rotation.set(0, Math.random() * Math.PI * 2, 0);
+                            dummy.scale.setScalar(s);
+                            dummy.updateMatrix();
+
+                            instancedGroups.forEach(g => {
+                                const instanceMatrix = new THREE.Matrix4().multiplyMatrices(dummy.matrix, g.localMatrix);
+                                g.im.setMatrixAt(placed, instanceMatrix);
+                            });
+
+                            if (shadowIm) {
+                                dummyShadow.position.set(rX, ry + 0.05, rZ);
+                                dummyShadow.rotation.set(0, dummy.rotation.y, 0);
+                                dummyShadow.scale.setScalar(s);
+                                dummyShadow.updateMatrix();
+                                shadowIm.setMatrixAt(placed, dummyShadow.matrix);
+                            }
+                            placed++;
                         }
                     }
                 }
+
+                // Actualizar las mallas instanciadas
+                instancedGroups.forEach(g => { g.im.count = placed; g.im.instanceMatrix.needsUpdate = true; });
+                if (shadowIm) { shadowIm.count = placed; shadowIm.instanceMatrix.needsUpdate = true; }
             };
             
             const mySetupInfo = customCarAssets[1]?.setup;
@@ -3867,8 +4026,8 @@
                             <button onClick={() => setIsNightMode(!isNightMode)} title={isNightMode ? 'DÍA' : 'NOCHE'} className={`px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded flex items-center gap-2 transform skew-x-6 ${isNightMode ? 'text-indigo-400 bg-gray-800' : 'text-yellow-400 hover:text-white hover:bg-gray-800'}`}>
                                 {isNightMode ? <Moon size={14}/> : <Sun size={14}/>} {isNightMode ? 'NOCHE' : 'DÍA'}
                             </button>
-                            <button onClick={toggleQuality} title={t.qualityTooltip} className={`px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded flex items-center gap-2 transform skew-x-6 ${['LOW', 'MIN'].includes(qualityMode) ? 'text-orange-400 bg-gray-800' : (qualityMode === 'ULTRA' ? 'text-purple-400 bg-gray-800' : 'text-gray-500 hover:text-white hover:bg-gray-800')}`}>
-                                <Zap size={14}/> {qualityMode}
+                            <button onClick={toggleQuality} title={t.qualityTooltip} className={`px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded flex items-center gap-2 transform skew-x-6 ${['LOW', 'MIN', 'PS2'].includes(qualityMode) ? 'text-orange-400 bg-gray-800' : (qualityMode === 'ULTRA' ? 'text-purple-400 bg-gray-800' : 'text-gray-500 hover:text-white hover:bg-gray-800')}`}>
+                                <Zap size={14}/> {qualityMode === 'ULTRA' ? 'ULTRA (PS3)' : qualityMode === 'PS2' ? 'RETRO (PS2)' : qualityMode}
                             </button>
                             <button onClick={toggleMusic} title={t.btnMusic} className={`px-4 py-2 font-black text-[10px] tracking-widest uppercase transition-all rounded flex items-center gap-2 transform skew-x-6 ${musicEnabled ? 'text-[#00f0ff] hover:bg-gray-800' : 'text-gray-500 hover:text-white hover:bg-gray-800'}`}>
                                 {musicEnabled ? <Volume2 size={14}/> : <VolumeX size={14}/>}
@@ -4456,8 +4615,8 @@
           const [carSettings, setCarSettings] = useState(Array(8).fill(null).map((_, i) => ({ id: i + 1, name: `PILOTO ${i + 1}`, color: ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#ec4899', '#f97316', '#64748b'][i % 8] })));
           
           // DEFAULT QUALITY a MED en lugar de HIGH para mejorar el rendimiento inicial en portátiles
-          const [qualityMode, setQualityMode] = useState(() => { try { const saved = localStorage.getItem('slot_quality'); return ['ULTRA','HIGH','MED','LOW','MIN'].includes(saved) ? saved : 'MED'; } catch(e) { return 'MED'; }});
-          const toggleQuality = () => { const levels = ['ULTRA', 'HIGH', 'MED', 'LOW', 'MIN']; const n = levels[(levels.indexOf(qualityMode) + 1) % levels.length]; setQualityMode(n); try { localStorage.setItem('slot_quality', n); } catch(e){} };
+          const [qualityMode, setQualityMode] = useState(() => { try { const saved = localStorage.getItem('slot_quality'); return ['ULTRA','HIGH','MED','LOW','MIN','PS2'].includes(saved) ? saved : 'MED'; } catch(e) { return 'MED'; }});
+          const toggleQuality = () => { const levels = ['ULTRA', 'HIGH', 'MED', 'LOW', 'PS2']; const n = levels[(levels.indexOf(qualityMode) + 1) % levels.length]; setQualityMode(n); try { localStorage.setItem('slot_quality', n); } catch(e){} };
           
           // Valores por defecto y carga automática de la configuración del coche desde el diseñador 2D
           const [customCarAssets, setCustomCarAssets] = useState(() => {
@@ -4689,7 +4848,7 @@
 
           // --- ESCUCHAR CIRCUITOS DE LA COMUNIDAD ---
           useEffect(() => {
-              if (!showCommunityModal || !dbRef.current) return;
+              if (!showCommunityModal || !dbRef.current || !user) return;
               setIsCommunityLoading(true);
               
               const { collection, onSnapshot } = window.FirebaseAPI;
@@ -4713,7 +4872,7 @@
               });
               
               return () => unsubscribe();
-          }, [showCommunityModal]);
+          }, [showCommunityModal, user]);
 
           const loadCommunityCircuit = (circuit) => {
               if (circuit && circuit.pieces) {
@@ -4816,7 +4975,7 @@
 
                       let decorUpdates = {};
                       // Asignación directa de los archivos solicitados a los slots de decoración
-                      const targetTrees = ['Alamo.glb', 'Pino.glb', 'Roble.glb'];
+                      const targetTrees = ['Alamo.glb', 'Pino.glb', 'Roble.glb', 'Prado.glb'];
                       const decorSlots = [3, 4, 5, 6, 7, 8];
                       decorSlots.forEach((slotId, index) => {
                           const fileName = targetTrees[index % targetTrees.length];
@@ -5039,7 +5198,7 @@
           };
 
           useEffect(() => {
-              if (!dbRef.current) return;
+              if (!dbRef.current || !user) return;
               const { collection, onSnapshot } = window.FirebaseAPI;
               const colRef = collection(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'multiplayer_rooms');
               const unsubscribe = onSnapshot(colRef, (snapshot) => {
@@ -5050,7 +5209,7 @@
                   setPublicRooms(fetchedData);
               }, (error) => console.error(error));
               return () => unsubscribe();
-          }, []);
+          }, [user]);
 
           const startPublicHost = () => {
               setIsSearching(true);
@@ -5313,10 +5472,10 @@
                         
                         <div className="absolute top-6 right-6 z-50 flex gap-4 items-start">
                     <div className="flex gap-2">
-                        <button onClick={toggleQuality} className={`px-3 md:px-4 h-10 flex items-center justify-center font-digital text-[10px] tracking-widest transform -skew-x-6 border-b-4 transition-all ${['LOW','MIN'].includes(qualityMode) ? 'bg-gradient-to-b from-orange-500/30 to-black/90 border-orange-500 text-orange-400 shadow-[0_5px_15px_rgba(249,115,22,0.4)]' : (qualityMode === 'ULTRA' ? 'bg-gradient-to-b from-purple-500/30 to-black/90 border-purple-500 text-purple-400 shadow-[0_5px_15px_rgba(168,85,247,0.4)]' : 'bg-gray-900 border-gray-700 text-gray-500 hover:text-white hover:border-gray-500')} rounded`} title={t.qualityTooltip}>
+                        <button onClick={toggleQuality} className={`px-3 md:px-4 h-10 flex items-center justify-center font-digital text-[10px] tracking-widest transform -skew-x-6 border-b-4 transition-all ${['LOW','MIN','PS2'].includes(qualityMode) ? 'bg-gradient-to-b from-orange-500/30 to-black/90 border-orange-500 text-orange-400 shadow-[0_5px_15px_rgba(249,115,22,0.4)]' : (qualityMode === 'ULTRA' ? 'bg-gradient-to-b from-purple-500/30 to-black/90 border-purple-500 text-purple-400 shadow-[0_5px_15px_rgba(168,85,247,0.4)]' : 'bg-gray-900 border-gray-700 text-gray-500 hover:text-white hover:border-gray-500')} rounded`} title={t.qualityTooltip}>
                             <span className="transform skew-x-6 flex items-center gap-2">
                                 <Zap size={16}/>
-                                <span className="font-black">{qualityMode}</span>
+                                <span className="font-black">{qualityMode === 'ULTRA' ? 'ULTRA (PS3)' : qualityMode === 'PS2' ? 'RETRO (PS2)' : qualityMode}</span>
                             </span>
                         </button>
                         <button onClick={toggleMusic} className={`px-3 md:px-4 h-10 flex items-center justify-center font-digital text-[10px] tracking-widest transform -skew-x-6 border-b-4 transition-all ${musicEnabled ? 'bg-gradient-to-b from-[#00f0ff]/30 to-black/90 border-[#00f0ff] text-[#00f0ff] shadow-[0_5px_15px_rgba(0,240,255,0.4)]' : 'bg-gray-900 border-gray-700 text-gray-500 hover:text-white hover:border-gray-500'} rounded`} title={t.btnMusic}>
