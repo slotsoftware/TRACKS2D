@@ -1842,7 +1842,8 @@
 
                             const flatZones = [];
                             pieceMapRef.current.forEach(p => {
-                                const isSpecial = [ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'rotonda' ].includes(p.subtype) || ['pit_entry', 'pit_exit'].includes(p.type);
+                                // Aseguramos que TODAS las piezas de chicane (entry, exit, center) y demás zonas rígidas queden perfectamente planas
+                                const isSpecial = [ 'crossing', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'digital_console', 'connection', 'analog_connect', 'starting_grid', 'chicane_entry', 'chicane_exit', 'chicane', 'rotonda' ].includes(p.subtype) || ['pit_entry', 'pit_exit'].includes(p.type) || (p.name && p.name.toLowerCase().includes('chicane'));
                                 if (isSpecial) flatZones.push({ start: p.distStart - 15.0, end: p.distEnd + 15.0 });
                             });
 
@@ -2063,42 +2064,107 @@
                     };
                     applyBridgeElevations();
 
-                    const buildPillars = () => {
-                        // PUENTES REALISTAS TIPO SLOT: Pilares en lugar de muros masivos para máxima fluidez 3D
-                        const pillarGeo = new THREE.CylinderGeometry(0.8, 1.2, 1, 16); // Base más ancha
-                        const pillarMat = new THREE.MeshStandardMaterial({ 
-                            color: 0xcc0000, 
-                            roughness: 0.6,
-                            metalness: 0.2
-                        });
-                        const maxPillars = Math.max(100, Math.floor(aspVertCount / 4));
-                        const pillarInstanced = new THREE.InstancedMesh(pillarGeo, pillarMat, maxPillars);
-                        let pCount = 0;
-                        const dummy = new THREE.Object3D();
+                    const buildWallsAndTunnels = () => {
+                        const wallVerts = []; const wallIndices = []; const wallUVs = [];
+                        const bottomVerts = []; const bottomIndices = []; const bottomUVs = [];
 
-                        for (let s = 0; s < aspVertCount; s += 8) { 
-                            const dist = asphaltDistances[s];
-                            const y = getElevationAtDist(dist);
-                            if (y > 2.5) {
-                                const cx = (asphaltVerts[s * 6] + asphaltVerts[s * 6 + 3]) / 2;
-                                const cz = (asphaltVerts[s * 6 + 2] + asphaltVerts[s * 6 + 5]) / 2;
-                                
-                                const h = y - 0.3; // Descontar grosor de pista
-                                dummy.position.set(cx, h / 2, cz);
-                                dummy.scale.set(1, h, 1);
-                                dummy.updateMatrix();
-                                
-                                if (pCount < maxPillars) {
-                                    pillarInstanced.setMatrixAt(pCount++, dummy.matrix);
+                        // PUENTES DE PIEDRA PERFECTOS ESTILO MAQUETA
+                        let tunnelRadius = 18.0; 
+                        let tunnelClearance = 8.5; 
+                        let depthOffset = 1.0; 
+                        const floorY = -0.5; 
+
+                        const getTunnelBottomY = (x, z, currentY, currentDist) => {
+                            let bottomY = floorY; 
+                            if (currentY > 2.0) {
+                                for (let i = 0; i < aspVertCount; i += 3) { 
+                                    if (Math.abs(asphaltDistances[i] - currentDist) > 40.0) {
+                                        const cx = (asphaltVerts[i * 6] + asphaltVerts[i * 6 + 3]) / 2;
+                                        const cz = (asphaltVerts[i * 6 + 2] + asphaltVerts[i * 6 + 5]) / 2;
+                                        const cy = (asphaltVerts[i * 6 + 1] + asphaltVerts[i * 6 + 4]) / 2;
+                                        
+                                        // Si el tramo que evaluamos pasa por debajo, generamos el arco del túnel
+                                        if (cy < currentY - 1.5) {
+                                            const d2 = (cx - x)**2 + (cz - z)**2;
+                                            if (d2 < tunnelRadius**2) {
+                                                const dist2d = Math.sqrt(d2);
+                                                const arch = Math.cos((dist2d / tunnelRadius) * (Math.PI / 2)); 
+                                                const localH = cy + (tunnelClearance * arch);
+                                                if (localH > bottomY) bottomY = localH;
+                                            }
+                                        }
+                                    }
                                 }
                             }
+                            return Math.min(bottomY, currentY - depthOffset);
+                        };
+
+                        for (let s = 0; s < aspVertCount; s++) {
+                            const xL = asphaltVerts[s * 6], yL = asphaltVerts[s * 6 + 1], zL = asphaltVerts[s * 6 + 2];
+                            const xR = asphaltVerts[s * 6 + 3], yR = asphaltVerts[s * 6 + 4], zR = asphaltVerts[s * 6 + 5];
+                            const dist = asphaltDistances[s];
+                            
+                            let bottomL = yL > 0.5 ? getTunnelBottomY(xL, zL, yL, dist) : floorY;
+                            let bottomR = yR > 0.5 ? getTunnelBottomY(xR, zR, yR, dist) : floorY;
+                            
+                            bottomL = Math.max(floorY, bottomL);
+                            bottomR = Math.max(floorY, bottomR);
+                            
+                            // Muro Izquierdo
+                            wallVerts.push(xL, yL, zL); wallVerts.push(xL, bottomL, zL); 
+                            wallUVs.push(dist * 0.05, yL * 0.1); wallUVs.push(dist * 0.05, bottomL * 0.1);
+                            
+                            // Muro Derecho
+                            wallVerts.push(xR, yR, zR); wallVerts.push(xR, bottomR, zR);
+                            wallUVs.push(dist * 0.05, yR * 0.1); wallUVs.push(dist * 0.05, bottomR * 0.1);
+                            
+                            // Tapa Inferior (suelo del puente)
+                            bottomVerts.push(xL, bottomL, zL); bottomVerts.push(xR, bottomR, zR);
+                            bottomUVs.push(0, dist * 0.05); bottomUVs.push(1, dist * 0.05);
+                            
+                            if (s > 0) {
+                                const cur = s * 4, prev = (s - 1) * 4;
+                                wallIndices.push(prev, prev + 1, cur); wallIndices.push(prev + 1, cur + 1, cur);
+                                wallIndices.push(prev + 2, cur + 2, prev + 3); wallIndices.push(prev + 3, cur + 2, cur + 3);
+                                
+                                const curB = s * 2, prevB = (s - 1) * 2;
+                                bottomIndices.push(prevB, curB, prevB + 1);
+                                bottomIndices.push(prevB + 1, curB, curB + 1);
+                            }
                         }
-                        pillarInstanced.count = pCount;
-                        pillarInstanced.castShadow = true;
-                        pillarInstanced.receiveShadow = true;
-                        trackGroup.add(pillarInstanced);
+
+                        const wallGeom = new THREE.BufferGeometry();
+                        wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallVerts, 3));
+                        wallGeom.setAttribute('uv', new THREE.Float32BufferAttribute(wallUVs, 2));
+                        wallGeom.setIndex(wallIndices);
+                        wallGeom.computeVertexNormals();
+
+                        const bottomGeom = new THREE.BufferGeometry();
+                        bottomGeom.setAttribute('position', new THREE.Float32BufferAttribute(bottomVerts, 3));
+                        bottomGeom.setAttribute('uv', new THREE.Float32BufferAttribute(bottomUVs, 2));
+                        bottomGeom.setIndex(bottomIndices);
+                        bottomGeom.computeVertexNormals();
+
+                        const stoneTex = createStoneTexture();
+                        const structMat = new THREE.MeshStandardMaterial({ 
+                            map: stoneTex,
+                            color: 0x999999,
+                            roughness: 0.9,
+                            metalness: 0.1,
+                            side: THREE.DoubleSide 
+                        });
+
+                        const wallMesh = new THREE.Mesh(wallGeom, structMat);
+                        wallMesh.receiveShadow = true;
+                        wallMesh.castShadow = true;
+                        trackGroup.add(wallMesh);
+
+                        const bottomMesh = new THREE.Mesh(bottomGeom, structMat);
+                        bottomMesh.receiveShadow = true;
+                        bottomMesh.castShadow = true;
+                        trackGroup.add(bottomMesh);
                     };
-                    buildPillars();
+                    buildWallsAndTunnels();
 
                     let finalRallyPath = []; let rallyDists = [0]; let currentRallyDist = 0;
                     if (hasRotonda) {
@@ -4198,36 +4264,35 @@
 
                     {/* MODAL DE RESULTADOS DE CARRERA ESPECTACULAR */}
                     {showResults && raceResultsData && (
-                        <div className="absolute inset-0 z-[200] bg-black/90 backdrop-blur-xl flex items-center justify-center animate-in p-4">
-                            <div className="bg-[#050510] border-4 border-yellow-500 rounded-[2rem] w-[1000px] max-w-full max-h-[95vh] flex flex-col overflow-hidden shadow-[0_0_100px_rgba(234,179,8,0.3)] relative">
+                        <div className="absolute inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in p-4">
+                            <div className="bg-[#0B0F19] border border-gray-800 rounded-xl w-[850px] max-w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative">
                                 
-                                {/* Background Glow */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-64 bg-yellow-500/20 blur-[80px] pointer-events-none"></div>
-
-                                {/* Header & Winner Banner */}
-                                <div className="pt-8 pb-6 px-6 text-center relative z-10 border-b-2 border-yellow-500/30 bg-gradient-to-b from-yellow-900/40 to-transparent shrink-0">
-                                    <div className="text-yellow-500 flex justify-center mb-2 animate-bounce"><Trophy size={56} className="drop-shadow-[0_0_20px_#eab308]" /></div>
-                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-digital font-black text-white tracking-widest drop-shadow-[0_0_20px_#eab308] uppercase leading-tight">
-                                        {lang === 'es' ? '¡VICTORIA PARA ' : 'VICTORY FOR '}
-                                        <span className="text-yellow-400">
-                                            {raceResultsData.winner === 0 ? (lang === 'en' ? 'YOU' : 'TI') : (multiplayerSession?.rivalName || (aiDifficulty > 0 ? 'IA' : t.rival))}
-                                        </span>!
-                                    </h2>
-                                    <button onClick={() => setShowResults(false)} className="absolute top-6 right-6 text-yellow-500/50 hover:text-yellow-400 bg-black/40 p-2 rounded-xl hover:bg-yellow-500/20 transition">
-                                        <XIcon size={28}/>
+                                {/* Header Minimalista */}
+                                <div className="px-6 py-4 flex items-center justify-between border-b border-gray-800/60 bg-gray-900/30 shrink-0">
+                                    <div className="flex items-center gap-3">
+                                        <Trophy size={20} className="text-yellow-500" />
+                                        <h2 className="text-xl font-black text-white tracking-widest uppercase">
+                                            {lang === 'es' ? 'VICTORIA PARA ' : 'VICTORY FOR '}
+                                            <span className="text-yellow-400 ml-1">
+                                                {raceResultsData.winner === 0 ? (lang === 'en' ? 'YOU' : 'TI') : (multiplayerSession?.rivalName || (aiDifficulty > 0 ? 'IA' : t.rival))}
+                                            </span>
+                                        </h2>
+                                    </div>
+                                    <button onClick={() => setShowResults(false)} className="text-gray-500 hover:text-white transition-colors">
+                                        <XIcon size={20}/>
                                     </button>
                                 </div>
                                 
                                 {/* MAIN CONTENT SCROLLABLE */}
-                                <div className="flex-1 overflow-y-auto hide-scrollbar relative z-10">
-                                    {/* Telemetry Cards */}
-                                    <div className="flex flex-col md:flex-row gap-4 p-6 shrink-0">
+                                <div className="flex-1 overflow-y-auto hide-scrollbar relative z-10 flex flex-col">
+                                    {/* Telemetry Cards Compactas */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 shrink-0">
                                         {(() => {
-                                            const formatResult = (t) => {
-                                                if (!t || t >= 999999) return '--.---';
-                                                if (t === 0) return '0.000';
-                                                const m = Math.floor(t / 60);
-                                                const s = (t % 60).toFixed(3).padStart(m > 0 ? 6 : 5, '0');
+                                            const formatResult = (timeVal) => {
+                                                if (!timeVal || timeVal >= 999999) return '--.---';
+                                                if (timeVal === 0) return '0.000';
+                                                const m = Math.floor(timeVal / 60);
+                                                const s = (timeVal % 60).toFixed(3).padStart(m > 0 ? 6 : 5, '0');
                                                 return m > 0 ? `${m}:${s}` : s;
                                             };
 
@@ -4238,69 +4303,64 @@
                                             const p1Avg = p1.laps.length > 0 ? p1.laps.reduce((a,b)=>a+b,0)/p1.laps.length : 0;
                                             const p2Avg = p2.laps.length > 0 ? p2.laps.reduce((a,b)=>a+b,0)/p2.laps.length : 0;
                                             
-                                            // Cálculos F1: GAP y Consistencia
                                             const timeDiff = p1.totalTime - p2.totalTime;
                                             const p1Gap = timeDiff <= 0 ? 0 : timeDiff;
                                             const p2Gap = timeDiff >= 0 ? 0 : -timeDiff;
-                                            
-                                            const p1Cons = p1Best !== Infinity && p1Avg > 0 ? Math.max(0, 100 - ((p1Avg - p1Best) / p1Best * 100)) : 0;
-                                            const p2Cons = p2Best !== Infinity && p2Avg > 0 ? Math.max(0, 100 - ((p2Avg - p2Best) / p2Best * 100)) : 0;
 
                                             return (
                                                 <>
                                                     {/* Card Jugador 1 */}
-                                                    <div className={`flex-1 bg-black/60 border-2 rounded-2xl p-5 flex flex-col gap-3 shadow-inner relative overflow-hidden ${raceResultsData.winner === 0 ? 'border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.2)]' : 'border-blue-500/40'}`}>
-                                                        {raceResultsData.winner === 0 && <div className="absolute inset-0 bg-yellow-500/10 pointer-events-none"></div>}
-                                                        <div className="flex justify-between items-center border-b pb-3 mb-2 border-gray-700/50">
-                                                            <h3 className={`text-2xl font-black uppercase tracking-widest ${raceResultsData.winner === 0 ? 'text-yellow-400 drop-shadow-[0_0_10px_#eab308]' : 'text-blue-400'}`}>
+                                                    <div className={`p-4 rounded-lg border ${raceResultsData.winner === 0 ? 'border-yellow-500/40 bg-yellow-500/5' : 'border-gray-800 bg-gray-900/30'}`}>
+                                                        <div className="flex justify-between items-center border-b border-gray-800/50 pb-2 mb-3">
+                                                            <h3 className={`text-sm font-black uppercase tracking-widest ${raceResultsData.winner === 0 ? 'text-yellow-400' : 'text-blue-400'}`}>
                                                                 P1 ({lang === 'en' ? 'YOU' : 'TÚ'})
                                                             </h3>
-                                                            <div className="flex flex-col items-end">
-                                                                <span className="text-[9px] text-gray-500 font-black tracking-widest uppercase">GAP</span>
-                                                                <span className={`font-digital text-xl font-bold ${p1Gap === 0 ? 'text-yellow-400' : 'text-red-400'}`}>{p1Gap === 0 ? 'LEADER' : `+${p1Gap.toFixed(3)}s`}</span>
-                                                            </div>
+                                                            <span className={`text-[10px] font-bold font-mono ${p1Gap === 0 ? 'text-yellow-500' : 'text-red-400'}`}>
+                                                                GAP: {p1Gap === 0 ? 'LEADER' : `+${p1Gap.toFixed(3)}s`}
+                                                            </span>
                                                         </div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-400 text-xs font-bold tracking-widest uppercase">{t.totalTime}</span><span className="text-white font-mono font-bold text-xl">{formatResult(p1.totalTime)}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-400 text-xs font-bold tracking-widest uppercase">{t.bestLap}</span><span className="text-[#39ff14] font-mono font-bold text-xl drop-shadow-[0_0_5px_#39ff14]">{p1Best !== Infinity ? p1Best.toFixed(3) : '--.---'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-400 text-xs font-bold tracking-widest uppercase">{t.avgLap}</span><span className="text-gray-200 font-mono font-bold text-lg">{p1Avg > 0 ? p1Avg.toFixed(3) : '--.---'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-400 text-xs font-bold tracking-widest uppercase">CONSISTENCIA</span><span className="text-purple-400 font-mono font-bold text-lg">{p1Cons > 0 ? p1Cons.toFixed(1) + '%' : '--.-%'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-400 text-xs font-bold tracking-widest uppercase">{t.topSpeed}</span><span className="text-cyan-400 font-mono font-black text-xl">{p1.topSpeed.toFixed(0)} <span className="text-xs">km/h</span></span></div>
+                                                        <div className="grid grid-cols-2 gap-3 text-xs">
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.totalTime}</span><span className="text-white font-mono font-bold">{formatResult(p1.totalTime)}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.bestLap}</span><span className="text-[#39ff14] font-mono font-bold">{p1Best !== Infinity ? p1Best.toFixed(3) : '--.---'}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.avgLap}</span><span className="text-gray-300 font-mono">{p1Avg > 0 ? p1Avg.toFixed(3) : '--.---'}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.topSpeed}</span><span className="text-cyan-400 font-mono">{p1.topSpeed.toFixed(0)} km/h</span></div>
+                                                        </div>
                                                     </div>
 
                                                     {/* Card Jugador 2 */}
-                                                    <div className={`flex-1 bg-black/60 border-2 rounded-2xl p-5 flex flex-col gap-3 shadow-inner relative overflow-hidden ${raceResultsData.winner === 1 ? 'border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.2)]' : 'border-gray-600/40'}`}>
-                                                        {raceResultsData.winner === 1 && <div className="absolute inset-0 bg-yellow-500/10 pointer-events-none"></div>}
-                                                        <div className="flex justify-between items-center border-b pb-3 mb-2 border-gray-700/50">
-                                                            <h3 className={`text-2xl font-black uppercase tracking-widest ${raceResultsData.winner === 1 ? 'text-yellow-400 drop-shadow-[0_0_10px_#eab308]' : 'text-gray-400'}`}>
+                                                    <div className={`p-4 rounded-lg border ${raceResultsData.winner === 1 ? 'border-yellow-500/40 bg-yellow-500/5' : 'border-gray-800 bg-gray-900/30'}`}>
+                                                        <div className="flex justify-between items-center border-b border-gray-800/50 pb-2 mb-3">
+                                                            <h3 className={`text-sm font-black uppercase tracking-widest ${raceResultsData.winner === 1 ? 'text-yellow-400' : 'text-gray-400'}`}>
                                                                 P2 ({multiplayerSession?.rivalName || (aiDifficulty > 0 ? 'IA' : t.rival)})
                                                             </h3>
-                                                            <div className="flex flex-col items-end">
-                                                                <span className="text-[9px] text-gray-500 font-black tracking-widest uppercase">GAP</span>
-                                                                <span className={`font-digital text-xl font-bold ${p2Gap === 0 ? 'text-yellow-400' : 'text-red-400'}`}>{p2Gap === 0 ? 'LEADER' : `+${p2Gap.toFixed(3)}s`}</span>
-                                                            </div>
+                                                            <span className={`text-[10px] font-bold font-mono ${p2Gap === 0 ? 'text-yellow-500' : 'text-red-400'}`}>
+                                                                GAP: {p2Gap === 0 ? 'LEADER' : `+${p2Gap.toFixed(3)}s`}
+                                                            </span>
                                                         </div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-500 text-xs font-bold tracking-widest uppercase">{t.totalTime}</span><span className="text-white font-mono font-bold text-xl">{formatResult(p2.totalTime)}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-500 text-xs font-bold tracking-widest uppercase">{t.bestLap}</span><span className="text-[#39ff14] font-mono font-bold text-xl opacity-80">{p2Best !== Infinity ? p2Best.toFixed(3) : '--.---'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-500 text-xs font-bold tracking-widest uppercase">{t.avgLap}</span><span className="text-gray-300 font-mono font-bold text-lg opacity-80">{p2Avg > 0 ? p2Avg.toFixed(3) : '--.---'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-500 text-xs font-bold tracking-widest uppercase">CONSISTENCIA</span><span className="text-purple-400 font-mono font-bold text-lg opacity-80">{p2Cons > 0 ? p2Cons.toFixed(1) + '%' : '--.-%'}</span></div>
-                                                        <div className="flex justify-between items-center"><span className="text-gray-500 text-xs font-bold tracking-widest uppercase">{t.topSpeed}</span><span className="text-cyan-500 font-mono font-black text-xl">{p2.topSpeed.toFixed(0)} <span className="text-xs">km/h</span></span></div>
+                                                        <div className="grid grid-cols-2 gap-3 text-xs">
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.totalTime}</span><span className="text-white font-mono font-bold">{formatResult(p2.totalTime)}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.bestLap}</span><span className="text-[#39ff14] font-mono font-bold opacity-80">{p2Best !== Infinity ? p2Best.toFixed(3) : '--.---'}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.avgLap}</span><span className="text-gray-400 font-mono">{p2Avg > 0 ? p2Avg.toFixed(3) : '--.---'}</span></div>
+                                                            <div><span className="text-gray-500 text-[9px] font-bold block uppercase tracking-wider">{t.topSpeed}</span><span className="text-cyan-500 font-mono">{p2.topSpeed.toFixed(0)} km/h</span></div>
+                                                        </div>
                                                     </div>
                                                 </>
                                             );
                                         })()}
                                     </div>
 
-                                    {/* Gráfica Espectacular F1-Style */}
-                                    <div className="px-6 mb-6">
-                                        <div className="bg-[#0a0a0a] border border-gray-800 rounded-xl p-4 shadow-inner">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h4 className="text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black flex items-center gap-2"><Activity size={14} className="text-[#00f0ff]"/> ANÁLISIS DE RITMO (PACE)</h4>
-                                                <div className="flex gap-4">
-                                                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-blue-500 rounded-sm"></div><span className="text-[9px] text-gray-500 font-black uppercase">P1</span></div>
-                                                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-gray-500 rounded-sm"></div><span className="text-[9px] text-gray-500 font-black uppercase">P2</span></div>
-                                                </div>
+                                    {/* Gráficas Telemetría */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 mb-6 shrink-0">
+                                        
+                                        {/* Pace Chart */}
+                                        <div className="bg-[#0f172a]/80 border border-gray-800/60 rounded-lg p-4 flex flex-col">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <h4 className="text-gray-400 text-[9px] uppercase tracking-[0.2em] font-black flex items-center gap-1.5"><Activity size={12} className="text-blue-400"/> PACE</h4>
+                                                <div className="flex gap-3 text-[8px] font-bold uppercase tracking-widest"><span className="text-blue-400">■ P1</span><span className="text-gray-500">■ P2</span></div>
                                             </div>
-                                            <div className="h-32 flex items-end gap-1.5 border-b border-l border-gray-700/50 pl-2 pb-1 relative">
+                                            <div className="h-28 flex items-end gap-1.5 border-b border-l border-gray-800 pl-1 pb-0.5 relative">
+                                                <div className="absolute top-0 left-0 w-full border-t border-gray-800/50"></div>
+                                                <div className="absolute top-1/2 left-0 w-full border-t border-gray-800/50 border-dashed"></div>
                                                 {(() => {
                                                     const p1Laps = raceResultsData.player1.laps;
                                                     const p2Laps = raceResultsData.player2.laps;
@@ -4312,16 +4372,14 @@
                                                     for (let i = 0; i < maxLaps; i++) {
                                                         const t1 = p1Laps[i] || 0;
                                                         const t2 = p2Laps[i] || 0;
-                                                        // El mejor tiempo (minTime) es la barra más alta (100%). Tiempos más lentos son barras más bajas.
                                                         const h1 = t1 > 0 ? (minTime / t1) * 100 : 0;
                                                         const h2 = t2 > 0 ? (minTime / t2) * 100 : 0;
                                                         
                                                         bars.push(
-                                                            <div key={i} className="flex-1 flex justify-center gap-[2px] h-full items-end group relative">
-                                                                {h1 > 0 && <div style={{height: `${h1}%`}} className={`w-1/2 rounded-t-sm transition-all shadow-[0_0_8px_rgba(59,130,246,0.3)] ${t1 === minTime ? 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]' : 'bg-blue-500 group-hover:bg-blue-400'}`}></div>}
-                                                                {h2 > 0 && <div style={{height: `${h2}%`}} className={`w-1/2 rounded-t-sm transition-all shadow-[0_0_8px_rgba(107,114,128,0.3)] ${t2 === minTime ? 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]' : 'bg-gray-500 group-hover:bg-gray-400'}`}></div>}
-                                                                
-                                                                <div className="absolute -bottom-5 text-[8px] font-mono text-gray-600 font-bold">{i+1}</div>
+                                                            <div key={i} className="flex-1 flex justify-center gap-[1px] h-full items-end group relative">
+                                                                {h1 > 0 && <div style={{height: `${h1}%`}} className={`w-1/2 rounded-t-[1px] transition-colors opacity-90 ${t1 === minTime ? 'bg-purple-500' : 'bg-blue-500'}`}></div>}
+                                                                {h2 > 0 && <div style={{height: `${h2}%`}} className={`w-1/2 rounded-t-[1px] transition-colors opacity-90 ${t2 === minTime ? 'bg-purple-500' : 'bg-gray-600'}`}></div>}
+                                                                <div className="absolute -bottom-4 text-[7px] font-mono text-gray-600">V{i+1}</div>
                                                             </div>
                                                         );
                                                     }
@@ -4329,17 +4387,55 @@
                                                 })()}
                                             </div>
                                         </div>
+
+                                        {/* Delta Chart */}
+                                        <div className="bg-[#0f172a]/80 border border-gray-800/60 rounded-lg p-4 flex flex-col">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <h4 className="text-gray-400 text-[9px] uppercase tracking-[0.2em] font-black flex items-center gap-1.5"><Activity size={12} className="text-purple-400"/> DELTA (P1)</h4>
+                                                <div className="flex gap-3 text-[8px] font-bold uppercase tracking-widest"><span className="text-[#39ff14]">↓ FAST</span><span className="text-red-500">↑ SLOW</span></div>
+                                            </div>
+                                            <div className="h-28 flex items-center gap-1.5 border-l border-gray-800 pl-1 relative">
+                                                <div className="absolute top-1/2 left-0 w-full border-t border-gray-600 z-0"></div>
+                                                {(() => {
+                                                    const p1Laps = raceResultsData.player1.laps;
+                                                    const p2Laps = raceResultsData.player2.laps;
+                                                    const maxLaps = Math.max(p1Laps.length, p2Laps.length);
+                                                    const allLaps = [...p1Laps, ...p2Laps].filter(l => l > 0);
+                                                    let maxDelta = 0;
+                                                    for(let i=0; i<maxLaps; i++) { if(p1Laps[i] && p2Laps[i]) { const d = Math.abs(p1Laps[i] - p2Laps[i]); if(d > maxDelta) maxDelta = d; } }
+                                                    const limit = maxDelta > 0 ? maxDelta : 1;
+                                                    
+                                                    const dbars = [];
+                                                    for (let i = 0; i < maxLaps; i++) {
+                                                        const t1 = p1Laps[i];
+                                                        const t2 = p2Laps[i];
+                                                        if (t1 && t2) {
+                                                            const diff = t1 - t2; // Positivo = P1 es más lento (rojo/arriba)
+                                                            const h = (Math.abs(diff) / limit) * 50; 
+                                                            if (diff > 0) {
+                                                                dbars.push(<div key={i} className="flex-1 flex flex-col justify-end pb-[50%] h-full relative z-10"><div style={{height: `${h}%`}} className="w-[80%] mx-auto bg-red-500/80 rounded-t-[1px]"></div></div>);
+                                                            } else {
+                                                                dbars.push(<div key={i} className="flex-1 flex flex-col justify-start pt-[50%] h-full relative z-10"><div style={{height: `${h}%`}} className="w-[80%] mx-auto bg-[#39ff14]/80 rounded-b-[1px]"></div></div>);
+                                                            }
+                                                        } else {
+                                                            dbars.push(<div key={i} className="flex-1 h-full"></div>);
+                                                        }
+                                                    }
+                                                    return dbars;
+                                                })()}
+                                            </div>
+                                        </div>
                                     </div>
                                     
-                                    {/* Detailed Laps Table with DELTA */}
+                                    {/* Detailed Laps Table Minimalist */}
                                     <div className="px-6 pb-6 relative z-10">
-                                        <table className="w-full text-left border-collapse bg-black/50 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.8)]">
-                                            <thead className="sticky top-0 bg-[#0f172a] z-20">
-                                                <tr className="border-b-2 border-gray-700">
-                                                    <th className="p-4 text-gray-500 font-black text-xs tracking-widest uppercase w-20 bg-gray-900/80">VUELTA</th>
-                                                    <th className="p-4 text-blue-400 font-black text-sm tracking-widest uppercase text-center bg-blue-900/20">P1 TIEMPO</th>
-                                                    <th className="p-4 text-white font-black text-sm tracking-widest uppercase text-center bg-gray-900/80 border-x border-gray-700/50">DELTA (P1-P2)</th>
-                                                    <th className="p-4 text-gray-400 font-black text-sm tracking-widest uppercase text-center bg-gray-800/80">P2 TIEMPO</th>
+                                        <table className="w-full text-left border-collapse bg-[#0f172a]/50 border border-gray-800 rounded-lg overflow-hidden">
+                                            <thead className="bg-gray-900/60 border-b border-gray-800">
+                                                <tr>
+                                                    <th className="py-2 px-4 text-gray-500 font-bold text-[9px] tracking-widest uppercase w-16">LAP</th>
+                                                    <th className="py-2 px-4 text-blue-400 font-bold text-[10px] tracking-widest uppercase text-center border-l border-gray-800/50">P1 TIME</th>
+                                                    <th className="py-2 px-4 text-white font-bold text-[10px] tracking-widest uppercase text-center border-x border-gray-800/50 bg-black/20">DELTA</th>
+                                                    <th className="py-2 px-4 text-gray-400 font-bold text-[10px] tracking-widest uppercase text-center border-r border-gray-800/50">P2 TIME</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -4361,14 +4457,14 @@
                                                         
                                                         const delta = (t1 && t2) ? (t1 - t2) : null;
                                                         let deltaUI = '--.---';
-                                                        let deltaColor = 'text-gray-500';
+                                                        let deltaColor = 'text-gray-600';
                                                         if (delta !== null) {
                                                             if (delta < -0.001) {
                                                                 deltaUI = delta.toFixed(3);
-                                                                deltaColor = 'text-[#39ff14] drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]'; // P1 fue más rápido
+                                                                deltaColor = 'text-[#39ff14]'; 
                                                             } else if (delta > 0.001) {
                                                                 deltaUI = '+' + delta.toFixed(3);
-                                                                deltaColor = 'text-red-500 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]'; // P1 fue más lento
+                                                                deltaColor = 'text-red-500'; 
                                                             } else {
                                                                 deltaUI = '0.000';
                                                                 deltaColor = 'text-gray-400';
@@ -4377,14 +4473,14 @@
 
                                                         rows.push(
                                                             <tr key={i} className="border-b border-gray-800/30 hover:bg-white/5 transition-colors">
-                                                                <td className="p-3 px-4 text-gray-500 font-mono font-bold text-sm bg-gray-900/30">V{i + 1}</td>
-                                                                <td className={`p-3 px-4 font-mono text-lg text-center bg-blue-900/10 ${isAbsoluteBest1 ? 'text-purple-400 font-black drop-shadow-[0_0_8px_#a855f7]' : 'text-blue-300'}`}>
+                                                                <td className="py-1.5 px-4 text-gray-500 font-mono text-[11px]">V{i + 1}</td>
+                                                                <td className={`py-1.5 px-4 font-mono text-[13px] text-center border-l border-gray-800/50 ${isAbsoluteBest1 ? 'text-purple-400 font-black' : 'text-blue-300'}`}>
                                                                     {t1 ? t1.toFixed(3) : '--.---'}
                                                                 </td>
-                                                                <td className={`p-3 px-4 font-mono text-lg text-center font-black border-x border-gray-800/50 bg-[#080808] ${deltaColor}`}>
+                                                                <td className={`py-1.5 px-4 font-mono text-[13px] text-center font-black border-x border-gray-800/50 bg-black/20 ${deltaColor}`}>
                                                                     {deltaUI}
                                                                 </td>
-                                                                <td className={`p-3 px-4 font-mono text-lg text-center bg-gray-900/40 ${isAbsoluteBest2 ? 'text-purple-400 font-black drop-shadow-[0_0_8px_#a855f7]' : 'text-gray-400'}`}>
+                                                                <td className={`py-1.5 px-4 font-mono text-[13px] text-center border-r border-gray-800/50 ${isAbsoluteBest2 ? 'text-purple-400 font-black' : 'text-gray-400'}`}>
                                                                     {t2 ? t2.toFixed(3) : '--.---'}
                                                                 </td>
                                                             </tr>
@@ -4397,16 +4493,16 @@
                                     </div>
                                 </div>
                                 
-                                {/* Bottom Action Bar */}
-                                <div className="bg-[#050510] p-5 md:p-6 border-t border-yellow-500/30 flex flex-col md:flex-row justify-between gap-4 relative z-20 shrink-0">
-                                    <button onClick={handleExportCSV} className="flex-1 bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border-2 border-gray-700 hover:border-gray-500 py-4 rounded-xl font-black tracking-widest uppercase flex items-center justify-center gap-3 transition-all active:scale-95">
-                                        <FileText size={22}/> EXPORTAR DATOS
+                                {/* Bottom Action Bar Minimalista */}
+                                <div className="bg-[#080B12] px-6 py-4 border-t border-gray-800 flex justify-end gap-3 shrink-0">
+                                    <button onClick={handleExportCSV} className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
+                                        <FileText size={14}/> CSV
                                     </button>
-                                    <button onClick={() => { setShowResults(false); handleRestartRace(); }} className="flex-1 bg-gradient-to-r from-yellow-600 to-orange-500 hover:from-yellow-500 hover:to-orange-400 text-black border-2 border-yellow-400 py-4 rounded-xl font-black tracking-widest uppercase flex items-center justify-center gap-3 transition-all shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:shadow-[0_0_35px_rgba(234,179,8,0.7)] active:scale-95 text-lg">
-                                        <Repeat size={24}/> REVANCHA
+                                    <button onClick={() => { setShowResults(false); handleRestartRace(); }} className="px-5 py-2 bg-yellow-500/10 hover:bg-yellow-500 text-yellow-500 hover:text-black border border-yellow-500/50 hover:border-yellow-500 rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+                                        <Repeat size={14}/> {lang === 'es' ? 'REPETIR' : 'REMATCH'}
                                     </button>
-                                    <button onClick={() => { setShowResults(false); onClose(); }} className="flex-1 bg-red-950/40 hover:bg-red-600 text-red-500 hover:text-white border-2 border-red-900 hover:border-red-500 py-4 rounded-xl font-black tracking-widest uppercase flex items-center justify-center gap-3 transition-all active:scale-95">
-                                        <XIcon size={22}/> SALIR
+                                    <button onClick={() => { setShowResults(false); onClose(); }} className="px-5 py-2 bg-gray-800 hover:bg-red-600/20 text-white hover:text-red-400 border border-gray-700 hover:border-red-500/50 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 transition-colors">
+                                        {t.exit}
                                     </button>
                                 </div>
                             </div>
