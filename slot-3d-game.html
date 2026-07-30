@@ -4400,7 +4400,6 @@
                                                     const p1Laps = raceResultsData.player1.laps;
                                                     const p2Laps = raceResultsData.player2.laps;
                                                     const maxLaps = Math.max(p1Laps.length, p2Laps.length);
-                                                    const allLaps = [...p1Laps, ...p2Laps].filter(l => l > 0);
                                                     let maxDelta = 0;
                                                     for(let i=0; i<maxLaps; i++) { if(p1Laps[i] && p2Laps[i]) { const d = Math.abs(p1Laps[i] - p2Laps[i]); if(d > maxDelta) maxDelta = d; } }
                                                     const limit = maxDelta > 0 ? maxDelta : 1;
@@ -4413,9 +4412,9 @@
                                                             const diff = t1 - t2; // Positivo = P1 es más lento (rojo/arriba)
                                                             const h = (Math.abs(diff) / limit) * 50; 
                                                             if (diff > 0) {
-                                                                dbars.push(<div key={i} className="flex-1 flex flex-col justify-end pb-[50%] h-full relative z-10"><div style={{height: `${h}%`}} className="w-[80%] mx-auto bg-red-500/80 rounded-t-[1px]"></div></div>);
+                                                                dbars.push(<div key={i} className="flex-1 h-full relative z-10"><div style={{height: `${h}%`}} className="absolute bottom-1/2 left-1/2 -translate-x-1/2 w-[80%] max-w-[12px] bg-red-500/80 rounded-t-[1px]"></div></div>);
                                                             } else {
-                                                                dbars.push(<div key={i} className="flex-1 flex flex-col justify-start pt-[50%] h-full relative z-10"><div style={{height: `${h}%`}} className="w-[80%] mx-auto bg-[#39ff14]/80 rounded-b-[1px]"></div></div>);
+                                                                dbars.push(<div key={i} className="flex-1 h-full relative z-10"><div style={{height: `${h}%`}} className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[80%] max-w-[12px] bg-[#39ff14]/80 rounded-b-[1px]"></div></div>);
                                                             }
                                                         } else {
                                                             dbars.push(<div key={i} className="flex-1 h-full"></div>);
