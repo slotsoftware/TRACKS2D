@@ -2063,103 +2063,42 @@
                     };
                     applyBridgeElevations();
 
-                    const buildWallsAndTunnels = () => {
-                        const wallVerts = []; const wallIndices = []; const wallUVs = [];
-                        const bottomVerts = []; const bottomIndices = []; const bottomUVs = [];
+                    const buildPillars = () => {
+                        // PUENTES REALISTAS TIPO SLOT: Pilares en lugar de muros masivos para máxima fluidez 3D
+                        const pillarGeo = new THREE.CylinderGeometry(0.8, 1.2, 1, 16); // Base más ancha
+                        const pillarMat = new THREE.MeshStandardMaterial({ 
+                            color: 0xcc0000, 
+                            roughness: 0.6,
+                            metalness: 0.2
+                        });
+                        const maxPillars = Math.max(100, Math.floor(aspVertCount / 4));
+                        const pillarInstanced = new THREE.InstancedMesh(pillarGeo, pillarMat, maxPillars);
+                        let pCount = 0;
+                        const dummy = new THREE.Object3D();
 
-                        // PUENTES REALISTAS TIPO SLOT: Arco normal, ancho justo y muros sólidos
-                        let tunnelRadius = 16.0; 
-                        let tunnelClearance = 8.5; 
-                        let depthOffset = 1.0; 
-                        const floorY = 0.0; 
-
-                        const getTunnelBottomY = (x, z, currentY, currentDist) => {
-                            let bottomY = floorY; 
-                            if (currentY > 2.0) {
-                                for (let i = 0; i < aspVertCount; i += 3) { 
-                                    if (Math.abs(asphaltDistances[i] - currentDist) > 40.0) {
-                                        const cx = (asphaltVerts[i * 6] + asphaltVerts[i * 6 + 3]) / 2;
-                                        const cz = (asphaltVerts[i * 6 + 2] + asphaltVerts[i * 6 + 5]) / 2;
-                                        const cy = (asphaltVerts[i * 6 + 1] + asphaltVerts[i * 6 + 4]) / 2;
-                                        
-                                        // Tolerancia más baja para crear huecos más fácilmente (1.0)
-                                        if (cy < currentY - 1.0) {
-                                            const d2 = (cx - x)**2 + (cz - z)**2;
-                                            if (d2 < tunnelRadius**2) {
-                                                const dist2d = Math.sqrt(d2);
-                                                const arch = Math.cos((dist2d / tunnelRadius) * (Math.PI / 2)); 
-                                                const localH = cy + (tunnelClearance * arch);
-                                                if (localH > bottomY) bottomY = localH;
-                                            }
-                                        }
-                                    }
+                        for (let s = 0; s < aspVertCount; s += 8) { 
+                            const dist = asphaltDistances[s];
+                            const y = getElevationAtDist(dist);
+                            if (y > 2.5) {
+                                const cx = (asphaltVerts[s * 6] + asphaltVerts[s * 6 + 3]) / 2;
+                                const cz = (asphaltVerts[s * 6 + 2] + asphaltVerts[s * 6 + 5]) / 2;
+                                
+                                const h = y - 0.3; // Descontar grosor de pista
+                                dummy.position.set(cx, h / 2, cz);
+                                dummy.scale.set(1, h, 1);
+                                dummy.updateMatrix();
+                                
+                                if (pCount < maxPillars) {
+                                    pillarInstanced.setMatrixAt(pCount++, dummy.matrix);
                                 }
                             }
-                            return Math.min(bottomY, currentY - depthOffset);
-                        };
-
-                        for (let s = 0; s < aspVertCount; s++) {
-                            const xL = asphaltVerts[s * 6], yL = asphaltVerts[s * 6 + 1], zL = asphaltVerts[s * 6 + 2];
-                            const xR = asphaltVerts[s * 6 + 3], yR = asphaltVerts[s * 6 + 4], zR = asphaltVerts[s * 6 + 5];
-                            const dist = asphaltDistances[s];
-                            
-                            let bottomL = yL > 0.5 ? getTunnelBottomY(xL, zL, yL, dist) : floorY;
-                            let bottomR = yR > 0.5 ? getTunnelBottomY(xR, zR, yR, dist) : floorY;
-                            
-                            bottomL = Math.max(floorY, bottomL);
-                            bottomR = Math.max(floorY, bottomR);
-                            
-                            wallVerts.push(xL, yL, zL); wallVerts.push(xL, bottomL, zL); 
-                            wallUVs.push(dist * 0.1, yL * 0.1); wallUVs.push(dist * 0.1, bottomL * 0.1);
-                            
-                            wallVerts.push(xR, yR, zR); wallVerts.push(xR, bottomR, zR);
-                            wallUVs.push(dist * 0.1, yR * 0.1); wallUVs.push(dist * 0.1, bottomR * 0.1);
-                            
-                            bottomVerts.push(xL, bottomL, zL); bottomVerts.push(xR, bottomR, zR);
-                            bottomUVs.push(0, dist * 0.1); bottomUVs.push(1, dist * 0.1);
-                            
-                            if (s > 0) {
-                                const cur = s * 4, prev = (s - 1) * 4;
-                                wallIndices.push(prev, prev + 1, cur); wallIndices.push(prev + 1, cur + 1, cur);
-                                wallIndices.push(prev + 2, cur + 2, prev + 3); wallIndices.push(prev + 3, cur + 2, cur + 3);
-                                
-                                const curB = s * 2, prevB = (s - 1) * 2;
-                                bottomIndices.push(prevB, curB, prevB + 1);
-                                bottomIndices.push(prevB + 1, curB, curB + 1);
-                            }
                         }
-
-                        const wallGeom = new THREE.BufferGeometry();
-                        wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallVerts, 3));
-                        wallGeom.setAttribute('uv', new THREE.Float32BufferAttribute(wallUVs, 2));
-                        wallGeom.setIndex(wallIndices);
-                        wallGeom.computeVertexNormals();
-
-                        const bottomGeom = new THREE.BufferGeometry();
-                        bottomGeom.setAttribute('position', new THREE.Float32BufferAttribute(bottomVerts, 3));
-                        bottomGeom.setAttribute('uv', new THREE.Float32BufferAttribute(bottomUVs, 2));
-                        bottomGeom.setIndex(bottomIndices);
-                        bottomGeom.computeVertexNormals();
-
-                        const stoneTex = createStoneTexture();
-                        // UPGRADE RENDIMIENTO: Material Lambert en lugar de Standard (PBR) para muros
-                        const structMat = new THREE.MeshLambertMaterial({ 
-                            map: stoneTex,
-                            color: 0xaaaaaa, 
-                            side: THREE.DoubleSide 
-                        });
-
-                        const wallMesh = new THREE.Mesh(wallGeom, structMat);
-                        wallMesh.receiveShadow = false; // OPTIMIZADO: Quitar sombras a estructuras gigantes
-                        wallMesh.castShadow = false;
-                        trackGroup.add(wallMesh);
-
-                        const bottomMesh = new THREE.Mesh(bottomGeom, structMat);
-                        bottomMesh.receiveShadow = false; // OPTIMIZADO: Quitar sombras a estructuras gigantes
-                        bottomMesh.castShadow = false;
-                        trackGroup.add(bottomMesh);
+                        pillarInstanced.count = pCount;
+                        pillarInstanced.castShadow = true;
+                        pillarInstanced.receiveShadow = true;
+                        trackGroup.add(pillarInstanced);
                     };
-                    buildWallsAndTunnels();
+                    buildPillars();
 
                     let finalRallyPath = []; let rallyDists = [0]; let currentRallyDist = 0;
                     if (hasRotonda) {
@@ -2290,7 +2229,7 @@
                         const c2 = new THREE.CatmullRomCurve3(p2);
                         const cMid = new THREE.CatmullRomCurve3(cp);
 
-                        const mMetal = new THREE.MeshPhongMaterial({ color: 0xeeeeee, shininess: 100 });
+                        const mMetal = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.3, metalness: 0.9 });
                         const mSlot = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
                         const g1 = new THREE.TubeGeometry(c1, segs, 0.15, 3, false);
@@ -2320,12 +2259,13 @@
                     const ag = new THREE.BufferGeometry(); ag.setAttribute('position', new THREE.Float32BufferAttribute(solidVerts, 3)); ag.setAttribute('uv', new THREE.Float32BufferAttribute(solidUVs, 2)); ag.setIndex(solidIndices); ag.computeVertexNormals(); 
                     
                     const asphaltTex = createAsphaltTexture();
-                    // UPGRADE RENDIMIENTO: Asfalto usa Phong en lugar de Standard
-                    const am = new THREE.Mesh(ag, new THREE.MeshPhongMaterial({ 
+                    // MATERIALES V.2.0: Standard PBR para máximo realismo y fluidez visual
+                    const am = new THREE.Mesh(ag, new THREE.MeshStandardMaterial({ 
                         map: asphaltTex, 
-                        bumpMap: asphaltTex,   
-                        bumpScale: 0.05,       
-                        color: 0x888888, 
+                        roughnessMap: asphaltTex,
+                        roughness: 0.8,
+                        metalness: 0.15,
+                        color: 0x999999, 
                         side: THREE.DoubleSide 
                     })); 
                     am.receiveShadow = true; am.castShadow = false; am.position.y = 0.0; trackGroup.add(am);
@@ -2432,8 +2372,10 @@
                         for(let i=0; i<posArray.length; i+=3) { posArray[i] /= baseW; posArray[i+2] /= baseD; }
                         terrainGeo.computeBoundingBox(); terrainGeo.computeBoundingSphere();
 
-                        const terrainMat = new THREE.MeshLambertMaterial({ 
+                        const terrainMat = new THREE.MeshStandardMaterial({ 
                             map: grassTex, 
+                            roughness: 0.9,
+                            metalness: 0.05,
                             vertexColors: true,
                             side: THREE.DoubleSide
                         });
@@ -2749,42 +2691,28 @@
                                 }
                             }
 
-                            // --- LÓGICA DE CINEMÁTICA LIBRE (COCHE ESTRELLADO VOLANDO) ---
+                            // --- SISTEMA DE CONDUCCIÓN FLUIDO V.2.0 (DERRAPES Y SALIDAS CONTROLADAS) ---
                             if (car.crashed) {
                                 car.crashTimer -= dt;
                                 if (car.crashTimer <= 0) {
-                                    // Respawn en pista
+                                    // Respawn rápido y fluido en pista
                                     car.crashed = false;
                                     car.speed = 0;
-                                    car.distance -= 15.0; // Lo colocamos un poco más atrás de donde chocó
+                                    car.distance -= 10.0; 
                                     if (car.distance < 0) car.distance += currentTrackLen;
-                                    pg.userData.initPos = false; // Forza el reenganche sin animaciones raras
+                                    pg.userData.initPos = false;
                                     pg.rotation.set(0,0,0);
                                 } else {
-                                    // Físicas de vuelo libre (Gravedad y Rebotes)
-                                    car.crashVelocity.y -= 45.0 * dt; // Gravedad
-                                    car.worldPos.addScaledVector(car.crashVelocity, dt);
+                                    // Derrape lateral suave en lugar de vuelo libre pesado (Mejora FPS y jugabilidad)
+                                    car.speed *= (1 - 2.5 * dt); // Fricción fuerte
+                                    car.worldPos.addScaledVector(_forward, car.speed * dt);
+                                    car.worldPos.addScaledVector(_right, (car.crashVelocity.x > 0 ? 1 : -1) * car.speed * 0.5 * dt);
                                     
-                                    // Colisión con el suelo virtual de la habitación
-                                    if (car.worldPos.y < -0.5) {
-                                        car.worldPos.y = -0.5;
-                                        car.crashVelocity.y *= -0.4; // Rebote vertical
-                                        car.crashVelocity.x *= 0.8;  // Fricción suelo
-                                        car.crashVelocity.z *= 0.8;
-                                        car.crashAngularVelocity.multiplyScalar(0.7); // Frena los giros
-                                    }
-
-                                    // Aplicar transformación visual directa
                                     pg.position.copy(car.worldPos);
-                                    pg.rotation.x += car.crashAngularVelocity.x * dt;
                                     pg.rotation.y += car.crashAngularVelocity.y * dt;
-                                    pg.rotation.z += car.crashAngularVelocity.z * dt;
                                     
-                                    // Fake targets para que la cámara lo siga mientras vuela
                                     p1 = car.worldPos.clone();
-                                    p2 = car.worldPos.clone().add(car.crashVelocity.clone().normalize().multiplyScalar(5));
-                                    _dir.copy(car.crashVelocity).normalize();
-                                    if(_dir.lengthSq() < 0.1) _dir.set(0,0,1);
+                                    p2 = car.worldPos.clone().add(_forward);
                                 }
                             }
 
@@ -3050,18 +2978,15 @@
                                                     
                                                     if (longDist > 0 && speedDiff > 25.0) { 
                                                         car.crashed = true;
-                                                        car.crashTimer = 2.5;
-                                                        car.crashVelocity.copy(_forward).multiplyScalar(car.speed * 0.15);
-                                                        car.crashVelocity.y = Math.random() * 8 + 4; 
-                                                        car.crashVelocity.x += (Math.random() - 0.5) * 8;
-                                                        car.crashAngularVelocity.set((Math.random()-0.5)*15, (Math.random()-0.5)*15, (Math.random()-0.5)*15);
+                                                        car.crashTimer = 1.5; // Recuperación más rápida
+                                                        car.crashVelocity.x = (Math.random() - 0.5) > 0 ? 1 : -1; // Dirección del derrape
+                                                        car.crashAngularVelocity.y = (Math.random() - 0.5) * 10;
 
                                                         if (speedDiff > 40.0) {
                                                             otherCar.crashed = true;
-                                                            otherCar.crashTimer = 2.5;
-                                                            otherCar.crashVelocity.copy(_forward).multiplyScalar(car.speed * 0.1);
-                                                            otherCar.crashVelocity.y = Math.random() * 5 + 2;
-                                                            otherCar.crashAngularVelocity.set((Math.random()-0.5)*10, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
+                                                            otherCar.crashTimer = 1.5;
+                                                            otherCar.crashVelocity.x = (Math.random() - 0.5) > 0 ? 1 : -1;
+                                                            otherCar.crashAngularVelocity.y = (Math.random() - 0.5) * 10;
                                                         }
 
                                                         const now = Date.now();
@@ -3103,13 +3028,14 @@
                                             
                                             if (car.speed > maxV + 15) { 
                                                 car.crashed = true;
-                                                car.crashTimer = 2.0;
+                                                car.crashTimer = 1.5;
                                                 
-                                                // FIX MEMORIA: Reutilizar vector en las salidas de pista
                                                 _forward.copy(_dir).normalize();
-                                                car.crashVelocity.copy(_forward).multiplyScalar(car.speed * 0.15);
-                                                car.crashVelocity.y = 1.0 + Math.random() * 2; // Ligero salto
-                                                car.crashAngularVelocity.set((Math.random()-0.5)*5, (Math.random()-0.5)*5, (Math.random()-0.5)*5);
+                                                _right.set(_forward.z, 0, -_forward.x).normalize();
+                                                
+                                                // Derrape hacia el exterior de la curva
+                                                car.crashVelocity.x = currentPiece.direction === 'left' ? 1 : -1;
+                                                car.crashAngularVelocity.y = currentPiece.direction === 'left' ? -5 : 5;
                                                 
                                                 const now = Date.now();
                                                 if (now - (car.lastBump || 0) > 1000) { playCommentary('crash'); car.lastBump = now; }
