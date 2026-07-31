@@ -4693,7 +4693,7 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // 1. Filtrado por propiedades explícitas de carriles paralelos
+            // 1. Filtrado por propiedades explícitas de carriles paralelos o decorativos
             let masterPieces = d.pieces.filter(p => 
                 p &&
                 !p.isParallel && 
@@ -4702,18 +4702,18 @@
                 p.lane !== 3 && 
                 p.lane !== 4 &&
                 p.lane !== 'outer' &&
-                p.group !== 'parallel'
+                p.group !== 'parallel' &&
+                !['text', 'label', 'obstacle', 'decor', 'ruler', 'arrow'].includes(p.type)
             );
 
-            // 2. Cortar secuencias desconectadas (ej. un segundo 'set_origin' que inicia el carril exterior)
+            // 2. Cortar secuencias desconectadas o saltos que rompan la simulación 3D
             const cleanPieces = [];
             let hasStarted = false;
             for (let i = 0; i < masterPieces.length; i++) {
                 const p = masterPieces[i];
-                if (p.type === 'set_origin') {
+                if (p.type === 'set_origin' || p.type === 'goto') {
+                    // Solo permitimos definir el origen antes de empezar la pista real
                     if (!hasStarted) cleanPieces.push(p);
-                } else if (p.type === 'goto') {
-                    cleanPieces.push(p);
                 } else {
                     hasStarted = true;
                     cleanPieces.push(p);
@@ -4785,14 +4785,11 @@
                       try {
                           const d = JSON.parse(e.newValue);
                           if (d.brand && d.pieces) {
-                              const isUnsupported = d.pieces.some(p => p && (p.type === 'rotonda' || p.subtype === 'rotonda' || p.name === 'Rotonda' || p.isParallel || p.isOuter || p.lane === 2 || p.lane === 3 || p.lane === 4 || p.lane === 'outer' || p.group === 'parallel'));
-                              if (!isUnsupported) {
-                                  const parsed = parseCircuitData(d);
-                                  setCircuitData(parsed);
-                                  localStorage.setItem('slot_last_circuit', e.newValue);
-                                  localStorage.removeItem('slot_circuit_transfer');
-                                  setHasSavedCircuit(true);
-                              }
+                              const parsed = parseCircuitData(d);
+                              setCircuitData(parsed);
+                              localStorage.setItem('slot_last_circuit', e.newValue);
+                              localStorage.removeItem('slot_circuit_transfer');
+                              setHasSavedCircuit(true);
                           }
                       } catch(err) { console.warn("Error auto-loading circuit transfer:", err); }
                   }
@@ -5040,25 +5037,8 @@
 
           const validateCircuit = (d) => {
               if (!d || !d.pieces) return false;
-              const isUnsupported = d.pieces.some(p => 
-                  p && (
-                  p.type === 'rotonda' || 
-                  p.subtype === 'rotonda' || 
-                  p.name === 'Rotonda' || 
-                  p.isParallel || 
-                  p.isOuter || 
-                  p.lane === 2 || 
-                  p.lane === 3 || 
-                  p.lane === 4 || 
-                  p.lane === 'outer' || 
-                  p.group === 'parallel'
-                  )
-              );
-              if (isUnsupported) {
-                  setToastMsg(t.unsupportedCircuit);
-                  setTimeout(() => setToastMsg(''), 6000);
-                  return false;
-              }
+              // Eliminado el bloqueo estricto que impedía transferir desde el 2D.
+              // parseCircuitData ya se encarga de limpiar pistas incompatibles.
               return true;
           };
 
