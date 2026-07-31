@@ -1106,7 +1106,7 @@
         };
 
         // Compilador 3D MEJORADO: ENCADENAMIENTO ESTRICTO Y CONTINUO
-        const compileCircuitFor3D = (rawPieces) => {
+        const compileCircuitFor3D = (rawPieces, expandMacros = false) => {
             if (!rawPieces || rawPieces.length === 0) return [];
             
             const finalCompiled = [];
@@ -1153,7 +1153,40 @@
                     return; 
                 }
 
-                if (p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry' || p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle' || p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit' || p.subtype === 'crossing' || p.subtype === 'full_chicane') {
+                if (p.subtype === 'full_chicane' && expandMacros) {
+                    const partLength = p.length / 3;
+                    
+                    let prefix = 'n_';
+                    if (currentBrandKey === 'SCX_CLASSIC') prefix = 'c_';
+                    else if (currentBrandKey === 'SCX_ANALOG') prefix = 's_';
+                    else if (currentBrandKey === 'SCX_ADVANCE') prefix = 'adv_';
+                    else if (currentBrandKey === 'SCALEXTRIC_UK') prefix = 'suk_';
+                    else if (currentBrandKey === 'CARRERA') prefix = 'car_';
+
+                    const isSCX = currentBrandKey.startsWith('SCX');
+
+                    let inId = isSCX ? `${prefix}pt74_in` : `${prefix}chicane_in`;
+                    let midId = isSCX ? `${prefix}pt74_mid` : `${prefix}chicane_mid`;
+                    let outId = isSCX ? `${prefix}pt74_out` : `${prefix}chicane_out`;
+                    
+                    const subIn = isSCX ? 'chicane3_entry' : 'chicane_entry';
+                    const subMid = isSCX ? 'chicane3_middle' : 'chicane_middle';
+                    const subOut = isSCX ? 'chicane3_exit' : 'chicane_exit';
+
+                    const p1 = { ...p, uid: p.uid + "_1", id: inId, label: isSCX ? "Chicane In (PT74)" : "Chicane In", subtype: subIn, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                    const p2 = { ...p, uid: p.uid + "_2", id: midId, label: isSCX ? "Chicane Med (PT74)" : "Chicane Med", subtype: subMid, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                    const p3 = { ...p, uid: p.uid + "_3", id: outId, label: isSCX ? "Chicane Out (PT74)" : "Chicane Out", subtype: subOut, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                    
+                    p2.x = p1.x + partLength * Math.cos(p.rot || 0);
+                    p2.y = p1.y + partLength * Math.sin(p.rot || 0);
+                    p3.x = p2.x + partLength * Math.cos(p.rot || 0);
+                    p3.y = p2.y + partLength * Math.sin(p.rot || 0);
+                    
+                    expandedPieces.push(p1, p2, p3);
+                    return;
+                }
+
+                if (p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry' || p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle' || p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit' || p.subtype === 'crossing' || (!expandMacros && p.subtype === 'full_chicane')) {
                     p.width = brandDef.width; 
                     p.laneSpacing = brandDef.laneSpacing;
                 }
@@ -3307,11 +3340,11 @@
               pushHistory(newPieces); setShowMultiLaneTools(false);
           };
 
-          const getCircuitDataPayload = (piecesToSend) => {
+          const getCircuitDataPayload = (piecesToSend, expandMacros = false) => {
               const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
               const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
               
-              const compiledPieces = compileCircuitFor3D(piecesToSend);
+              const compiledPieces = compileCircuitFor3D(piecesToSend, expandMacros);
               
               // CENTRADO ABSOLUTO EN (0,0) PARA LOS MOTORES 3D
               // Soluciona el problema de que el 3D "no lo hace" cuando se dibuja en el 2D muy lejos del centro
@@ -3381,13 +3414,13 @@
                   alert("AVISO DE INGENIERÍA:\n\nTu circuito tiene un número IMPAR de cruces (" + crossingCount + "). Físicamente, esto fusiona los carriles en un único recorrido continuo.\n\nPor este motivo, en la simulación 3D el coche 'saltará' de carril en la línea de meta (donde no hay ningún cruce) para compensar el desajuste estructural.\n\n-> SOLUCIÓN: Añade o quita 1 cruce para que el total sea PAR y ambos carriles cierren perfectamente.");
               }
               
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend))); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(piecesToSend, true))); window.location.href = '3d.html'; } catch (e) { alert(t.alerts.sim); }
           };
           const goToMulti = () => {
               if (pieces.length === 0) { alert(t.alerts.pieces); return; }
               
               // Multi-lane sí envía todas las piezas (sin filtrar)
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces))); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces, true))); window.location.href = 'multi.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
           const goTo2DGame = () => {
@@ -3396,7 +3429,7 @@
 
           const goTo3DGame = () => {
               if (pieces.length === 0) { alert(t.alerts.emptyGame); return; }
-              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces))); window.location.href = 'slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
+              try { localStorage.setItem('slot_circuit_transfer', JSON.stringify(getCircuitDataPayload(pieces, false))); window.location.href = 'slot-3d-game.html'; } catch (e) { alert(t.alerts.sim); }
           };
 
           const generateReport = () => { 
