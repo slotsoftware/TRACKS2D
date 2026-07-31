@@ -684,10 +684,13 @@
             
             const isCurve = p.type === 'curve';
             const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
+            
+            // Detección segura: si es chicane, forzamos que sea recta para que no desaparezca
+            const isChicane = p.type === 'chicane' || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicane);
 
             if (isStraight) { 
-                dx = p.length || 0; 
+                dx = p.length || (isChicane ? 35 : 0); // Si viene sin longitud desde el 2D, le damos 35
             } else if (isCurve) {
                 const r = Math.abs(p.radius || 0);
                 const aRad = ((p.angle || 0) * Math.PI) / 180;
@@ -717,10 +720,11 @@
                 let dx = 0, dy = 0, dAngle = 0;
                 const isCurve = p.type === 'curve';
                 const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
+                const isChicane = p.type === 'chicane' || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicane);
 
                 if (isRotonda) { dAngle = Math.PI; }
-                else if (isStraight) { dx = p.length || 0; }
+                else if (isStraight) { dx = p.length || (isChicane ? 35 : 0); }
                 else if (isCurve) { 
                     const r = Math.abs(p.radius || 0); 
                     const aRad = ((p.angle || 0) * Math.PI) / 180; 
@@ -763,11 +767,12 @@
                     
                     const isCurve = p.type === 'curve';
                     const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
+                    const isChicane = p.type === 'chicane' || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicane);
 
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
-                        const l = (p.length || 0) * s;
+                        const l = (p.length || (isChicane ? 35 : 0)) * s;
                         
                         const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
                         const isChicaneMiddle = p.subtype === 'chicane_middle';
@@ -1695,10 +1700,19 @@
                     scene.add(ambLight); 
                     scene.userData.ambientLight = ambLight;
 
-                    const dl = new THREE.DirectionalLight(0xfffae8, 1.2); // Luz de Sol directa y brillante
-                    dl.position.set(0, 100, -300); // Sol bajo en el horizonte apuntando hacia los coches
-                    dl.castShadow = qSettings.shadow; dl.shadow.mapSize.width = 512; dl.shadow.mapSize.height = 512; // OPTIMIZADO: Sombras de 1024 a 512px
-                    dl.shadow.camera.near = 0.5; dl.shadow.camera.far = 1500; dl.shadow.camera.left = -400; dl.shadow.camera.right = 400; dl.shadow.camera.top = 400; dl.shadow.camera.bottom = -400; dl.shadow.bias = -0.001; scene.add(dl);
+                    const dl = new THREE.DirectionalLight(0xfffae8, 1.2); 
+                    dl.position.set(100, 200, -150); // Ángulo ajustado para sombras más realistas y proyectadas
+                    dl.castShadow = qSettings.shadow; 
+                    dl.shadow.mapSize.width = 2048; // Alta resolución para sombras detalladas
+                    dl.shadow.mapSize.height = 2048; 
+                    dl.shadow.camera.near = 0.5; 
+                    dl.shadow.camera.far = 1500; 
+                    dl.shadow.camera.left = -300; 
+                    dl.shadow.camera.right = 300; 
+                    dl.shadow.camera.top = 300; 
+                    dl.shadow.camera.bottom = -300; 
+                    dl.shadow.bias = -0.001; 
+                    scene.add(dl);
                     dirLightRef.current = dl;
                     
                     const trackGroup = new THREE.Group(); trackGroupRef.current = trackGroup;
@@ -1774,16 +1788,18 @@
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
                         
+                        const isChicanePiece = p.type === 'chicane' || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
                         const isChicaneEntry = p.subtype === 'chicane_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit';
                         const isChicaneMiddle = p.subtype === 'chicane_middle';
-                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const isFullChicane = isChicanePiece && !isChicaneEntry && !isChicaneExit && !isChicaneMiddle;
                         const chicaneDir = p.invert ? -1 : 1;
 
-                        let pieceLen = p.length || 0;
+                        // Asignar longitud matemática correcta (105 si es la pieza completa unida, 35 si viene en 3 trozos separados)
+                        let pieceLen = p.length || (isChicanePiece ? (isFullChicane ? 105 : 35) : 0);
 
                         let steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle || 0) * 1.5 * resMult)) : Math.max(4, Math.ceil((Math.abs(pieceLen) / 3.0) * resMult));
-                        if (p.subtype && p.subtype.includes('chicane')) steps = Math.max(steps, 24);
+                        if (isChicanePiece) steps = Math.max(steps, 24);
                         
                         const stepLen = pieceLen / steps; const totalSweep = (p.type==='curve') ? ((p.angle || 0) * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * (p.radius || 0)) * (Math.abs(p.angle || 0) / 360) / steps;
@@ -2548,8 +2564,7 @@
                         const boardMesh = new THREE.Mesh(terrainGeo, terrainMat); 
                         boardMesh.scale.set(baseW, 1.0, baseD); 
                         boardMesh.position.y = -0.5; 
-                        // TRUCO NFS #3: El terreno gigante no recibe sombras dinámicas de los coches (ahorra GPU)
-                        boardMesh.receiveShadow = false; 
+                        boardMesh.receiveShadow = qSettings.shadow; // Restaurar sombras dinámicas en el terreno
                         scene.add(boardMesh); 
                         boardMeshRef.current = boardMesh; 
                         
@@ -3605,8 +3620,8 @@
                             const model = gltf.scene;
                             model.traverse(child => { 
                                 if (child.isMesh) { 
-                                    child.castShadow = false; // OPTIMIZACIÓN: NINGÚN coche ni árbol genera sombras pesadas
-                                    child.receiveShadow = false; 
+                                    child.castShadow = true; // Activar proyección de sombras en los modelos
+                                    child.receiveShadow = true; 
                                     
                                     // ALTERNATIVA ROBUSTA: RECONSTRUCCIÓN LIMPIA DE GEOMETRÍA
                                     // Previene el crash de 'isGLBufferAttribute' en WebGLRenderer
@@ -3736,7 +3751,7 @@
                     if (isDecor) {
                         rawModel.name = "REAL_MODEL";
                         rawModel.position.y += isPrado ? 0 : 0.5;
-                        rawModel.traverse(child => { if (child.isMesh) { child.castShadow = false; child.receiveShadow = false; } });
+                        rawModel.traverse(child => { if (child.isMesh) { child.castShadow = !isPrado; child.receiveShadow = true; } });
                         templateGroup.add(rawModel);
                     } else {
                         templateGroup.add(rawModel);
@@ -3817,14 +3832,16 @@
                 const maxInstances = isPrado ? 600 : Math.min(count * 5, 250);
                 const instancedGroups = meshesToInstance.map(m => {
                     const im = new THREE.InstancedMesh(m.geometry, m.material, maxInstances);
-                    im.castShadow = false; im.receiveShadow = false;
+                    im.castShadow = !isPrado; // Los árboles proyectan sombra (el prado no)
+                    im.receiveShadow = true;
                     container.add(im);
                     return { im, localMatrix: m.localMatrix };
                 });
 
-                // Sombra falsa instanciada (solo para árboles/arbustos)
+                // Sombra falsa instanciada (solo como fallback para calidades bajas sin sombras reales)
+                const qSettings = getQualitySettings(qualityMode);
                 let shadowIm = null;
-                if (!isPrado) {
+                if (!isPrado && !qSettings.shadow) {
                     const fakeTex = getFakeShadowTexture();
                     const shadowGeo = new THREE.PlaneGeometry(finalSize.x * 2.0, finalSize.z * 2.0);
                     shadowGeo.rotateX(-Math.PI / 2);
@@ -4698,12 +4715,14 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // LA ÚNICA Y VERDADERA SOLUCIÓN (IGUAL QUE EN TU 3D.HTML ORIGINAL):
-            // El 2D marca internamente las pistas de la chicane con `isParallel: true` 
-            // para no duplicar distancias en telemetría. Mis filtros anteriores estaban
-            // borrando estas piezas. Aquí NO filtramos nada destructivo, ni aplanamos, 
-            // ni reconstruimos. Lo pasamos crudo al 3D quitando solo los nulos.
-            const cleanPieces = d.pieces.filter(p => p !== null && p !== undefined);
+            // LA ÚNICA VERDAD: En el 2D, la Gran Chicane utiliza propiedades isParallel y group="parallel".
+            // Al quitar el filtro que las borraba por error, la pista llegará intacta al motor 3D.
+            const cleanPieces = d.pieces.filter(p => {
+                if (!p) return false;
+                // SOLO borramos basura visual (textos, reglas, flechas)
+                if (['text', 'label', 'ruler', 'arrow'].includes(p.type)) return false;
+                return true;
+            });
 
             return { ...d, pieces: cleanPieces };
         };
