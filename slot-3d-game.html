@@ -684,16 +684,10 @@
             
             const isCurve = p.type === 'curve';
             const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-            
-            // DETECCIÓN INFALIBLE DE CHICANE (JSON o En Vivo)
-            const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
-            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
+            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
 
             if (isStraight) { 
                 dx = p.length || 0; 
-                if (dx === 0 && isChicanePiece) {
-                    dx = (p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105;
-                }
             } else if (isCurve) {
                 const r = Math.abs(p.radius || 0);
                 const aRad = ((p.angle || 0) * Math.PI) / 180;
@@ -723,16 +717,10 @@
                 let dx = 0, dy = 0, dAngle = 0;
                 const isCurve = p.type === 'curve';
                 const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
-                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
+                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
 
                 if (isRotonda) { dAngle = Math.PI; }
-                else if (isStraight) { 
-                    dx = p.length || 0; 
-                    if (dx === 0 && isChicanePiece) {
-                        dx = (p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105;
-                    }
-                }
+                else if (isStraight) { dx = p.length || 0; }
                 else if (isCurve) { 
                     const r = Math.abs(p.radius || 0); 
                     const aRad = ((p.angle || 0) * Math.PI) / 180; 
@@ -775,17 +763,16 @@
                     
                     const isCurve = p.type === 'curve';
                     const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                    const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
-                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
+                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
 
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
-                        const l = (p.length || (isChicanePiece ? ((p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105) : 0)) * s;
+                        const l = (p.length || 0) * s;
                         
+                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle';
                         const isChicaneEntry = p.subtype === 'chicane_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit';
-                        const isChicaneMiddle = p.subtype === 'chicane_middle';
-                        const isFullChicane = isChicanePiece && !isChicaneEntry && !isChicaneExit && !isChicaneMiddle;
                         const chicaneDir = p.invert ? -1 : 1;
                         
                         if (isFullChicane || isChicaneMiddle || isChicaneEntry || isChicaneExit) {
@@ -1787,20 +1774,16 @@
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
                         
-                        const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
                         const isChicaneEntry = p.subtype === 'chicane_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit';
                         const isChicaneMiddle = p.subtype === 'chicane_middle';
-                        const isFullChicane = isChicanePiece && !isChicaneEntry && !isChicaneExit && !isChicaneMiddle;
+                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
                         const chicaneDir = p.invert ? -1 : 1;
 
                         let pieceLen = p.length || 0;
-                        if (pieceLen === 0 && isChicanePiece) {
-                            pieceLen = isFullChicane ? 105 : 35;
-                        }
 
                         let steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle || 0) * 1.5 * resMult)) : Math.max(4, Math.ceil((Math.abs(pieceLen) / 3.0) * resMult));
-                        if (isChicanePiece) steps = Math.max(steps, 24);
+                        if (p.subtype && p.subtype.includes('chicane')) steps = Math.max(steps, 24);
                         
                         const stepLen = pieceLen / steps; const totalSweep = (p.type==='curve') ? ((p.angle || 0) * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * (p.radius || 0)) * (Math.abs(p.angle || 0) / 360) / steps;
