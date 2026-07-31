@@ -661,7 +661,6 @@
           NINCO: { name: 'NINCO', themeColor: 'red', neonColor: '#ef4444', uiClass: 'border-red-500/50 text-red-400', trackColor: '#111111', railColor: '#dcdcdc', slotColor: '#000000', width: 18.0, laneSpacing: 9.0, connectionBoxColor: '#ef4444' },
           SCX_ANALOG: { name: 'SCALEXTRIC', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
           SCX_ADVANCE: { name: 'SCX ADVANCE', themeColor: 'blue', neonColor: '#3b82f6', uiClass: 'border-blue-500/50 text-blue-400', trackColor: '#5a5a5a', railColor: '#d0d0d0', slotColor: '#1a1a1a', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
-          SCX_CLASSIC: { name: 'SCX CLÁSICO', themeColor: 'yellow', neonColor: '#facc15', uiClass: 'border-yellow-500/50 text-yellow-400', trackColor: '#262626', railColor: '#a0a0a0', slotColor: '#000000', width: 15.6, laneSpacing: 7.7, connectionBoxColor: '#ef4444' },
           SCALEAUTO: { name: 'SCALEAUTO', themeColor: 'lime', neonColor: '#84cc16', uiClass: 'border-lime-500/50 text-lime-400', trackColor: '#4d4d4d', railColor: '#e0e0e0', slotColor: '#111111', width: 20.0, laneSpacing: 10.0, connectionBoxColor: '#9ca3af' },
           POLICAR: { name: 'POLICAR', themeColor: 'orange', neonColor: '#f97316', uiClass: 'border-orange-500/50 text-orange-400', trackColor: '#1a1a1a', railColor: '#dcdcdc', slotColor: '#000000', width: 17.9, laneSpacing: 9.0, connectionBoxColor: '#333' }
         };
@@ -769,36 +768,95 @@
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
                         const l = (p.length || 0) * s;
-                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const isFullChicane = p.subtype === 'full_chicane';
                         const isChicaneMiddle = p.subtype === 'chicane_middle';
                         const isChicaneEntry = p.subtype === 'chicane_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit';
+                        const chicaneDir = p.invert ? -1 : 1;
                         
                         if (isFullChicane || isChicaneMiddle || isChicaneEntry || isChicaneExit) {
-                            // ASFALTO RECTO (Sin curvas ni estrechamientos de la pieza plástica)
-                            ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
-                            ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
-                            
-                            // RIELES CURVADOS / ESTRECHADOS SIMÉTRICAMENTE
+                            ctx.beginPath();
                             const steps = 30;
+                            for(let i = 0; i <= steps; i++) {
+                                const t = i / steps;
+                                const x = t * l;
+                                let yOffset = 0;
+                                let narrowFactor = 0;
+                                
+                                if (isChicaneMiddle) {
+                                    narrowFactor = 1.0;
+                                } else if (isFullChicane) {
+                                    if (t < 0.25) narrowFactor = (1 - Math.cos((t / 0.25) * Math.PI)) / 2;
+                                    else if (t < 0.75) narrowFactor = 1.0;
+                                    else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.75) / 0.25) * Math.PI)) / 2;
+                                    
+                                    if (t >= 0.25 && t <= 0.75) {
+                                        const sT = (t - 0.25) / 0.5;
+                                        yOffset = chicaneDir * Math.sin(sT * Math.PI * 2) * (laneOff * 0.8);
+                                    }
+                                } else if (isChicaneEntry) {
+                                    narrowFactor = (1 - Math.cos(t * Math.PI)) / 2;
+                                } else if (isChicaneExit) {
+                                    narrowFactor = 1.0 - (1 - Math.cos(t * Math.PI)) / 2;
+                                }
+                                
+                                let currentW = w - (w * 0.15) * narrowFactor;
+                                
+                                if (i === 0) ctx.moveTo(x, yOffset - currentW/2);
+                                else ctx.lineTo(x, yOffset - currentW/2);
+                            }
+                            for(let i = steps; i >= 0; i--) {
+                                const t = i / steps;
+                                const x = t * l;
+                                let yOffset = 0;
+                                let narrowFactor = 0;
+                                
+                                if (isChicaneMiddle) {
+                                    narrowFactor = 1.0;
+                                } else if (isFullChicane) {
+                                    if (t < 0.25) narrowFactor = (1 - Math.cos((t / 0.25) * Math.PI)) / 2;
+                                    else if (t < 0.75) narrowFactor = 1.0;
+                                    else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.75) / 0.25) * Math.PI)) / 2;
+                                    
+                                    if (t >= 0.25 && t <= 0.75) {
+                                        const sT = (t - 0.25) / 0.5;
+                                        yOffset = chicaneDir * Math.sin(sT * Math.PI * 2) * (laneOff * 0.8);
+                                    }
+                                } else if (isChicaneEntry) {
+                                    narrowFactor = (1 - Math.cos(t * Math.PI)) / 2;
+                                } else if (isChicaneExit) {
+                                    narrowFactor = 1.0 - (1 - Math.cos(t * Math.PI)) / 2;
+                                }
+                                
+                                let currentW = w - (w * 0.15) * narrowFactor;
+                                
+                                ctx.lineTo(x, yOffset + currentW/2);
+                            }
+                            ctx.closePath();
+                            ctx.fillStyle = brand.trackColor;
+                            ctx.fill();
+                            ctx.strokeStyle = '#222';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+
                             const drawRailPath = (isLane2) => {
                                 ctx.beginPath();
                                 for(let i = 0; i <= steps; i++) {
                                     const t = i / steps;
                                     const x = t * l;
+                                    let yOffset = 0;
                                     let narrowFactor = 0;
-                                    let sCurveOffset = 0;
                                     
                                     if (isChicaneMiddle) {
                                         narrowFactor = 1.0;
                                     } else if (isFullChicane) {
-                                        if (t < 0.3) narrowFactor = (1 - Math.cos((t / 0.3) * Math.PI)) / 2;
-                                        else if (t < 0.7) narrowFactor = 1.0;
-                                        else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.7) / 0.3) * Math.PI)) / 2;
-                                        
-                                        // Desplazamiento lateral para hacer la forma de "S"
-                                        const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
-                                        sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneOff * 1.5);
+                                        if (t < 0.25) narrowFactor = (1 - Math.cos((t / 0.25) * Math.PI)) / 2;
+                                        else if (t < 0.75) narrowFactor = 1.0;
+                                        else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.75) / 0.25) * Math.PI)) / 2;
+                                        if (t >= 0.25 && t <= 0.75) {
+                                            const sT = (t - 0.25) / 0.5;
+                                            yOffset = chicaneDir * Math.sin(sT * Math.PI * 2) * (laneOff * 0.8);
+                                        }
                                     } else if (isChicaneEntry) {
                                         narrowFactor = (1 - Math.cos(t * Math.PI)) / 2;
                                     } else if (isChicaneExit) {
@@ -809,8 +867,8 @@
                                     const targetOff = baseOff * 0.15;
                                     const currentOff = baseOff + (targetOff - baseOff) * narrowFactor;
                                     
-                                    if (i === 0) ctx.moveTo(x, currentOff + sCurveOffset);
-                                    else ctx.lineTo(x, currentOff + sCurveOffset);
+                                    if (i === 0) ctx.moveTo(x, yOffset + currentOff);
+                                    else ctx.lineTo(x, yOffset + currentOff);
                                 }
                             };
 
@@ -1773,8 +1831,7 @@
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
                         
-                        let steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(4, Math.ceil((p.length / 3.0) * resMult));
-                        if (p.subtype && p.subtype.includes('chicane')) steps = Math.max(steps, 24);
+                        const steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(4, Math.ceil((p.length / 3.0) * resMult));
                         
                         const stepLen = p.length / steps; const totalSweep = (p.type==='curve') ? (p.angle * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * p.radius) * (Math.abs(p.angle) / 360) / steps;
@@ -1782,7 +1839,7 @@
                         const isCrossing = p.subtype === 'crossing', isPitEntry = p.type === 'pit_entry', isPitExit = p.type === 'pit_exit', isChicaneEntry = p.subtype === 'chicane_entry', isChicaneExit = p.subtype === 'chicane_exit', pitSide = p.invert ? 'left' : 'right', pitDir = pitSide === 'right' ? 1 : -1;
                         
                         const isChicaneMiddle = p.subtype === 'chicane_middle';
-                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const isFullChicane = p.subtype === 'full_chicane';
                         const chicaneDir = p.invert ? -1 : 1;
 
                         let sL1 = l1Off, sL2 = l2Off, tL1 = l1Off, tL2 = l2Off;
@@ -1816,26 +1873,49 @@
                             
                             let mixT = (isCrossing || isChicaneEntry || isChicaneExit) ? easeSine(t) : t;
                             let cL1 = sL1 + (tL1 - sL1) * mixT, cL2 = sL2 + (tL2 - sL2) * mixT;
+                            let sOffset = 0;
 
                             if (isFullChicane) {
                                 let narrowFactor = 0;
-                                if (t < 0.3) narrowFactor = easeSine(t / 0.3);
-                                else if (t < 0.7) narrowFactor = 1.0;
-                                else narrowFactor = 1.0 - easeSine((t - 0.7) / 0.3);
+                                if (t < 0.25) narrowFactor = easeSine(t / 0.25);
+                                else if (t < 0.75) narrowFactor = 1.0;
+                                else narrowFactor = 1.0 - easeSine((t - 0.75) / 0.25);
                                 
                                 const targetL1 = sL1 * 0.15;
                                 const targetL2 = sL2 * 0.15;
                                 cL1 = sL1 + (targetL1 - sL1) * narrowFactor;
                                 cL2 = sL2 + (targetL2 - sL2) * narrowFactor;
-                                
-                                // Desplazamiento lateral para hacer la forma de "S" en el 3D
-                                const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
-                                const sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneSpacing * 0.75);
-                                cL1 += sCurveOffset;
-                                cL2 += sCurveOffset;
+
+                                if (t >= 0.25 && t <= 0.75) {
+                                    const sT = (t - 0.25) / 0.5; 
+                                    sOffset = chicaneDir * Math.sin(sT * Math.PI * 2) * (laneSpacing * 0.4);
+                                    cL1 += sOffset;
+                                    cL2 += sOffset;
+                                }
                             }
 
                             let cPit = null, cTWL = stdHalf, cTWR = stdHalf;
+                            
+                            if (isChicaneEntry) {
+                                const e = easeSine(t);
+                                cTWL = stdHalf - (stdHalf * 0.15) * e;
+                                cTWR = stdHalf - (stdHalf * 0.15) * e;
+                            } else if (isChicaneExit) {
+                                const e = easeSine(t);
+                                cTWL = (stdHalf * 0.85) + (stdHalf * 0.15) * e;
+                                cTWR = (stdHalf * 0.85) + (stdHalf * 0.15) * e;
+                            } else if (isChicaneMiddle) {
+                                cTWL = stdHalf * 0.85;
+                                cTWR = stdHalf * 0.85;
+                            } else if (isFullChicane) {
+                                let narrowFactor = 0;
+                                if (t < 0.25) narrowFactor = easeSine(t / 0.25);
+                                else if (t < 0.75) narrowFactor = 1.0;
+                                else narrowFactor = 1.0 - easeSine((t - 0.75) / 0.25);
+                                
+                                cTWL = stdHalf - (stdHalf * 0.15) * narrowFactor;
+                                cTWR = stdHalf - (stdHalf * 0.15) * narrowFactor;
+                            }
                             
                             if (isPitEntry) { const sp = pitDir * (laneSpacing/2), ep = pitDir * pitCenterDist, e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = stdHalf + (pitOuterEdge-stdHalf)*e; else cTWL = stdHalf + (pitOuterEdge-stdHalf)*e; } 
                             else if (isPitExit) { const sp = pitDir * pitCenterDist, ep = pitDir * (laneSpacing/2), e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = pitOuterEdge - (pitOuterEdge-stdHalf)*e; else cTWL = pitOuterEdge - (pitOuterEdge-stdHalf)*e; } 
@@ -1844,8 +1924,14 @@
                             
                             addRailPoint(curX, curZ, curAngle, (p.subtype === 'single_lane_2' ? null : cL1), (p.subtype === 'single_lane_1' ? null : cL2), cPit, stepPhysDist);
                             
+                            const pxAsp = Math.cos(curAngle + Math.PI/2);
+                            const pzAsp = Math.sin(curAngle + Math.PI/2);
+                            const centerAspX = curX + pxAsp * sOffset;
+                            const centerAspZ = curZ + pzAsp * sOffset;
+
                             const isNormalCurve = p.type === 'curve';
-                            addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, isNormalCurve, isNormalCurve);
+                            const drawChicaneKerbs = isChicaneMiddle || isFullChicane || isChicaneEntry || isChicaneExit;
+                            addAsphaltSlice(centerAspX, centerAspZ, curAngle, cTWL, cTWR, accumulatedDist, isNormalCurve || drawChicaneKerbs, isNormalCurve || drawChicaneKerbs);
 
                             if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) { 
                                 const ct = easeSine(t), o12 = sL1 + (sL2-sL1)*ct, o21 = sL2 + (sL1-sL2)*ct, px = Math.cos(curAngle+Math.PI/2), pz = Math.sin(curAngle+Math.PI/2); 
@@ -4693,12 +4779,32 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // IGUAL QUE EN 3D.HTML: No destruimos NADA del circuito.
-            // Solo filtramos nulos (para evitar crasheos) y elementos 2D (textos, flechas).
-            // Esto garantiza que la Gran Chicane PT74 y sus piezas internas lleguen intactas al 3D en vivo.
-            const cleanPieces = d.pieces.filter(p => 
-                p && !['text', 'label', 'ruler', 'arrow'].includes(p.type)
+            // 1. Filtrado por propiedades explícitas de carriles paralelos
+            let masterPieces = d.pieces.filter(p => 
+                !p.isParallel && 
+                !p.isOuter && 
+                p.lane !== 2 && 
+                p.lane !== 3 && 
+                p.lane !== 4 &&
+                p.lane !== 'outer' &&
+                p.group !== 'parallel'
             );
+
+            // 2. Cortar secuencias desconectadas (ej. un segundo 'set_origin' que inicia el carril exterior)
+            const cleanPieces = [];
+            let hasStarted = false;
+            for (let i = 0; i < masterPieces.length; i++) {
+                const p = masterPieces[i];
+                if (p.type === 'set_origin') {
+                    if (hasStarted) break; // Fin del trazado maestro, comienza un carril paralelo 4, 6 u 8
+                    cleanPieces.push(p);
+                } else if (p.type === 'goto') {
+                    cleanPieces.push(p);
+                } else {
+                    hasStarted = true;
+                    cleanPieces.push(p);
+                }
+            }
 
             return { ...d, pieces: cleanPieces };
         };
@@ -4759,19 +4865,6 @@
                               return nextState;
                           });
                       } catch(err) { console.warn("Error sincronizando setups:", err); }
-                  }
-                  
-                  if (e.key === 'slot_circuit_transfer' && e.newValue) {
-                      try {
-                          const d = JSON.parse(e.newValue);
-                          if (d.brand && d.pieces) {
-                              const parsed = parseCircuitData(d);
-                              setCircuitData(parsed);
-                              localStorage.setItem('slot_last_circuit', e.newValue);
-                              localStorage.removeItem('slot_circuit_transfer');
-                              setHasSavedCircuit(true);
-                          }
-                      } catch(err) { console.warn("Error auto-loading circuit transfer:", err); }
                   }
               };
               window.addEventListener('storage', handleStorageChange);
@@ -5017,8 +5110,23 @@
 
           const validateCircuit = (d) => {
               if (!d || !d.pieces) return false;
-              // Eliminado el bloqueo estricto que impedía transferir desde el 2D.
-              // parseCircuitData ya se encarga de limpiar pistas incompatibles.
+              const isUnsupported = d.pieces.some(p => 
+                  p.type === 'rotonda' || 
+                  p.subtype === 'rotonda' || 
+                  p.name === 'Rotonda' || 
+                  p.isParallel || 
+                  p.isOuter || 
+                  p.lane === 2 || 
+                  p.lane === 3 || 
+                  p.lane === 4 || 
+                  p.lane === 'outer' || 
+                  p.group === 'parallel'
+              );
+              if (isUnsupported) {
+                  setToastMsg(t.unsupportedCircuit);
+                  setTimeout(() => setToastMsg(''), 6000);
+                  return false;
+              }
               return true;
           };
 
