@@ -768,9 +768,62 @@
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
                         const l = (p.length || 0) * s;
-                        ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
-                        ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
-                        DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle';
+                        const isChicaneEntry = p.subtype === 'chicane_entry';
+                        const isChicaneExit = p.subtype === 'chicane_exit';
+                        
+                        if (isFullChicane || isChicaneMiddle || isChicaneEntry || isChicaneExit) {
+                            // ASFALTO RECTO (Sin curvas ni estrechamientos de la pieza plástica)
+                            ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                            ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
+                            
+                            // RIELES CURVADOS / ESTRECHADOS SIMÉTRICAMENTE
+                            const steps = 30;
+                            const drawRailPath = (isLane2) => {
+                                ctx.beginPath();
+                                for(let i = 0; i <= steps; i++) {
+                                    const t = i / steps;
+                                    const x = t * l;
+                                    let narrowFactor = 0;
+                                    let sCurveOffset = 0;
+                                    
+                                    if (isChicaneMiddle) {
+                                        narrowFactor = 1.0;
+                                    } else if (isFullChicane) {
+                                        if (t < 0.3) narrowFactor = (1 - Math.cos((t / 0.3) * Math.PI)) / 2;
+                                        else if (t < 0.7) narrowFactor = 1.0;
+                                        else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.7) / 0.3) * Math.PI)) / 2;
+                                        
+                                        // Desplazamiento lateral para hacer la forma de "S"
+                                        const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
+                                        sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneOff * 1.5);
+                                    } else if (isChicaneEntry) {
+                                        narrowFactor = (1 - Math.cos(t * Math.PI)) / 2;
+                                    } else if (isChicaneExit) {
+                                        narrowFactor = 1.0 - (1 - Math.cos(t * Math.PI)) / 2;
+                                    }
+
+                                    const baseOff = isLane2 ? laneOff : -laneOff;
+                                    const targetOff = baseOff * 0.15;
+                                    const currentOff = baseOff + (targetOff - baseOff) * narrowFactor;
+                                    
+                                    if (i === 0) ctx.moveTo(x, currentOff + sCurveOffset);
+                                    else ctx.lineTo(x, currentOff + sCurveOffset);
+                                }
+                            };
+
+                            ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
+                            drawRailPath(false); ctx.stroke();
+                            drawRailPath(true); ctx.stroke();
+                            ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1;
+                            drawRailPath(false); ctx.stroke();
+                            drawRailPath(true); ctx.stroke();
+                        } else {
+                            ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); 
+                            ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); 
+                            DrawEngine2D.drawRails(ctx, l, laneOff, brand);
+                        }
                     } else if (isCurve) {
                         const trueR = Math.max(0.1, Math.abs((p.radius || 0) * s));
                         const isLeft = p.direction === 'left';
@@ -1719,14 +1772,30 @@
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
                         
-                        const steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(4, Math.ceil((p.length / 3.0) * resMult));
+                        let steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(4, Math.ceil((p.length / 3.0) * resMult));
+                        if (p.subtype && p.subtype.includes('chicane')) steps = Math.max(steps, 24);
                         
                         const stepLen = p.length / steps; const totalSweep = (p.type==='curve') ? (p.angle * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * p.radius) * (Math.abs(p.angle) / 360) / steps;
 
                         const isCrossing = p.subtype === 'crossing', isPitEntry = p.type === 'pit_entry', isPitExit = p.type === 'pit_exit', isChicaneEntry = p.subtype === 'chicane_entry', isChicaneExit = p.subtype === 'chicane_exit', pitSide = p.invert ? 'left' : 'right', pitDir = pitSide === 'right' ? 1 : -1;
+                        
+                        const isChicaneMiddle = p.subtype === 'chicane_middle';
+                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
+                        const chicaneDir = p.invert ? -1 : 1;
+
                         let sL1 = l1Off, sL2 = l2Off, tL1 = l1Off, tL2 = l2Off;
-                        if (isCrossing) { tL1 = l2Off; tL2 = l1Off; l1Off = tL1; l2Off = tL2; } else if (isChicaneEntry) { tL1 = sL1 * 0.2; tL2 = sL2 * 0.2; l1Off = tL1; l2Off = tL2; } else if (isChicaneExit) { tL1 = (sL1 > 0 ? 1 : -1) * (laneSpacing / 2); tL2 = (sL2 > 0 ? 1 : -1) * (laneSpacing / 2); l1Off = tL1; l2Off = tL2; }
+                        if (isCrossing) { 
+                            tL1 = l2Off; tL2 = l1Off; l1Off = tL1; l2Off = tL2; 
+                        } else if (isChicaneEntry) { 
+                            tL1 = sL1 * 0.15; tL2 = sL2 * 0.15; l1Off = tL1; l2Off = tL2; 
+                        } else if (isChicaneExit) { 
+                            tL1 = (sL1 > 0 ? 1 : -1) * (laneSpacing / 2); tL2 = (sL2 > 0 ? 1 : -1) * (laneSpacing / 2); l1Off = tL1; l2Off = tL2; 
+                        } else if (isFullChicane) {
+                            l1Off = sL1; l2Off = sL2;
+                        } else if (isChicaneMiddle) {
+                            tL1 = sL1; tL2 = sL2; l1Off = tL1; l2Off = tL2;
+                        }
 
                         const d12 = [], d21 = []; const dStartX = curX, dStartZ = curZ, dStartAngle = curAngle;
                         if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) {
@@ -1743,13 +1812,35 @@
                             } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
                             
                             pathPoints.push(new THREE.Vector3(curX, 0, curZ));
+                            
                             let mixT = (isCrossing || isChicaneEntry || isChicaneExit) ? easeSine(t) : t;
-                            const cL1 = sL1 + (tL1 - sL1) * mixT, cL2 = sL2 + (tL2 - sL2) * mixT;
+                            let cL1 = sL1 + (tL1 - sL1) * mixT, cL2 = sL2 + (tL2 - sL2) * mixT;
+
+                            if (isFullChicane) {
+                                let narrowFactor = 0;
+                                if (t < 0.3) narrowFactor = easeSine(t / 0.3);
+                                else if (t < 0.7) narrowFactor = 1.0;
+                                else narrowFactor = 1.0 - easeSine((t - 0.7) / 0.3);
+                                
+                                const targetL1 = sL1 * 0.15;
+                                const targetL2 = sL2 * 0.15;
+                                cL1 = sL1 + (targetL1 - sL1) * narrowFactor;
+                                cL2 = sL2 + (targetL2 - sL2) * narrowFactor;
+                                
+                                // Desplazamiento lateral para hacer la forma de "S" en el 3D
+                                const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
+                                const sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneSpacing * 0.75);
+                                cL1 += sCurveOffset;
+                                cL2 += sCurveOffset;
+                            }
+
                             let cPit = null, cTWL = stdHalf, cTWR = stdHalf;
+                            
                             if (isPitEntry) { const sp = pitDir * (laneSpacing/2), ep = pitDir * pitCenterDist, e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = stdHalf + (pitOuterEdge-stdHalf)*e; else cTWL = stdHalf + (pitOuterEdge-stdHalf)*e; } 
                             else if (isPitExit) { const sp = pitDir * pitCenterDist, ep = pitDir * (laneSpacing/2), e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = pitOuterEdge - (pitOuterEdge-stdHalf)*e; else cTWL = pitOuterEdge - (pitOuterEdge-stdHalf)*e; } 
                             else if (p.subtype && p.subtype.includes('pit_parallel')) { cPit = pitDir * pitCenterDist; if(pitSide==='right') cTWR = pitOuterEdge; else cTWL = pitOuterEdge; }
                             if (p.subtype === 'single_lane_1') { cTWR = 0; } if (p.subtype === 'single_lane_2') { cTWL = 0; }
+                            
                             addRailPoint(curX, curZ, curAngle, (p.subtype === 'single_lane_2' ? null : cL1), (p.subtype === 'single_lane_1' ? null : cL2), cPit, stepPhysDist);
                             
                             const isNormalCurve = p.type === 'curve';
