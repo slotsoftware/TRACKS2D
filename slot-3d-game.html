@@ -4698,59 +4698,14 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // 1. DESEMPAQUETAR MACROS: El 2D en vivo oculta la chicane dentro de arrays anidados
-            const flattenPieces = (piecesList) => {
-                let flat = [];
-                piecesList.forEach(p => {
-                    if (!p) return;
-                    if (p.pieces && Array.isArray(p.pieces)) flat = flat.concat(flattenPieces(p.pieces));
-                    else if (p.children && Array.isArray(p.children)) flat = flat.concat(flattenPieces(p.children));
-                    else if (p.groupPieces && Array.isArray(p.groupPieces)) flat = flat.concat(flattenPieces(p.groupPieces));
-                    else flat.push(p);
-                });
-                return flat;
-            };
+            // LA ÚNICA Y VERDADERA SOLUCIÓN (IGUAL QUE EN TU 3D.HTML ORIGINAL):
+            // El 2D marca internamente las pistas de la chicane con `isParallel: true` 
+            // para no duplicar distancias en telemetría. Mis filtros anteriores estaban
+            // borrando estas piezas. Aquí NO filtramos nada destructivo, ni aplanamos, 
+            // ni reconstruimos. Lo pasamos crudo al 3D quitando solo los nulos.
+            const cleanPieces = d.pieces.filter(p => p !== null && p !== undefined);
 
-            let flatPieces = flattenPieces(d.pieces);
-            
-            // 2. Limpiar basura 2D
-            flatPieces = flatPieces.filter(p => p && p.type !== 'text' && p.type !== 'label' && p.type !== 'ruler');
-
-            // 3. RECONSTRUCCIÓN PERFECTA DE LA CHICANE EN VIVO (Adiós a la serpiente)
-            let chicaneCounter = 0;
-            flatPieces = flatPieces.map(p => {
-                const isChicane = p.subtype?.includes('chicane') || p.type?.includes('chicane') || p.id?.toLowerCase().includes('pt74') || p.id?.toLowerCase().includes('chicane');
-                
-                if (isChicane) {
-                    let finalSubtype = p.subtype;
-                    let finalLength = p.length || 35; // SCX Recta Standard
-
-                    // Si viene del 2D en vivo y ha perdido el orden, lo reconstruimos matemáticamente
-                    if (!finalSubtype || !finalSubtype.includes('chicane')) {
-                        if (finalLength > 70) {
-                            finalSubtype = 'full_chicane';
-                        } else {
-                            chicaneCounter++;
-                            if (chicaneCounter === 1) finalSubtype = 'chicane_entry';
-                            else if (chicaneCounter === 2) finalSubtype = 'chicane_middle';
-                            else {
-                                finalSubtype = 'chicane_exit';
-                                chicaneCounter = 0; // Reseteamos por si hay otra chicane después
-                            }
-                        }
-                    } else {
-                        chicaneCounter = 0; // Si viene del JSON (perfecto), no tocamos nada
-                    }
-
-                    // Forzamos tipo "straight" para que el motor 3D lo acepte siempre
-                    return { ...p, type: 'straight', subtype: finalSubtype, length: finalLength };
-                } else {
-                    chicaneCounter = 0;
-                }
-                return p;
-            });
-
-            return { ...d, pieces: flatPieces };
+            return { ...d, pieces: cleanPieces };
         };
 
         function Slot3DPlayer() {
