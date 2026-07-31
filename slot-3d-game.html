@@ -684,7 +684,7 @@
             
             const isCurve = p.type === 'curve';
             const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
+            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
 
             if (isStraight) { 
                 dx = p.length || 0; 
@@ -717,7 +717,7 @@
                 let dx = 0, dy = 0, dAngle = 0;
                 const isCurve = p.type === 'curve';
                 const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
+                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
 
                 if (isRotonda) { dAngle = Math.PI; }
                 else if (isStraight) { dx = p.length || 0; }
@@ -763,7 +763,7 @@
                     
                     const isCurve = p.type === 'curve';
                     const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
+                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
 
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
