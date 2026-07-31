@@ -793,7 +793,6 @@
                                     const t = i / steps;
                                     const x = t * l;
                                     let narrowFactor = 0;
-                                    let sCurveOffset = 0;
                                     
                                     if (isChicaneMiddle) {
                                         narrowFactor = 1.0;
@@ -801,10 +800,6 @@
                                         if (t < 0.3) narrowFactor = (1 - Math.cos((t / 0.3) * Math.PI)) / 2;
                                         else if (t < 0.7) narrowFactor = 1.0;
                                         else narrowFactor = 1.0 - (1 - Math.cos(((t - 0.7) / 0.3) * Math.PI)) / 2;
-                                        
-                                        // Desplazamiento lateral para hacer la forma de "S"
-                                        const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
-                                        sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneOff * 1.5);
                                     } else if (isChicaneEntry) {
                                         narrowFactor = (1 - Math.cos(t * Math.PI)) / 2;
                                     } else if (isChicaneExit) {
@@ -815,8 +810,8 @@
                                     const targetOff = baseOff * 0.15;
                                     const currentOff = baseOff + (targetOff - baseOff) * narrowFactor;
                                     
-                                    if (i === 0) ctx.moveTo(x, currentOff + sCurveOffset);
-                                    else ctx.lineTo(x, currentOff + sCurveOffset);
+                                    if (i === 0) ctx.moveTo(x, currentOff);
+                                    else ctx.lineTo(x, currentOff);
                                 }
                             };
 
@@ -1848,12 +1843,6 @@
                                 const targetL2 = sL2 * 0.15;
                                 cL1 = sL1 + (targetL1 - sL1) * narrowFactor;
                                 cL2 = sL2 + (targetL2 - sL2) * narrowFactor;
-                                
-                                // Desplazamiento lateral para hacer la forma de "S" en el 3D
-                                const envelope = (1 - Math.cos(t * Math.PI * 2)) / 2;
-                                const sCurveOffset = chicaneDir * Math.sin(t * Math.PI * 2) * envelope * (laneSpacing * 0.75);
-                                cL1 += sCurveOffset;
-                                cL2 += sCurveOffset;
                             }
 
                             let cPit = null, cTWL = stdHalf, cTWR = stdHalf;
@@ -4715,11 +4704,8 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // LA ÚNICA VERDAD: En el 2D, la Gran Chicane utiliza propiedades isParallel y group="parallel".
-            // Al quitar el filtro que las borraba por error, la pista llegará intacta al motor 3D.
             const cleanPieces = d.pieces.filter(p => {
                 if (!p) return false;
-                // SOLO borramos basura visual (textos, reglas, flechas)
                 if (['text', 'label', 'ruler', 'arrow'].includes(p.type)) return false;
                 return true;
             });
