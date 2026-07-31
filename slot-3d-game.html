@@ -684,10 +684,16 @@
             
             const isCurve = p.type === 'curve';
             const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
+            
+            // DETECCIÓN INFALIBLE DE CHICANE (JSON o En Vivo)
+            const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+            const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
 
             if (isStraight) { 
                 dx = p.length || 0; 
+                if (dx === 0 && isChicanePiece) {
+                    dx = (p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105;
+                }
             } else if (isCurve) {
                 const r = Math.abs(p.radius || 0);
                 const aRad = ((p.angle || 0) * Math.PI) / 180;
@@ -712,16 +718,21 @@
                 if (p.type === 'set_origin') { cx = circuitOrigin.x + (p.x || 0); cy = circuitOrigin.y + (p.y || 0); currentAngle = p.angle || 0; endPos[p.uid] = { cx, cy, currentAngle }; return { ...p, x: cx, y: cy, rot: currentAngle }; }
                 if (p.type === 'goto') { if (endPos[p.targetUid]) { cx = endPos[p.targetUid].cx; cy = endPos[p.targetUid].cy; currentAngle = endPos[p.targetUid].currentAngle; } endPos[p.uid] = { cx, cy, currentAngle }; return { ...p, x: cx, y: cy, rot: currentAngle }; }
                 
-                // Forzamos el recálculo siempre para que coincida exactamente con el 3D y evite NaNs
                 let pX = cx, pY = cy, pRot = currentAngle;
                 
                 let dx = 0, dy = 0, dAngle = 0;
                 const isCurve = p.type === 'curve';
                 const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')));
+                const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+                const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
 
                 if (isRotonda) { dAngle = Math.PI; }
-                else if (isStraight) { dx = p.length || 0; }
+                else if (isStraight) { 
+                    dx = p.length || 0; 
+                    if (dx === 0 && isChicanePiece) {
+                        dx = (p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105;
+                    }
+                }
                 else if (isCurve) { 
                     const r = Math.abs(p.radius || 0); 
                     const aRad = ((p.angle || 0) * Math.PI) / 180; 
@@ -764,15 +775,18 @@
                     
                     const isCurve = p.type === 'curve';
                     const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda';
-                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || (p.subtype && p.subtype.includes('chicane')));
+                    const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+                    const isStraight = !isCurve && !isRotonda && (p.type === 'straight' || p.length > 0 || (p.type && p.type.includes('pit')) || isChicanePiece);
 
                     ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
                     if (isStraight) {
-                        const l = (p.length || (p.subtype && p.subtype.includes('chicane') ? 35 : 0)) * s;
-                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
-                        const isChicaneMiddle = p.subtype === 'chicane_middle';
+                        const l = (p.length || (isChicanePiece ? ((p.subtype && p.subtype !== 'full_chicane' && p.subtype !== 'chicane') ? 35 : 105) : 0)) * s;
+                        
                         const isChicaneEntry = p.subtype === 'chicane_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle';
+                        const isFullChicane = isChicanePiece && !isChicaneEntry && !isChicaneExit && !isChicaneMiddle;
+                        const chicaneDir = p.invert ? -1 : 1;
                         
                         if (isFullChicane || isChicaneMiddle || isChicaneEntry || isChicaneExit) {
                             // ASFALTO RECTO (Sin curvas ni estrechamientos de la pieza plástica)
@@ -1773,23 +1787,26 @@
 
                         const startDist = accumulatedDist; const startVertexIdx = rails.lane1.length - 1;
                         
+                        const isChicanePiece = (p.type && p.type.includes('chicane')) || (p.subtype && p.subtype.includes('chicane')) || (p.id && p.id.includes('pt74'));
+                        const isChicaneEntry = p.subtype === 'chicane_entry';
+                        const isChicaneExit = p.subtype === 'chicane_exit';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle';
+                        const isFullChicane = isChicanePiece && !isChicaneEntry && !isChicaneExit && !isChicaneMiddle;
+                        const chicaneDir = p.invert ? -1 : 1;
+
                         let pieceLen = p.length || 0;
-                        if (pieceLen === 0 && p.subtype && p.subtype.includes('chicane')) {
-                            pieceLen = p.subtype === 'full_chicane' ? 105 : 35;
+                        if (pieceLen === 0 && isChicanePiece) {
+                            pieceLen = isFullChicane ? 105 : 35;
                         }
 
                         let steps = (p.type === 'curve') ? Math.max(6, Math.ceil(Math.abs(p.angle || 0) * 1.5 * resMult)) : Math.max(4, Math.ceil((Math.abs(pieceLen) / 3.0) * resMult));
-                        if (p.subtype && p.subtype.includes('chicane')) steps = Math.max(steps, 24);
+                        if (isChicanePiece) steps = Math.max(steps, 24);
                         
                         const stepLen = pieceLen / steps; const totalSweep = (p.type==='curve') ? ((p.angle || 0) * Math.PI / 180) * (p.direction==='left'?-1:1) : 0; const stepAngle = totalSweep / steps;
                         let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * (p.radius || 0)) * (Math.abs(p.angle || 0) / 360) / steps;
 
-                        const isCrossing = p.subtype === 'crossing', isPitEntry = p.type === 'pit_entry', isPitExit = p.type === 'pit_exit', isChicaneEntry = p.subtype === 'chicane_entry', isChicaneExit = p.subtype === 'chicane_exit', pitSide = p.invert ? 'left' : 'right', pitDir = pitSide === 'right' ? 1 : -1;
+                        const isCrossing = p.subtype === 'crossing', isPitEntry = p.type === 'pit_entry', isPitExit = p.type === 'pit_exit', pitSide = p.invert ? 'left' : 'right', pitDir = pitSide === 'right' ? 1 : -1;
                         
-                        const isChicaneMiddle = p.subtype === 'chicane_middle';
-                        const isFullChicane = p.subtype === 'full_chicane' || p.subtype === 'chicane';
-                        const chicaneDir = p.invert ? -1 : 1;
-
                         let sL1 = l1Off, sL2 = l2Off, tL1 = l1Off, tL2 = l2Off;
                         if (isCrossing) { 
                             tL1 = l2Off; tL2 = l1Off; l1Off = tL1; l2Off = tL2; 
@@ -4698,30 +4715,12 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // EL SECRETO ESTÁ AQUÍ: El diseñador 2D agrupa las macros (como la Gran Chicane PT74)
-            // en la memoria viva (localStorage). Cuando descargas el JSON, el 2D las aplana automáticamente.
-            // Para que el 3D lo dibuje igual desde el 2D, extraemos y aplanamos las sub-piezas nosotros mismos.
-            const flattenPieces = (piecesList) => {
-                let flat = [];
-                piecesList.forEach(p => {
-                    if (!p) return;
-                    if (p.pieces && Array.isArray(p.pieces)) {
-                        flat = flat.concat(flattenPieces(p.pieces));
-                    } else if (p.children && Array.isArray(p.children)) {
-                        flat = flat.concat(flattenPieces(p.children));
-                    } else if (p.groupPieces && Array.isArray(p.groupPieces)) {
-                        flat = flat.concat(flattenPieces(p.groupPieces));
-                    } else {
-                        if (!['text', 'label', 'ruler', 'arrow'].includes(p.type)) {
-                            flat.push(p);
-                        }
-                    }
-                });
-                return flat;
-            };
-
-            const flatPieces = flattenPieces(d.pieces);
-            return { ...d, pieces: flatPieces };
+            // EXACTAMENTE COMO EL 3D.HTML ORIGINAL
+            // Las chicanes (como la PT74) usan internamente pistas superpuestas marcadas 
+            // como isParallel o group='parallel'. No las aplanamos ni las filtramos.
+            const cleanPieces = d.pieces.filter(p => p !== null && p !== undefined && p.type !== 'text' && p.type !== 'label');
+            
+            return { ...d, pieces: cleanPieces };
         };
 
         function Slot3DPlayer() {
