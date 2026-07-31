@@ -4768,11 +4768,21 @@
                       try {
                           const d = JSON.parse(e.newValue);
                           if (d.brand && d.pieces) {
-                              const parsed = parseCircuitData(d);
-                              setCircuitData(parsed);
-                              localStorage.setItem('slot_last_circuit', e.newValue);
-                              localStorage.removeItem('slot_circuit_transfer');
-                              setHasSavedCircuit(true);
+                              const validation = validateCircuit(d);
+                              if (validation.valid) {
+                                  const parsed = parseCircuitData(d);
+                                  setCircuitData(parsed);
+                                  localStorage.setItem('slot_last_circuit', e.newValue);
+                                  localStorage.removeItem('slot_circuit_transfer');
+                                  setHasSavedCircuit(true);
+                              } else {
+                                  const currentLang = localStorage.getItem('slot_lang') || 'es';
+                                  const localT = TRANSLATIONS[currentLang] || TRANSLATIONS.es;
+                                  const msg = validation.error === 'unsupportedCircuit' ? localT.unsupportedCircuit : ('⚠️ ' + (localT[validation.error] || localT.invalidFormat));
+                                  setToastMsg(msg);
+                                  setTimeout(() => setToastMsg(''), 6000);
+                                  localStorage.removeItem('slot_circuit_transfer');
+                              }
                           }
                       } catch(err) { console.warn("Error auto-loading circuit transfer:", err); }
                   }
@@ -4984,16 +4994,9 @@
           }, [showCommunityModal, user]);
 
           const loadCommunityCircuit = (circuit) => {
-              if (circuit && circuit.pieces) {
-                  if (!validateCircuit(circuit)) return;
-                  const parsed = parseCircuitData(circuit);
-                  setCircuitData(parsed);
-                  try { localStorage.setItem('slot_last_circuit', JSON.stringify(parsed)); } catch(e){}
+              if (attemptLoadCircuit(circuit, true)) {
                   setShowCommunityModal(false);
                   setToastMsg(lang === 'es' ? 'Circuito cargado correctamente' : 'Track loaded successfully');
-                  setTimeout(() => setToastMsg(''), 3000);
-              } else {
-                  setToastMsg(lang === 'es' ? 'Error: Circuito sin datos válidos.' : 'Error: Invalid track data.');
                   setTimeout(() => setToastMsg(''), 3000);
               }
           };
@@ -5019,9 +5022,34 @@
           const [toastMsg, setToastMsg] = useState('');
 
           const validateCircuit = (d) => {
-              if (!d || !d.pieces) return false;
-              // Eliminado el bloqueo estricto que impedía transferir desde el 2D.
-              // parseCircuitData ya se encarga de limpiar pistas incompatibles.
+              if (!d || !d.pieces) return { valid: false, error: 'invalidFormat' };
+              
+              // Bloqueo de Rotondas o más de 2 carriles
+              const hasRotonda = d.pieces.some(p => p && (p.subtype === 'rotonda' || (p.name && p.name.toLowerCase().includes('rotonda'))));
+              // Detecta 'hasMultiLane' global o piezas agrupadas en vías adicionales (lane > 0)
+              const isMultiLane = d.hasMultiLane === true || d.lanes > 2 || d.laneCount > 2 || d.pieces.some(p => p && (p.lanes > 2 || p.laneCount > 2 || p.lane > 0));
+              
+              if (hasRotonda || isMultiLane) {
+                  return { valid: false, error: 'unsupportedCircuit' };
+              }
+              
+              return { valid: true };
+          };
+
+          const attemptLoadCircuit = (d, saveToLocal = true) => {
+              const validation = validateCircuit(d);
+              if (!validation.valid) {
+                  const msg = validation.error === 'unsupportedCircuit' ? t.unsupportedCircuit : ('⚠️ ' + (t[validation.error] || t.invalidFormat));
+                  setToastMsg(msg);
+                  setTimeout(() => setToastMsg(''), 6000);
+                  return false;
+              }
+              const parsed = parseCircuitData(d);
+              setCircuitData(parsed);
+              if (saveToLocal) {
+                  try { localStorage.setItem('slot_last_circuit', JSON.stringify(parsed)); } catch(e){}
+                  setHasSavedCircuit(true);
+              }
               return true;
           };
 
@@ -5415,7 +5443,7 @@
                           const saved = localStorage.getItem('slot_last_circuit');
                           if(saved) {
                               const d = JSON.parse(saved);
-                              if (validateCircuit(d)) circuitToSend = parseCircuitData(d);
+                              if (validateCircuit(d).valid) circuitToSend = parseCircuitData(d);
                           }
                       } catch(e) {}
                       if (!circuitToSend || !circuitToSend.pieces) {
@@ -5444,13 +5472,7 @@
                       setSession(prev => ({...prev, rivalName: data.playerName}));
                       if (data.carUrl) setCustomCarAssets(prev => ({ ...prev, 2: { ...prev[2], glb: data.carUrl, isDecor: false } }));
                       if (data.circuit) {
-                          if (!validateCircuit(data.circuit)) return;
-                          const parsed = parseCircuitData(data.circuit);
-                          setCircuitData(parsed); 
-                          try { 
-                              localStorage.setItem('slot_last_circuit', JSON.stringify(parsed)); 
-                              setHasSavedCircuit(true); 
-                          } catch(e) {}
+                          attemptLoadCircuit(data.circuit, true);
                       }
                   } else {
                       // Tráfico de Telemetría en carrera (Velocidad, vía, gasolina...)
@@ -5479,7 +5501,15 @@
                       try { 
                           const d = JSON.parse(dataStr); 
                           if (d.brand && d.pieces) { 
-                              if (!validateCircuit(d)) return false;
+                              const validation = validateCircuit(d);
+                              if (!validation.valid) {
+                                  const currentLang = localStorage.getItem('slot_lang') || 'es';
+                                  const localT = TRANSLATIONS[currentLang] || TRANSLATIONS.es;
+                                  const msg = validation.error === 'unsupportedCircuit' ? localT.unsupportedCircuit : ('⚠️ ' + (localT[validation.error] || localT.invalidFormat));
+                                  setToastMsg(msg);
+                                  setTimeout(() => setToastMsg(''), 6000);
+                                  return false;
+                              }
                               setCircuitData(parseCircuitData(d)); 
                               return true; 
                           } 
@@ -5497,6 +5527,7 @@
                   setHasSavedCircuit(!!localStorage.getItem('slot_last_circuit'));
               } catch(e) {}
               if (ls) { ls.style.opacity = '0'; setTimeout(() => ls.style.display = 'none', 1000); } 
+          // eslint-disable-next-line react-hooks/exhaustive-deps
           }, []);
 
           const loadLastCircuit = () => {
@@ -5505,11 +5536,10 @@
                   if (saved) {
                       const d = JSON.parse(saved);
                       if (d.brand && d.pieces) {
-                          if (!validateCircuit(d)) {
+                          if (!attemptLoadCircuit(d, false)) {
                               localStorage.removeItem('slot_last_circuit');
-                              return;
+                              setHasSavedCircuit(false);
                           }
-                          setCircuitData(parseCircuitData(d));
                       }
                   }
               } catch(e){}
@@ -5521,10 +5551,7 @@
                 try { 
                     const d = JSON.parse(ev.target.result); 
                     if (d.brand && d.pieces) { 
-                        if (!validateCircuit(d)) return;
-                        const parsed = parseCircuitData(d);
-                        setCircuitData(parsed); 
-                        localStorage.setItem('slot_last_circuit', JSON.stringify(parsed)); 
+                        attemptLoadCircuit(d, true);
                     } else { 
                         setToastMsg('⚠️ ' + t.invalidFormat);
                         setTimeout(() => setToastMsg(''), 5000);
