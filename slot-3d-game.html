@@ -4693,34 +4693,12 @@
         const parseCircuitData = (d) => {
             if (!d || !d.pieces) return null;
             
-            // 1. Filtrado muy permisivo: quitamos pistas paralelas explícitas y textos.
-            // NO quitamos 'obstacle' ni 'decor' porque la Gran Chicane puede estar agrupada con ellos en vivo.
-            let masterPieces = d.pieces.filter(p => 
-                p &&
-                !p.isParallel && 
-                !p.isOuter && 
-                p.lane !== 2 && 
-                p.lane !== 3 && 
-                p.lane !== 4 &&
-                p.lane !== 'outer' &&
-                p.group !== 'parallel' &&
-                !['text', 'label', 'ruler', 'arrow'].includes(p.type)
+            // IGUAL QUE EN 3D.HTML: No destruimos NADA del circuito.
+            // Solo filtramos nulos (para evitar crasheos) y elementos 2D (textos, flechas).
+            // Esto garantiza que la Gran Chicane PT74 y sus piezas internas lleguen intactas al 3D en vivo.
+            const cleanPieces = d.pieces.filter(p => 
+                p && !['text', 'label', 'ruler', 'arrow'].includes(p.type)
             );
-
-            // 2. Conservar TODOS los gotos para no romper las coordenadas de la chicane en vivo.
-            const cleanPieces = [];
-            let originCount = 0;
-            
-            for (let i = 0; i < masterPieces.length; i++) {
-                const p = masterPieces[i];
-                if (p.type === 'set_origin') {
-                    originCount++;
-                    if (originCount > 1) break; // Si hay otro origen, cortamos (evita circuitos dobles de 4 carriles)
-                    cleanPieces.push(p);
-                } else {
-                    cleanPieces.push(p); // Aceptamos gotos y el resto de piezas con normalidad
-                }
-            }
 
             return { ...d, pieces: cleanPieces };
         };
