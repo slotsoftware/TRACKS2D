@@ -856,14 +856,14 @@
                             );
                         })}
                         {Array.from({length: maxLap}).map((_, i) => (
-                            <text key={i} x={getX(i)} y={height - padding + 15} textAnchor="middle" className="text-[10px] fill-gray-400 font-mono">V{i+1}</text>
+                            <text key={`lx-${i}`} x={getX(i)} y={height - padding + 15} textAnchor="middle" className="text-[10px] fill-gray-500 font-mono">L{i+1}</text>
                         ))}
                     </svg>
                 </div>
             );
         });
 
-        const DrivingStyleSelector = memo(({ profile, setProfile, showDunlop, setShowDunlop }) => {
+        const DrivingStyleSelector = memo(({ profile, setProfile, showDunlop, setShowDunlop, showFences, setShowFences }) => {
             const { t } = useTranslation();
             const styles = [
                 { id: 1, label: 'ECO', color: 'bg-blue-400', shadow: 'shadow-[0_0_10px_rgba(96,165,250,0.4)]' },
@@ -890,11 +890,18 @@
                             })}
                         </div>
                     </div>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); setShowDunlop(!showDunlop); }}
-                        className={`px-3 py-1 rounded text-[7px] font-black tracking-widest uppercase shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all border ${showDunlop ? 'bg-[#39ff14] text-black border-[#39ff14]' : 'bg-black/80 text-gray-400 border-gray-700 hover:bg-gray-800 hover:text-white hover:border-[#39ff14]'}`}>
-                        PUENTE DUNLOP {showDunlop ? 'ON' : 'OFF'}
-                    </button>
+                    <div className="flex gap-1">
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setShowDunlop(!showDunlop); }}
+                            className={`px-2 py-1 rounded text-[7px] font-black tracking-widest uppercase shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all border ${showDunlop ? 'bg-[#39ff14] text-black border-[#39ff14]' : 'bg-black/80 text-gray-400 border-gray-700 hover:bg-gray-800 hover:text-white hover:border-[#39ff14]'}`}>
+                            DUNLOP {showDunlop ? 'ON' : 'OFF'}
+                        </button>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setShowFences(!showFences); }}
+                            className={`px-2 py-1 rounded text-[7px] font-black tracking-widest uppercase shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all border ${showFences ? 'bg-[#39ff14] text-black border-[#39ff14]' : 'bg-black/80 text-gray-400 border-gray-700 hover:bg-gray-800 hover:text-white hover:border-[#39ff14]'}`}>
+                            VALLAS {showFences ? 'ON' : 'OFF'}
+                        </button>
+                    </div>
                 </div>
             );
         });
@@ -978,7 +985,7 @@
             );
         });
 
-        const AnalogDashboard = memo(({ telemetry, carSetups, raceState, activeLights, elapsedTime, targetLaps, aiLevel, setAiLevel, throttleProfile, setThrottleProfile, showTrees, setShowTrees, showGarage, setShowGarage, cameraMode, setCameraMode, isRally, showDunlop, setShowDunlop }) => {
+        const AnalogDashboard = memo(({ telemetry, carSetups, raceState, activeLights, elapsedTime, targetLaps, aiLevel, setAiLevel, throttleProfile, setThrottleProfile, showTrees, setShowTrees, showGarage, setShowGarage, cameraMode, setCameraMode, isRally, showDunlop, setShowDunlop, showFences, setShowFences }) => {
             const { t } = useTranslation();
             const isPractice = raceState === 'idle';
             const formatTime = (ms) => { if (!ms || ms === Infinity) return "00:00.000"; const m = Math.floor(ms / 60000); const s = Math.floor((ms % 60000) / 1000); const sms = Math.floor(ms % 1000); return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${sms.toString().padStart(3,'0')}`; };
@@ -1113,7 +1120,7 @@
                     
                     <div className="flex-1 flex flex-col items-center mx-2 -mt-4 pointer-events-auto">
                         <div className="flex gap-4 items-end mb-1">
-                            <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} />
+                            <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} showFences={showFences} setShowFences={setShowFences} />
                             <AiLevelSelector aiLevel={aiLevel} setAiLevel={setAiLevel} />
                             <TreeToggle showTrees={showTrees} setShowTrees={setShowTrees} />
                             <GarageToggle showGarage={showGarage} setShowGarage={setShowGarage} />
@@ -1154,7 +1161,7 @@
             );
         });
 
-        const DigitalDashboard = memo(({ telemetry, carSetups, raceState, activeLights, elapsedTime, targetLaps, aiLevel, setAiLevel, throttleProfile, setThrottleProfile, showTrees, setShowTrees, numCars, showGarage, setShowGarage, cameraMode, setCameraMode, showDunlop, setShowDunlop }) => {
+        const DigitalDashboard = memo(({ telemetry, carSetups, raceState, activeLights, elapsedTime, targetLaps, aiLevel, setAiLevel, throttleProfile, setThrottleProfile, showTrees, setShowTrees, numCars, showGarage, setShowGarage, cameraMode, setCameraMode, showDunlop, setShowDunlop, showFences, setShowFences }) => {
             const { t } = useTranslation();
             const isPractice = raceState === 'idle';
             const formatTime = (ms) => { if (!ms || ms === Infinity) return "00:00.000"; const m = Math.floor(ms / 60000); const s = Math.floor((ms % 60000) / 1000); const sms = Math.floor(ms % 1000); return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${sms.toString().padStart(3,'0')}`; };
@@ -1253,7 +1260,7 @@
                     {/* CENTRO: SEMÁFORO Y CONTROLES */}
                     <div className="flex-1 flex flex-col items-center mx-2 -mt-4 pointer-events-auto">
                         <div className="flex gap-4 items-end mb-1">
-                            <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} />
+                            <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} showFences={showFences} setShowFences={setShowFences} />
                             <AiLevelSelector aiLevel={aiLevel} setAiLevel={setAiLevel} />
                             <TreeToggle showTrees={showTrees} setShowTrees={setShowTrees} />
                             <GarageToggle showGarage={showGarage} setShowGarage={setShowGarage} />
@@ -1341,6 +1348,7 @@
         const MotorShowcase = memo(({ selectedCarId, currentConfig, onUpdate }) => {
             if (!currentConfig) return null;
             const { t } = useTranslation();
+            const [isExpanded, setIsExpanded] = useState(false);
             const defaultMotors = {
                 "SLOT.IT (V12/BOXER)": [{ label: "V12/4", rpm: "23.000", torque: "170", type: "Short Can", color: "#fca5a5", name: "V12/4 23k" },{ label: "BOXER 2", rpm: "21.500", torque: "340", type: "Long Can", color: "#fdba74", name: "Boxer 21.5k" },{ label: "FLAT-6", rpm: "20.500", torque: "200", type: "Flat", color: "#fde047", name: "Flat-6 20.5k" }],
                 "NSR (KING/SHARK)": [{ label: "KING 21", rpm: "21.400", torque: "350", type: "Long Can", color: "#bef264", name: "King 21 Evo" },{ label: "SHARK 25", rpm: "25.000", torque: "176", type: "Short Can", color: "#67e8f9", name: "Shark 25k" },{ label: "BABY K", rpm: "17.000", torque: "245", type: "Long Can", color: "#d8b4fe", name: "Baby King" }],
@@ -1356,7 +1364,8 @@
             const [isAdding, setIsAdding] = useState(false);
             const [newForm, setNewForm] = useState({ name: 'Custom M', rpm: 25000, torque: 250, type: 'Long Can' });
 
-            const handleAdd = () => {
+            const handleAdd = (e) => {
+                if(e) e.stopPropagation();
                 const updated = { ...motors };
                 if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
                 
@@ -1375,7 +1384,8 @@
                 setIsAdding(false);
             };
 
-            const handleDelete = (idx) => {
+            const handleDelete = (e, idx) => {
+                if(e) e.stopPropagation();
                 const updated = { ...motors };
                 updated["CUSTOM (USER)"].splice(idx, 1);
                 if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
@@ -1383,20 +1393,65 @@
                 localStorage.setItem('slot_custom_motors', JSON.stringify(updated["CUSTOM (USER)"] || []));
             };
 
-            return (
-                <div className="w-64 h-[21rem] flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] group relative">
-                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14]"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14]"></div>
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-[21rem]' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                >
+                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14] pointer-events-none"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14] pointer-events-none"></div>
                     
                     <div className="p-2 border-b border-[#39ff14]/20 bg-[#39ff14]/5 flex justify-between items-center shrink-0 relative z-10">
                         <div className="flex items-center gap-2"> <Zap className="text-[#39ff14]" size={14} /> <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase">{t('motorPower')}</h2> </div>
                         <div className="flex items-center gap-2">
-                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Motor Personalizado"><Plus size={10}/> NUEVO</button>
+                            <button onClick={(e)=>{e.stopPropagation(); setIsAdding(true);}} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Motor Personalizado"><Plus size={10}/> NUEVO</button>
                             <div className="flex items-center gap-1"><div className="w-1 h-1 rounded-full bg-[#39ff14] animate-pulse"></div><span className="text-[8px] text-[#39ff14]/70 font-mono">C{selectedCarId}</span></div>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
 
+                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10" onWheel={(e)=>e.stopPropagation()} onTouchMove={(e)=>e.stopPropagation()}>
+                        {Object.entries(motors).map(([brand, list]) => (
+                            <div key={brand}>
+                                <div className="flex items-center gap-2 mb-1.5 pl-1"><div className="h-px w-2 bg-[#39ff14]/50"></div><h3 className="text-[9px] font-bold text-[#39ff14] uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-[#39ff14]/30 to-transparent"></div></div>
+                                <div className="space-y-1">{list.map((motor, idx) => { 
+                                    const isSelected = currentConfig.motorName === motor.name || currentConfig.motorName === motor.label; 
+                                    return (
+                                        <div key={idx} onClick={(e) => { e.stopPropagation(); onUpdate('motor', motor); setIsExpanded(false); }} className={`rounded-sm p-1.5 flex gap-2 transition-all group/item items-center cursor-pointer border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'bg-black/40 border-[#39ff14]/10 hover:bg-[#39ff14]/10 hover:border-[#39ff14]/40'}`}>
+                                            <div className="w-10 h-6 shrink-0"><MotorSVG type={motor.type} color={motor.color} label={motor.label} /></div>
+                                            <div className="flex-1 min-w-0 pl-1">
+                                                <div className="flex justify-between items-baseline"><h4 className={`font-bold text-[9px] truncate transition-colors pr-4 ${isSelected ? 'text-white' : 'text-gray-300 group-hover/item:text-white'}`}>{motor.name || motor.label}</h4></div>
+                                                <div className="flex justify-between text-[7px] text-gray-500 mt-0.5"><span className="text-[#39ff14]">{motor.rpm} rpm</span><span>{motor.torque} g/cm</span></div>
+                                            </div>
+                                            {brand === 'CUSTOM (USER)' && (
+                                                <button onClick={(e) => handleDelete(e, idx)} className="absolute top-1 right-1 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-0.5 transition-all"><X size={10}/></button>
+                                            )}
+                                        </div>
+                                    ); 
+                                })}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="w-64 h-[21rem] relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
+                    </div>
+
                     {isAdding && ReactDOM.createPortal(
-                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
+                        <div className="fixed inset-0 z-[10005] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={(e) => { e.stopPropagation(); setIsAdding(false); }}>
                             <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
                                 <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVO MOTOR</h3>
                                 <div className="space-y-4">
@@ -1406,36 +1461,13 @@
                                     <div><label className="text-xs text-gray-400 font-bold tracking-wider">TIPO</label><select value={newForm.type} onChange={e=>setNewForm({...newForm, type: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1"><option>Long Can</option><option>Short Can</option><option>Flat</option></select></div>
                                 </div>
                                 <div className="flex gap-3 mt-6 pt-4 border-t border-gray-800">
-                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
-                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                    <button onClick={(e) => { e.stopPropagation(); setIsAdding(false); }} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={(e) => handleAdd(e)} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
                                 </div>
                             </div>
                         </div>,
                         document.body
                     )}
-
-                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10">
-                        {Object.entries(motors).map(([brand, list]) => (
-                            <div key={brand}>
-                                <div className="flex items-center gap-2 mb-1.5 pl-1"><div className="h-px w-2 bg-[#39ff14]/50"></div><h3 className="text-[9px] font-bold text-[#39ff14] uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-[#39ff14]/30 to-transparent"></div></div>
-                                <div className="space-y-1">{list.map((motor, idx) => { 
-                                    const isSelected = currentConfig.motorName === motor.name || currentConfig.motorName === motor.label; 
-                                    return (
-                                        <div key={idx} onClick={() => onUpdate('motor', motor)} className={`rounded-sm p-1.5 flex gap-2 transition-all group/item items-center cursor-pointer border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'bg-black/40 border-[#39ff14]/10 hover:bg-[#39ff14]/10 hover:border-[#39ff14]/40'}`}>
-                                            <div className="w-10 h-6 shrink-0"><MotorSVG type={motor.type} color={motor.color} label={motor.label} /></div>
-                                            <div className="flex-1 min-w-0 pl-1">
-                                                <div className="flex justify-between items-baseline"><h4 className={`font-bold text-[9px] truncate transition-colors pr-4 ${isSelected ? 'text-white' : 'text-gray-300 group-hover/item:text-white'}`}>{motor.name || motor.label}</h4></div>
-                                                <div className="flex justify-between text-[7px] text-gray-500 mt-0.5"><span className="text-[#39ff14]">{motor.rpm} rpm</span><span>{motor.torque} g/cm</span></div>
-                                            </div>
-                                            {brand === 'CUSTOM (USER)' && (
-                                                <button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute top-1 right-1 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-0.5 transition-all"><X size={10}/></button>
-                                            )}
-                                        </div>
-                                    ); 
-                                })}</div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             ); 
         });
@@ -1443,6 +1475,7 @@
         const TireShowcase = memo(({ selectedCarId, currentConfig, onUpdate }) => {
             if (!currentConfig) return null;
             const { t } = useTranslation();
+            const [isExpanded, setIsExpanded] = useState(false);
             const defaultTires = {
                 "SCALEAUTO (1/32)": [{ name: "Spirits", type: "Slick", compound: "Blando", grip: 95, color: "#cbd5e1", text: "#fff", label: "SPIRITS" },{ name: "AS-25", type: "Slick", compound: "Duro", grip: 40, color: "#94a3b8", text: "#94a3b8", label: "AS-25" },{ name: "Zero Grip", type: "Slick", compound: "Delantero", grip: 5, color: "#475569", text: "#475569", label: "ZERO" }],
                 "SLOT.IT (P6/F22)": [{ name: "P6", type: "Slick", compound: "Medio", grip: 70, color: "#fdba74", text: "#f97316", label: "P6" },{ name: "F22", type: "Slick", compound: "Blando", grip: 85, color: "#86efac", text: "#22c55e", label: "F22" },{ name: "N18", type: "Slick", compound: "Duro", grip: 50, color: "#fca5a5", text: "#ef4444", label: "N18" },{ name: "G25", type: "Slick", compound: "Ex-Blando", grip: 90, color: "#fde047", text: "#eab308", label: "G25" }],
@@ -1457,7 +1490,8 @@
             const [isAdding, setIsAdding] = useState(false);
             const [newForm, setNewForm] = useState({ name: 'Custom Grip', grip: 85, type: 'Slick' });
 
-            const handleAdd = () => {
+            const handleAdd = (e) => {
+                if(e) e.stopPropagation();
                 const updated = { ...tires };
                 if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
                 
@@ -1476,7 +1510,8 @@
                 setIsAdding(false);
             };
 
-            const handleDelete = (idx) => {
+            const handleDelete = (e, idx) => {
+                if(e) e.stopPropagation();
                 const updated = { ...tires };
                 updated["CUSTOM (USER)"].splice(idx, 1);
                 if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
@@ -1484,44 +1519,32 @@
                 localStorage.setItem('slot_custom_tires', JSON.stringify(updated["CUSTOM (USER)"] || []));
             };
 
-            return (
-                <div className="w-64 h-[21rem] flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] group relative">
-                    <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#39ff14]"></div><div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#39ff14]"></div><div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#39ff14]"></div><div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#39ff14]"></div><div className="absolute inset-0 opacity-5 pointer-events-none" style={{backgroundImage: 'linear-gradient(#39ff14 1px, transparent 1px), linear-gradient(90deg, #39ff14 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-[21rem]' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#39ff14] pointer-events-none"></div><div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#39ff14] pointer-events-none"></div><div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#39ff14] pointer-events-none"></div><div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#39ff14] pointer-events-none"></div><div className="absolute inset-0 opacity-5 pointer-events-none" style={{backgroundImage: 'linear-gradient(#39ff14 1px, transparent 1px), linear-gradient(90deg, #39ff14 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
                     
                     <div className="p-2 border-b border-[#39ff14]/20 bg-[#39ff14]/5 flex justify-between items-center shrink-0 relative z-10">
                         <div className="flex items-center gap-2"> <RotateCw className="text-[#39ff14]" size={14} /> <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase drop-shadow-[0_0_5px_rgba(57,255,20,0.8)]">{t('compounds')}</h2> </div>
                         <div className="flex items-center gap-2">
-                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Neumático Personalizado"><Plus size={10}/> NUEVO</button>
+                            <button onClick={(e)=>{e.stopPropagation(); setIsAdding(true);}} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Neumático Personalizado"><Plus size={10}/> NUEVO</button>
                             <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-[#39ff14] animate-pulse"></div><span className="text-[8px] text-[#39ff14]/70 font-mono">C{selectedCarId}</span></div>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
 
-                    {isAdding && ReactDOM.createPortal(
-                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
-                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
-                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVO NEUMÁTICO</h3>
-                                <div className="space-y-4">
-                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">NOMBRE</label><input type="text" maxLength="15" value={newForm.name} onChange={e=>setNewForm({...newForm, name: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1" /></div>
-                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">GRIP (0-100%)</label><input type="number" min="0" max="100" value={newForm.grip} onChange={e=>setNewForm({...newForm, grip: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1" /></div>
-                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">TIPO</label><select value={newForm.type} onChange={e=>setNewForm({...newForm, type: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1"><option>Slick</option><option>Rain</option></select></div>
-                                </div>
-                                <div className="flex gap-3 mt-6 pt-4 border-t border-gray-800">
-                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
-                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
-                                </div>
-                            </div>
-                        </div>,
-                        document.body
-                    )}
-
-                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10">
+                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10" onWheel={(e)=>e.stopPropagation()} onTouchMove={(e)=>e.stopPropagation()}>
                         {Object.entries(tires).map(([brand, list]) => (
                             <div key={brand}>
                                 <div className="flex items-center gap-2 mb-1.5 pl-1"><div className="h-px w-2 bg-[#39ff14]/50"></div><h3 className="text-[9px] font-bold text-[#39ff14] uppercase tracking-wider">{brand}</h3><div className="h-px flex-1 bg-gradient-to-r from-[#39ff14]/30 to-transparent"></div></div>
                                 <div className="space-y-1">{list.map((tire, idx) => { 
                                     const isSelected = currentConfig.tireName === tire.name || currentConfig.tireName === tire.label; 
                                     return (
-                                        <div key={idx} onClick={() => onUpdate('tire', tire)} className={`rounded-sm p-1.5 flex gap-2 transition-all group/item items-center cursor-pointer border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'bg-black/40 border-[#39ff14]/10 hover:bg-[#39ff14]/10 hover:border-[#39ff14]/40'}`}>
+                                        <div key={idx} onClick={(e) => { e.stopPropagation(); onUpdate('tire', tire); setIsExpanded(false); }} className={`rounded-sm p-1.5 flex gap-2 transition-all group/item items-center cursor-pointer border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'bg-black/40 border-[#39ff14]/10 hover:bg-[#39ff14]/10 hover:border-[#39ff14]/40'}`}>
                                             <div className="w-8 h-8 shrink-0 flex items-center justify-center opacity-90 group-hover/item:opacity-100 transition-opacity"><TireSVG type={tire.type} rimColor={tire.color} label={tire.label} compoundColor={tire.text} /></div>
                                             <div className="flex-1 min-w-0 pl-1">
                                                 <div className="flex justify-between items-baseline"><h4 className={`font-bold text-[9px] truncate transition-colors pr-4 ${isSelected ? 'text-white' : 'text-gray-300 group-hover/item:text-white'}`}>{tire.name}</h4><span className="text-[7px] text-[#39ff14]/60 font-mono">{tire.type === 'Rain' ? 'Lluvia' : tire.type}</span></div>
@@ -1531,7 +1554,7 @@
                                                 </div>
                                             </div>
                                             {brand === 'CUSTOM (USER)' && (
-                                                <button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute top-1 right-1 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-0.5 transition-all"><X size={10}/></button>
+                                                <button onClick={(e) => handleDelete(e, idx)} className="absolute top-1 right-1 opacity-0 group-hover/item:opacity-100 text-red-500 hover:bg-red-500 hover:text-white rounded p-0.5 transition-all"><X size={10}/></button>
                                             )}
                                         </div>
                                     ); 
@@ -1540,12 +1563,47 @@
                         ))}
                     </div>
                 </div>
+            );
+
+            return (
+                <div className="w-64 h-[21rem] relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
+                    </div>
+
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[10005] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={(e) => { e.stopPropagation(); setIsAdding(false); }}>
+                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVO NEUMÁTICO</h3>
+                                <div className="space-y-4">
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">NOMBRE</label><input type="text" maxLength="15" value={newForm.name} onChange={e=>setNewForm({...newForm, name: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">GRIP (0-100%)</label><input type="number" min="0" max="100" value={newForm.grip} onChange={e=>setNewForm({...newForm, grip: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1" /></div>
+                                    <div><label className="text-xs text-gray-400 font-bold tracking-wider">TIPO</label><select value={newForm.type} onChange={e=>setNewForm({...newForm, type: e.target.value})} className="w-full bg-black border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-[#39ff14] outline-none mt-1"><option>Slick</option><option>Rain</option></select></div>
+                                </div>
+                                <div className="flex gap-3 mt-6 pt-4 border-t border-gray-800">
+                                    <button onClick={(e) => { e.stopPropagation(); setIsAdding(false); }} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={(e) => handleAdd(e)} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                </div>
             ); 
         });
         
         const GearShowcase = memo(({ selectedCarId, currentConfig, onUpdate }) => {
             if (!currentConfig) return null;
             const { t } = useTranslation();
+            const [isExpanded, setIsExpanded] = useState(false);
             const defaultGears = {
                 "SLOT.IT (EN LÍNEA)": [{ teeth: "24z", color: "#22c55e", type: "Aluminio", label: "GRN" },{ teeth: "25z", color: "#78350f", type: "Bronce", label: "BRN" },{ teeth: "26z", color: "#3b82f6", type: "Bronce", label: "BLU" },{ teeth: "27z", color: "#eab308", type: "Aluminio", label: "YEL" },{ teeth: "28z", color: "#f97316", type: "Aluminio", label: "ORG" }],
                 "NSR (ANGLEWINDER)": [{ teeth: "29z", color: "#ec4899", type: "Aluminio", label: "PNK" },{ teeth: "30z", color: "#ef4444", type: "Aluminio", label: "RED" },{ teeth: "31z", color: "#111111", type: "Aluminio", label: "BLK" },{ teeth: "32z", color: "#a855f7", type: "Aluminio", label: "PUR" }],
@@ -1559,7 +1617,8 @@
             const [isAdding, setIsAdding] = useState(false);
             const [newForm, setNewForm] = useState({ teeth: 27 });
 
-            const handleAdd = () => {
+            const handleAdd = (e) => {
+                if(e) e.stopPropagation();
                 const updated = { ...gears };
                 if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
                 updated["CUSTOM (USER)"].push({ teeth: `${newForm.teeth}z`, color: "#39ff14", type: "Custom", label: "CST" });
@@ -1568,7 +1627,8 @@
                 setIsAdding(false);
             };
 
-            const handleDelete = (idx) => {
+            const handleDelete = (e, idx) => {
+                if(e) e.stopPropagation();
                 const updated = { ...gears };
                 updated["CUSTOM (USER)"].splice(idx, 1);
                 if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
@@ -1576,40 +1636,25 @@
                 localStorage.setItem('slot_custom_gears', JSON.stringify(updated["CUSTOM (USER)"] || []));
             };
 
-            return (
-                <div className="w-64 h-40 flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] group relative">
-                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14]"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14]"></div>
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-40' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                >
+                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14] pointer-events-none"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14] pointer-events-none"></div>
                     
                     <div className="p-2 border-b border-[#39ff14]/20 bg-[#39ff14]/5 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2"> <Settings className="text-[#39ff14]" size={14} /> <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase">{t('gears')}</h2> </div>
                         <div className="flex items-center gap-2">
                             <span className="text-[8px] text-[#39ff14]/70 font-mono">EJES</span>
-                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Corona Personalizada"><Plus size={10}/> NUEVA</button>
+                            <button onClick={(e)=>{e.stopPropagation(); setIsAdding(true);}} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Corona Personalizada"><Plus size={10}/> NUEVA</button>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
 
-                    {isAdding && ReactDOM.createPortal(
-                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
-                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
-                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVA CORONA</h3>
-                                <div className="flex-1 flex flex-col justify-center gap-6">
-                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
-                                    <div className="flex items-center justify-center gap-5">
-                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.max(10, newForm.teeth - 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
-                                        <span className="font-digital text-5xl text-[#39ff14] w-20 text-center drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">{newForm.teeth}</span>
-                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.min(50, newForm.teeth + 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
-                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
-                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
-                                </div>
-                            </div>
-                        </div>,
-                        document.body
-                    )}
-
-                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10">
+                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10" onWheel={(e)=>e.stopPropagation()} onTouchMove={(e)=>e.stopPropagation()}>
                         {Object.entries(gears).map(([brand, list]) => (
                             <div key={brand}>
                                 <div className="flex items-center gap-2 mb-1.5 pl-1"><div className="w-1 h-1 bg-[#39ff14] rounded-full"></div><h3 className="text-[9px] font-bold text-[#39ff14]/80 uppercase tracking-wide">{brand}</h3></div>
@@ -1617,11 +1662,11 @@
                                     {list.map((gear, idx) => { 
                                         const isSelected = currentConfig.gearTeeth === parseInt(gear.teeth); 
                                         return (
-                                            <div key={idx} onClick={() => onUpdate('gear', gear)} className={`flex flex-col items-center gap-1 group/gear cursor-pointer p-1 rounded transition-all border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'border-transparent hover:bg-[#39ff14]/10'}`} title={`${gear.teeth} - ${gear.type}`}>
+                                            <div key={idx} onClick={(e) => { e.stopPropagation(); onUpdate('gear', gear); setIsExpanded(false); }} className={`flex flex-col items-center gap-1 group/gear cursor-pointer p-1 rounded transition-all border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'border-transparent hover:bg-[#39ff14]/10'}`} title={`${gear.teeth} - ${gear.type}`}>
                                                 <div className="w-10 h-10 transition-transform duration-300 group-hover/gear:scale-110"><GearSVG teeth={gear.teeth} color={gear.color} material={gear.type} /></div>
                                                 <div className={`text-[8px] font-mono transition-colors ${isSelected ? 'text-[#39ff14]' : 'text-gray-400 group-hover/gear:text-white'}`}>{gear.teeth}</div>
                                                 {brand === 'CUSTOM (USER)' && (
-                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute -top-1 -right-1 opacity-0 group-hover/gear:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-0.5 transition-all"><X size={8}/></button>
+                                                    <button onClick={(e) => handleDelete(e, idx)} className="absolute -top-1 -right-1 opacity-0 group-hover/gear:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-0.5 transition-all"><X size={8}/></button>
                                                 )}
                                             </div>
                                         ); 
@@ -1631,12 +1676,50 @@
                         ))}
                     </div>
                 </div>
+            );
+
+            return (
+                <div className="w-64 h-40 relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
+                    </div>
+
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[10005] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={(e) => { e.stopPropagation(); setIsAdding(false); }}>
+                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVA CORONA</h3>
+                                <div className="flex-1 flex flex-col justify-center gap-6">
+                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
+                                    <div className="flex items-center justify-center gap-5">
+                                        <button onClick={(e)=> { e.stopPropagation(); setNewForm({...newForm, teeth: Math.max(10, newForm.teeth - 1)}); }} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
+                                        <span className="font-digital text-5xl text-[#39ff14] w-20 text-center drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">{newForm.teeth}</span>
+                                        <button onClick={(e)=> { e.stopPropagation(); setNewForm({...newForm, teeth: Math.min(50, newForm.teeth + 1)}); }} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
+                                    <button onClick={(e) => { e.stopPropagation(); setIsAdding(false); }} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={(e) => handleAdd(e)} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                </div>
             ); 
         });
         
         const PinionShowcase = memo(({ selectedCarId, currentConfig, onUpdate }) => {
             if (!currentConfig) return null;
             const { t } = useTranslation();
+            const [isExpanded, setIsExpanded] = useState(false);
             const defaultPinions = {
                 "SLOT.IT (5.5mm / 6.5mm)": [{ teeth: "9z", type: "Latón", diameter: "5.5" },{ teeth: "10z", type: "Latón", diameter: "5.5" },{ teeth: "11z", type: "Bronce", diameter: "6.5" },{ teeth: "12z", type: "Bronce", diameter: "6.5" }],
                 "NSR (RACING)": [{ teeth: "10z", type: "Acero", diameter: "5.5" },{ teeth: "11z", type: "Acero", diameter: "6.5" },{ teeth: "12z", type: "Acero", diameter: "7.5" },{ teeth: "13z", type: "Acero", diameter: "7.5" }],
@@ -1651,7 +1734,8 @@
             const [isAdding, setIsAdding] = useState(false);
             const [newForm, setNewForm] = useState({ teeth: 9 });
 
-            const handleAdd = () => {
+            const handleAdd = (e) => {
+                if(e) e.stopPropagation();
                 const updated = { ...pinions };
                 if (!updated["CUSTOM (USER)"]) updated["CUSTOM (USER)"] = [];
                 updated["CUSTOM (USER)"].push({ teeth: `${newForm.teeth}z`, type: "Custom", diameter: "6.0" });
@@ -1660,7 +1744,8 @@
                 setIsAdding(false);
             };
 
-            const handleDelete = (idx) => {
+            const handleDelete = (e, idx) => {
+                if(e) e.stopPropagation();
                 const updated = { ...pinions };
                 updated["CUSTOM (USER)"].splice(idx, 1);
                 if (updated["CUSTOM (USER)"].length === 0) delete updated["CUSTOM (USER)"];
@@ -1668,40 +1753,25 @@
                 localStorage.setItem('slot_custom_pinions', JSON.stringify(updated["CUSTOM (USER)"] || []));
             };
 
-            return (
-                <div className="w-64 h-40 flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] group relative">
-                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14]"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14]"></div>
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-40' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                >
+                    <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#39ff14] pointer-events-none"></div><div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#39ff14] pointer-events-none"></div>
                     
                     <div className="p-2 border-b border-[#39ff14]/20 bg-[#39ff14]/5 flex justify-between items-center shrink-0">
                         <div className="flex items-center gap-2"> <Settings className="text-[#39ff14]" size={14} /> <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase">{t('pinions')}</h2> </div>
                         <div className="flex items-center gap-2">
                             <span className="text-[8px] text-[#39ff14]/70 font-mono">MOTORES</span>
-                            <button onClick={()=>setIsAdding(true)} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Piñón Personalizado"><Plus size={10}/> NUEVO</button>
+                            <button onClick={(e)=>{e.stopPropagation(); setIsAdding(true);}} className="px-2 py-1 bg-[#39ff14]/20 hover:bg-[#39ff14] text-[#39ff14] hover:text-black rounded flex items-center justify-center gap-1 transition-colors text-[8px] font-black tracking-widest" title="Añadir Piñón Personalizado"><Plus size={10}/> NUEVO</button>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
 
-                    {isAdding && ReactDOM.createPortal(
-                        <div className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={() => setIsAdding(false)}>
-                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
-                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVO PIÑÓN</h3>
-                                <div className="flex-1 flex flex-col justify-center gap-6">
-                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
-                                    <div className="flex items-center justify-center gap-5">
-                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.max(5, newForm.teeth - 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
-                                        <span className="font-digital text-5xl text-[#39ff14] w-20 text-center drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">{newForm.teeth}</span>
-                                        <button onClick={()=>setNewForm({...newForm, teeth: Math.min(20, newForm.teeth + 1)})} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
-                                    <button onClick={() => setIsAdding(false)} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
-                                    <button onClick={handleAdd} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
-                                </div>
-                            </div>
-                        </div>,
-                        document.body
-                    )}
-
-                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10">
+                    <div className="flex-1 overflow-y-auto p-2 space-y-3 workshop-scroll relative z-10" onWheel={(e)=>e.stopPropagation()} onTouchMove={(e)=>e.stopPropagation()}>
                         {Object.entries(pinions).map(([brand, list]) => (
                             <div key={brand}>
                                 <div className="flex items-center gap-2 mb-1.5 pl-1"><div className="w-1 h-1 bg-[#39ff14] rounded-full"></div><h3 className="text-[9px] font-bold text-[#39ff14]/80 uppercase tracking-wide">{brand}</h3></div>
@@ -1709,11 +1779,11 @@
                                     {list.map((pinion, idx) => { 
                                         const isSelected = currentConfig.pinionTeeth === parseInt(pinion.teeth); 
                                         return (
-                                            <div key={idx} onClick={() => onUpdate('pinion', pinion)} className={`flex flex-col items-center gap-1 group/pinion cursor-pointer p-1 rounded transition-all border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'border-transparent hover:bg-[#39ff14]/10'}`} title={`${pinion.teeth} - ${pinion.type}`}>
+                                            <div key={idx} onClick={(e) => { e.stopPropagation(); onUpdate('pinion', pinion); setIsExpanded(false); }} className={`flex flex-col items-center gap-1 group/pinion cursor-pointer p-1 rounded transition-all border relative ${isSelected ? 'bg-[#39ff14]/20 border-[#39ff14] shadow-[0_0_10px_#39ff14]' : 'border-transparent hover:bg-[#39ff14]/10'}`} title={`${pinion.teeth} - ${pinion.type}`}>
                                                 <div className="w-10 h-10 transition-transform duration-300 group-hover/pinion:scale-110"><PinionSVG teeth={pinion.teeth} material={pinion.type} diameter={pinion.diameter} /></div>
                                                 <div className={`text-[8px] font-mono transition-colors ${isSelected ? 'text-[#39ff14]' : 'text-gray-400 group-hover/pinion:text-white'}`}>{pinion.teeth}</div>
                                                 {brand === 'CUSTOM (USER)' && (
-                                                    <button onClick={(e) => { e.stopPropagation(); handleDelete(idx); }} className="absolute -top-1 -right-1 opacity-0 group-hover/pinion:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-0.5 transition-all"><X size={8}/></button>
+                                                    <button onClick={(e) => handleDelete(e, idx)} className="absolute -top-1 -right-1 opacity-0 group-hover/pinion:opacity-100 bg-red-500/80 hover:bg-red-500 text-white rounded p-0.5 transition-all"><X size={8}/></button>
                                                 )}
                                             </div>
                                         ); 
@@ -1723,11 +1793,49 @@
                         ))}
                     </div>
                 </div>
+            );
+
+            return (
+                <div className="w-64 h-40 relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
+                    </div>
+
+                    {isAdding && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[10005] bg-black/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in" onClick={(e) => { e.stopPropagation(); setIsAdding(false); }}>
+                            <div className="bg-[#050a05] border-2 border-[#39ff14] rounded-xl p-6 w-80 shadow-[0_0_50px_rgba(57,255,20,0.4)]" onClick={e => e.stopPropagation()}>
+                                <h3 className="text-sm font-black text-[#39ff14] uppercase mb-4 border-b border-[#39ff14]/30 pb-2 tracking-widest">NUEVO PIÑÓN</h3>
+                                <div className="flex-1 flex flex-col justify-center gap-6">
+                                    <label className="text-xs text-gray-400 font-bold tracking-wider text-center">NÚMERO DE DIENTES</label>
+                                    <div className="flex items-center justify-center gap-5">
+                                        <button onClick={(e)=>{e.stopPropagation(); setNewForm({...newForm, teeth: Math.max(5, newForm.teeth - 1)});}} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Minus size={20}/></button>
+                                        <span className="font-digital text-5xl text-[#39ff14] w-20 text-center drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">{newForm.teeth}</span>
+                                        <button onClick={(e)=>{e.stopPropagation(); setNewForm({...newForm, teeth: Math.min(20, newForm.teeth + 1)});}} className="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center transition hover:bg-gray-700 active:scale-95"><Plus size={20}/></button>
+                                    </div>
+                                </div>
+                                <div className="flex gap-3 mt-8 pt-4 border-t border-gray-800">
+                                    <button onClick={(e) => { e.stopPropagation(); setIsAdding(false); }} className="flex-1 py-2 rounded-lg bg-gray-800 text-gray-300 text-xs font-bold hover:bg-gray-700 transition">CANCELAR</button>
+                                    <button onClick={(e) => handleAdd(e)} className="flex-1 py-2 rounded-lg bg-[#39ff14] text-black text-xs font-black hover:bg-white transition">GUARDAR</button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+                </div>
             ); 
         });
 
         const VoltageShowcase = memo(({ voltage, setVoltage }) => { 
             const { t } = useTranslation(); 
+            const [isExpanded, setIsExpanded] = useState(false);
             const [amps, setAmps] = useState(1.2); 
             const [history, setHistory] = useState(new Array(24).fill(0.2)); 
             
@@ -1745,8 +1853,11 @@
                 return () => clearInterval(interval); 
             }, [voltage]); 
             
-            return (
-                <div className="w-64 h-40 flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] relative group">
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-40' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                >
                     <svg className="absolute top-0 left-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M1 1 L10 1 L10 2 L2 2 L2 10 L1 10 Z" fill="#39ff14"/></svg>
                     <svg className="absolute top-0 right-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M31 1 L22 1 L22 2 L30 2 L30 10 L31 10 Z" fill="#39ff14"/></svg>
                     <svg className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none opacity-50" viewBox="0 0 32 32"><path d="M1 31 L10 31 L10 30 L2 30 L2 22 L1 22 Z" fill="#39ff14"/></svg>
@@ -1757,9 +1868,14 @@
                             <Battery className="text-[#39ff14]" size={14} /> 
                             <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase">{t('powerSupply')}</h2> 
                         </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                            <span className="text-[8px] text-[#39ff14]/70 font-mono">ON AIR</span>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                                <span className="text-[8px] text-[#39ff14]/70 font-mono">ON AIR</span>
+                            </div>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
                     
@@ -1789,12 +1905,28 @@
                             <span className="absolute top-0.5 right-1 text-[6px] text-[#39ff14]/50 font-mono">LOAD MONITOR</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button onClick={() => setVoltage(Math.max(10, voltage - 0.5))} className="w-8 h-6 rounded bg-gray-900 border border-gray-700 hover:border-[#39ff14] hover:bg-[#39ff14]/20 text-gray-400 hover:text-[#39ff14] flex items-center justify-center transition-all active:scale-95"><Minus size={12}/></button>
+                            <button onClick={(e) => { e.stopPropagation(); setVoltage(Math.max(10, voltage - 0.5)); }} className="w-8 h-6 rounded bg-gray-900 border border-gray-700 hover:border-[#39ff14] hover:bg-[#39ff14]/20 text-gray-400 hover:text-[#39ff14] flex items-center justify-center transition-all active:scale-95"><Minus size={12}/></button>
                             <div className="flex-1 h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-700 relative group-hover:border-[#39ff14]/30 transition-colors">
                                 <div className="h-full bg-gradient-to-r from-[#39ff14]/40 to-[#39ff14] shadow-[0_0_10px_#39ff14] relative transition-all duration-300" style={{width: `${((voltage - 10) / 10) * 100}%`}}></div>
                             </div>
-                            <button onClick={() => setVoltage(Math.min(20, voltage + 0.5))} className="w-8 h-6 rounded bg-gray-900 border border-gray-700 hover:border-[#39ff14] hover:bg-[#39ff14]/20 text-gray-400 hover:text-[#39ff14] flex items-center justify-center transition-all active:scale-95"><Plus size={12}/></button>
+                            <button onClick={(e) => { e.stopPropagation(); setVoltage(Math.min(20, voltage + 0.5)); }} className="w-8 h-6 rounded bg-gray-900 border border-gray-700 hover:border-[#39ff14] hover:bg-[#39ff14]/20 text-gray-400 hover:text-[#39ff14] flex items-center justify-center transition-all active:scale-95"><Plus size={12}/></button>
                         </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="w-64 h-40 relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
                     </div>
                 </div>
             ); 
@@ -1803,6 +1935,7 @@
         const WeightShowcase = memo(({ selectedCarId, currentConfig, onUpdate }) => {
             if (!currentConfig) return null;
             const { t } = useTranslation();
+            const [isExpanded, setIsExpanded] = useState(false);
             
             const defaultWeights = { body: 24.5, chassis: 16.2, trans: 12.8, wheels: 8.4, cockpit: 2.1 };
             const currentWeights = currentConfig.weights || defaultWeights;
@@ -1825,17 +1958,26 @@
                 onUpdate('weights', newWeights);
             };
 
-            return (
-                <div className="w-64 h-40 flex flex-col rounded-sm overflow-hidden border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md animate-in z-50 transition-all hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)] relative group" title="Modifica los pesos para ajustar la física">
+            const renderContent = (isPortal) => (
+                <div 
+                    onClick={() => { if (!isExpanded && !isPortal) setIsExpanded(true); }}
+                    className={`flex flex-col rounded-sm overflow-hidden transition-all duration-300 group cursor-pointer ${isPortal ? 'relative scale-[1.5] border-2 border-[#39ff14] shadow-[0_0_50px_rgba(57,255,20,0.5)] bg-[#050a05] w-64 h-40' : 'w-full h-full border border-[#39ff14]/30 shadow-[0_0_20px_rgba(57,255,20,0.1)] bg-[#050a05]/90 backdrop-blur-md hover:border-[#39ff14]/80 hover:shadow-[0_0_30px_rgba(57,255,20,0.2)]'}`}
+                    title="Modifica los pesos para ajustar la física"
+                >
                     <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: 'radial-gradient(#39ff14 1px, transparent 1px)', backgroundSize: '10px 10px'}}></div>
                     <div className="p-2 border-b border-[#39ff14]/20 bg-[#39ff14]/5 flex justify-between items-center shrink-0 relative z-10">
                         <div className="flex items-center gap-2"> 
                             <Scale className="text-[#39ff14]" size={14} /> 
                             <h2 className="text-[10px] font-black text-white tracking-[0.2em] uppercase">{t('digitalScale')}</h2> 
                         </div>
-                        <div className="flex items-center gap-1">
-                            <div className="w-1 h-1 rounded-full bg-[#39ff14] animate-pulse"></div>
-                            <span className="text-[8px] text-[#39ff14]/70 font-mono">C{selectedCarId}</span>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full bg-[#39ff14] animate-pulse"></div>
+                                <span className="text-[8px] text-[#39ff14]/70 font-mono">C{selectedCarId}</span>
+                            </div>
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }} className={`p-1 rounded transition-colors ${isExpanded ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-gray-800 hover:bg-[#39ff14] text-gray-400 hover:text-black'}`} title="Zoom">
+                                {isExpanded ? <Minimize size={10} /> : <Maximize size={10} />}
+                            </button>
                         </div>
                     </div>
                     <div className="flex flex-row flex-1 p-2 gap-2 relative z-10 overflow-hidden">
@@ -1844,16 +1986,17 @@
                                 <div key={i} className="flex items-center justify-between group/row">
                                     <span className="text-[7px] text-gray-400 font-bold uppercase tracking-tighter group-hover/row:text-white transition-colors">{label}</span>
                                     <div className="flex items-center gap-0.5">
-                                        <button onClick={() => adjustWeight(id, -0.5)} className="w-3.5 h-3.5 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-[#39ff14] text-gray-400 hover:text-[#39ff14] rounded-sm transition-all active:scale-90"><Minus size={10}/></button>
+                                        <button onClick={(e) => { e.stopPropagation(); adjustWeight(id, -0.5); }} className="w-3.5 h-3.5 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-[#39ff14] text-gray-400 hover:text-[#39ff14] rounded-sm transition-all active:scale-90"><Minus size={10}/></button>
                                         <input 
                                             type="number"
                                             step="0.1"
                                             min="0"
                                             value={currentWeights[id] === 0 ? '' : currentWeights[id]}
                                             onChange={(e) => handleWeightChange(id, e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
                                             className="w-7 bg-transparent border-none text-center text-[9px] font-mono text-[#39ff14] outline-none px-0 hide-scrollbar transition-colors"
                                         />
-                                        <button onClick={() => adjustWeight(id, 0.5)} className="w-3.5 h-3.5 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-[#39ff14] text-gray-400 hover:text-[#39ff14] rounded-sm transition-all active:scale-90"><Plus size={10}/></button>
+                                        <button onClick={(e) => { e.stopPropagation(); adjustWeight(id, 0.5); }} className="w-3.5 h-3.5 flex items-center justify-center bg-black/60 border border-gray-700 hover:border-[#39ff14] text-gray-400 hover:text-[#39ff14] rounded-sm transition-all active:scale-90"><Plus size={10}/></button>
                                     </div>
                                 </div>
                             ))}
@@ -1877,6 +2020,22 @@
                                 })}
                             </div>
                         </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="w-64 h-40 relative z-50">
+                    {isExpanded && ReactDOM.createPortal(
+                        <div className="fixed inset-0 z-[9998] flex items-center justify-center animate-in fade-in">
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsExpanded(false)}></div>
+                            {renderContent(true)}
+                        </div>,
+                        document.body
+                    )}
+                    
+                    <div className={`w-full h-full ${isExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                        {renderContent(false)}
                     </div>
                 </div>
             ); 
@@ -2660,11 +2819,23 @@
             useEffect(() => { showDunlopRef.current = showDunlop; }, [showDunlop]);
             const dunlopGroupRef = useRef(null);
 
+            // --- NUEVO: ESTADO VALLAS ---
+            const [showFences, setShowFences] = useState(false);
+            const showFencesRef = useRef(showFences);
+            useEffect(() => { showFencesRef.current = showFences; }, [showFences]);
+            const fenceGroupRef = useRef(null);
+
             useEffect(() => {
                 if (dunlopGroupRef.current) {
                     dunlopGroupRef.current.visible = showDunlop;
                 }
             }, [showDunlop]);
+
+            useEffect(() => {
+                if (fenceGroupRef.current) {
+                    fenceGroupRef.current.visible = showFences;
+                }
+            }, [showFences]);
 
             // NUEVO: ESTADO Y FUNCIONES PARA BACKUP/RESTORE DE COMPONENTES
             const [refreshPartsKey, setRefreshPartsKey] = useState(0);
@@ -3789,7 +3960,7 @@
                     const numLanes = typeof circuitData.numLanes === 'number' ? circuitData.numLanes : detectedLanes;
                     
                     // --- GENERACIÓN DINÁMICA DE CARRILES (SOPORTA 2, 4, 6, 8... CARRILES) ---
-                    const rails = { lanes: Array.from({length: numLanes}, () => []), pit: [], changes: [] }, vertexDistances = [0]; let accumulatedDist = 0;
+                    const rails = { lanes: Array.from({length: numLanes}, () => []), visualLanes: Array.from({length: numLanes}, () => []), pit: [], changes: [] }, vertexDistances = [0]; let accumulatedDist = 0;
                     
                     scene = new THREE.Scene(); scene.background = new THREE.Color(0x60a5fa); scene.fog = new THREE.Fog(0x60a5fa, 500, 3000); 
                     
@@ -3906,14 +4077,19 @@
                     
                     let curX = 0, curZ = 0, curAngle = 0;
 
-                    const addRailPoint = (x, z, ang, lOffs, po, di, brand) => { 
+                    const addRailPoint = (x, z, ang, lOffs, po, di, brand, visArray) => { 
                         const px = Math.cos(ang + Math.PI/2), pz = Math.sin(ang + Math.PI/2); 
                         for(let i=0; i<numLanes; i++) {
                             if (lOffs && lOffs[i] !== null && lOffs[i] !== undefined) {
                                 const pt = new THREE.Vector3(x + px * lOffs[i], 0.2, z + pz * lOffs[i]);
                                 pt.brand = brand;
                                 rails.lanes[i].push(pt); 
-                            } else rails.lanes[i].push(null);
+                                if (!visArray || visArray[i] !== null) rails.visualLanes[i].push(pt);
+                                else rails.visualLanes[i].push(null);
+                            } else {
+                                rails.lanes[i].push(null);
+                                rails.visualLanes[i].push(null);
+                            }
                         }
                         if (po !== null) {
                             const pt = new THREE.Vector3(x + px * po, 0.2, z + pz * po);
@@ -3932,6 +4108,8 @@
                     let resMult = 1.0;
                     if (bridgeMode === 'Medio') resMult = 1.5; 
                     else if (bridgeMode === 'Básico') resMult = 1.2; 
+
+                    let chicaneActiveSide = null;
 
                     // CAMBIO CLAVE: Recorrer masterPieces en lugar de circuitData.pieces
                     masterPieces.forEach((p, index) => {
@@ -4037,11 +4215,20 @@
                         const startVertexIdx = rails.lanes[0].length - 1;
                         const startDist = accumulatedDist;
                         
-                        const steps = (p.type === 'curve') ? Math.max(12, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(10, Math.ceil((p.length / 3.0) * resMult));
-                        const stepLen = p.length / steps;
+                        // FIX: Calcular longitud física de forma segura (las curvas no tienen p.length)
+                        const physicalLength = p.length || (2 * Math.PI * p.radius * (Math.abs(p.angle) / 360));
+                        
+                        // Aumentamos la resolución geométrica de las entradas, salidas y cambios de carril para que la curva CatmullRom sea perfectamente suave
+                        let steps = (p.type === 'curve') ? Math.max(12, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(10, Math.ceil((physicalLength / 3.0) * resMult));
+                        const isSmoothMergePiece = (p.subtype && ['y_merge_in', 'y_merge_out', 'single_lane_s', 'single_lane_curve', 'single_lane_1', 'single_lane_2', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) || ['pit_entry', 'pit_exit'].includes(p.type);
+                        if (isSmoothMergePiece) {
+                            steps = Math.max(steps, Math.ceil((physicalLength / 1.5) * resMult));
+                        }
+                        
+                        const stepLen = (p.type === 'curve' ? 0 : p.length) / steps;
                         const totalSweep = (p.type==='curve') ? (p.angle * Math.PI / 180) * (p.direction==='left'?-1:1) : 0;
                         const stepAngle = totalSweep / steps;
-                        let stepPhysDist = stepLen; if (p.type === 'curve') stepPhysDist = (2 * Math.PI * p.radius) * (Math.abs(p.angle) / 360) / steps;
+                        let stepPhysDist = physicalLength / steps;
                         
                         let pb = p.brand || p.brandKey;
                         let brandChanged = false;
@@ -4099,6 +4286,9 @@
                         let startHalfL = stdHalfL, startHalfR = stdHalfR;
                         let endHalfL = stdHalfL, endHalfR = stdHalfR;
 
+                        const stdOffL = -currentLaneSpacing / 2;
+                        const stdOffR = currentLaneSpacing / 2;
+
                         if (p.subtype && p.subtype.includes('adapter')) {
                             let wIn = p.widthIn || currentTrackWidth;
                             let wOut = p.widthOut || currentTrackWidth;
@@ -4149,6 +4339,69 @@
                             }
                             stdHalfL = endHalfL;
                             stdHalfR = endHalfR;
+                            currentOffsets = [...tL];
+                        }
+                        else if (p.subtype === 'y_merge_out') {
+                            chicaneActiveSide = p.direction === 'left' ? 'right' : 'left'; // INVERTIDO PARA QUE COINCIDA CON LA PIEZA REAL
+                            const tgtOff = chicaneActiveSide === 'left' ? stdOffL : stdOffR;
+                            
+                            sL = [...currentOffsets];
+                            tL = currentOffsets.map(() => tgtOff); // Converge al lado activo
+                            
+                            startHalfL = stdHalfL; 
+                            startHalfR = stdHalfR;
+                            endHalfL = stdHalfL; 
+                            endHalfR = stdHalfR;
+                            
+                            currentOffsets = [...tL];
+                        }
+                        else if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve' || (p.type === 'curve' && numLanes === 1 && (p.brand === 'SCX_ADVANCE' || p.brandKey === 'SCX_ADVANCE'))) {
+                            const startSide = chicaneActiveSide || 'left';
+                            const targetSide = startSide === 'left' ? 'right' : 'left'; // Alterna siempre forzando la 'S'
+                            
+                            const stOff = startSide === 'left' ? stdOffL : stdOffR;
+                            const tgOff = targetSide === 'left' ? stdOffL : stdOffR;
+                            
+                            sL = currentOffsets.map(() => stOff); // Ambos parten superpuestos
+                            tL = currentOffsets.map(() => tgOff); // Ambos se mueven hacia el lado opuesto
+                            
+                            const narrowExtra = 2.5; // Margen extra para tapar huecos en los lados cerrados
+                            startHalfL = startSide === 'left' ? stdHalfL : narrowExtra;
+                            startHalfR = startSide === 'right' ? stdHalfR : narrowExtra;
+                            
+                            endHalfL = targetSide === 'left' ? stdHalfL : narrowExtra;
+                            endHalfR = targetSide === 'right' ? stdHalfR : narrowExtra;
+                            
+                            chicaneActiveSide = targetSide;
+                            currentOffsets = [...tL];
+                        }
+                        else if (p.subtype === 'y_merge_in') {
+                            const startSide = chicaneActiveSide || (p.direction === 'left' ? 'right' : 'left'); 
+                            const stOff = startSide === 'left' ? stdOffL : stdOffR;
+                            
+                            sL = currentOffsets.map(() => stOff);
+                            
+                            let standardOffsets = [];
+                            if (hasGroups) {
+                                for (let i = 0; i < numLanes; i++) {
+                                    const pairIndex = Math.floor(i / 2);
+                                    const isRightLane = i % 2 === 1;
+                                    const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
+                                    standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
+                                }
+                            } else {
+                                for(let i=0; i<numLanes; i++) {
+                                    standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
+                                }
+                            }
+                            tL = [...standardOffsets]; // Vuelven a divergir
+                            
+                            startHalfL = stdHalfL;
+                            startHalfR = stdHalfR;
+                            endHalfL = stdHalfL; 
+                            endHalfR = stdHalfR; // Recupera todo el asfalto
+                            
+                            chicaneActiveSide = null;
                             currentOffsets = [...tL];
                         }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
@@ -4202,7 +4455,10 @@
 
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps; if (p.type === 'curve') { const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2; curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle; } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
-                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
+                            
+                            const isSmoothMerge = p.subtype && ['y_merge_in', 'y_merge_out', 'single_lane_s', 'single_lane_curve', 'single_lane_1', 'single_lane_2'].includes(p.subtype);
+                            const isSCXAdvanceSingleCurve = p.type === 'curve' && numLanes === 1 && (p.brand === 'SCX_ADVANCE' || p.brandKey === 'SCX_ADVANCE');
+                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || isSmoothMerge || isSCXAdvanceSingleCurve || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
                             
                             let cL = [];
                             for(let j=0; j<numLanes; j++) {
@@ -4217,9 +4473,17 @@
                             else if (isPitExit) { const sp = pitDir * pcd, ep = pitDir * (currentLaneSpacing/2), e = t*t*(3-2*t); cPit = sp + (ep-sp)*e; if(pitSide==='right') cTWR = poe - (poe-endHalfR)*e; else cTWL = poe - (poe-endHalfL)*e; }
                             else if (p.subtype && p.subtype.includes('pit_parallel')) { cPit = pitDir * pcd; if(pitSide==='right') cTWR = poe; else cTWL = poe; }
                             
-                            let curL_Vis = [...cL];
+                            // NUEVO: Separar la visibilidad de los carriles de su existencia física.
+                            let curL_Vis = [...cL]; // Copiamos las posiciones físicas para pasárselas al dibujante
+                            
                             if (p.subtype === 'single_lane_1') { curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); cTWR = 0; }
                             if (p.subtype === 'single_lane_2') { curL_Vis = curL_Vis.map((v, idx) => idx === 1 ? v : null); cTWL = 0; }
+                            
+                            // En la "S" de un carril, ambos raíles físicos van por el mismo sitio, 
+                            // pero solo dibujamos uno (el 0) para que no parpadee el render 3D.
+                            if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve' || isSCXAdvanceSingleCurve) {
+                                curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); 
+                            }
 
                             let railX = curX;
                             let railZ = curZ;
@@ -4234,17 +4498,34 @@
                             } else if (p.subtype === 'chicane3_exit') {
                                 // Fase 3: Retorna al centro. Inicia paralelo en el borde y termina paralelo en el centro (0)
                                 sShapeOffset = -(currentLaneSpacing * 0.5) + (easeSine(t) * (currentLaneSpacing * 0.5));
+                            } else if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve') {
+                                // IA DE CHICANE PT74 DE SCX ADVANCE (Basada en tu foto)
+                                // Movimiento serpenteante DENTRO del medio ancho del carril
+                                // Math.PI en lugar de Math.PI * 2 para que haga 1 sola curva, no un zig-zag doble
+                                const waveAmplitude = currentLaneSpacing * 0.15; 
+                                const waveDirection = p.direction === 'left' ? -1 : 1;
+                                sShapeOffset = Math.sin(t * Math.PI) * waveAmplitude * waveDirection;
                             }
+
+                            let asphaltX = curX;
+                            let asphaltZ = curZ;
 
                             if (sShapeOffset !== 0) {
                                 const px = Math.cos(curAngle + Math.PI/2);
                                 const pz = Math.sin(curAngle + Math.PI/2);
                                 railX += px * sShapeOffset;
                                 railZ += pz * sShapeOffset;
+                                
+                                // Hacemos que el asfalto de la chicane ondule con el raíl para no salirnos de la pista
+                                asphaltX += px * sShapeOffset;
+                                asphaltZ += pz * sShapeOffset;
                             }
 
-                            addRailPoint(railX, railZ, curAngle, curL_Vis, cPit, stepPhysDist, pieceBrand); 
-                            addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
+                            // IMPORTANTE: Le pasamos 'curL_Vis' (con el raíl oculto) al dibujante para que lo ignore visualmente,
+                            // pero las coordenadas físicas 'cL' están perfectas y contiguas
+                            addRailPoint(railX, railZ, curAngle, cL, cPit, stepPhysDist, pieceBrand, curL_Vis); 
+
+                            addAsphaltSlice(asphaltX, asphaltZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
                             
                             if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype) && numLanes >= 2) { 
                                 const ct = easeSine(t), o12 = sL[0] + (sL[1]-sL[0])*ct, o21 = sL[1] + (sL[0]-sL[1])*ct, px = Math.cos(curAngle+Math.PI/2), pz = Math.sin(curAngle+Math.PI/2); 
@@ -4263,7 +4544,7 @@
                         if (d12.length > 0) rails.changes.push({ points: d12, refIdx: startVertexIdx, count: steps });
                         if (d21.length > 0) rails.changes.push({ points: d21, refIdx: startVertexIdx, count: steps });
                         
-                        pieceMapRef.current.push({ index, distStart: startDist, distEnd: accumulatedDist, type: p.type, subtype: p.subtype, invert: p.invert, canChangeLane: ['digital_x','change_right','change_left','pit_entry', 'pit_parallel_double_x'].includes(p.subtype) || p.type === 'pit_entry' || p.type === 'pit_exit', isPitSection: isPitEntry || isPitExit || (p.subtype && p.subtype.includes('pit_parallel')), elevation: p.elevation || 0 });
+                        pieceMapRef.current.push({ index, distStart: startDist, distEnd: accumulatedDist, type: p.type, subtype: p.subtype, invert: p.invert, canChangeLane: ['digital_x','change_right','change_left','pit_entry', 'pit_parallel_double_x', 'y_merge_in'].includes(p.subtype) || p.type === 'pit_entry' || p.type === 'pit_exit', isPitSection: isPitEntry || isPitExit || (p.subtype && p.subtype.includes('pit_parallel')), elevation: p.elevation || 0 });
                     });
                     
                     // --- AUTO BRIDGE ELEVATION LOGIC (OPTIMIZED & SMOOTH) ---
@@ -4855,6 +5136,191 @@
                     bottomMesh.receiveShadow = true; bottomMesh.castShadow = true;
                     trackGroup.add(bottomMesh);
 
+                    // --- AUTO-GENERACIÓN DE VALLAS (GUARDARRAÍLES) ---
+                    const fenceGroup = new THREE.Group();
+                    fenceGroup.name = "FENCE_GROUP";
+                    fenceGroup.visible = showFencesRef.current;
+                    trackGroup.add(fenceGroup);
+                    fenceGroupRef.current = fenceGroup;
+
+                    let needsFenceL = new Array(aspVertCount).fill(false);
+                    let needsFenceR = new Array(aspVertCount).fill(false);
+
+                    for (let s = 0; s < aspVertCount; s++) {
+                        const dist = asphaltDists[s];
+                        const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd + 0.1);
+                        if (!piece) continue;
+
+                        const yL = asphaltVerts[s * 6 + 1];
+                        const yR = asphaltVerts[s * 6 + 4];
+
+                        // 1. PUENTES Y DESNIVELES: Cualquier elevación sobre el tapete base (Y > 0.3) necesita valla obligatoria a ambos lados.
+                        if (yL > 0.3) needsFenceL[s] = true;
+                        if (yR > 0.3) needsFenceR[s] = true;
+
+                        // 2. CURVAS, ROTONDAS, CHICANES Y PITLANE
+                        const isCurve = piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'));
+                        
+                        if (isCurve) {
+                            // En las curvas, la valla exterior es VITAL. Calculamos la dirección real teniendo en cuenta si está invertida.
+                            let dir = piece.direction;
+                            if (!dir) dir = (piece.angle < 0) ? 'right' : 'left'; // Fallback por si no hay dirección explícita
+                            if (piece.invert) dir = (dir === 'left') ? 'right' : 'left'; // Invertir gira la curva hacia el otro lado
+                            
+                            if (dir === 'right') {
+                                needsFenceL[s] = true; // Curva a derecha, la fuerza centrífuga empuja a la izquierda
+                            } else if (dir === 'left') {
+                                needsFenceR[s] = true;  // Curva a izquierda, la fuerza centrífuga empuja a la derecha
+                            } else {
+                                // Fallback de seguridad: si no logramos detectar el giro, protegemos ambos lados
+                                needsFenceL[s] = true;
+                                needsFenceR[s] = true;
+                            }
+                        } else if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
+                            needsFenceL[s] = true; 
+                            needsFenceR[s] = true;
+                        } else if (piece.type === 'chicane' || (piece.subtype && piece.subtype.includes('chicane'))) {
+                            needsFenceL[s] = true; 
+                            needsFenceR[s] = true;
+                        } else if (piece.type === 'pit_entry' || piece.type === 'pit_exit' || (piece.subtype && piece.subtype.includes('pit'))) {
+                            needsFenceL[s] = true; // Toda la zona de Pitlane lleva vallas
+                            needsFenceR[s] = true;
+                        }
+                    }
+
+                    // Suavizado de tramos cortos (Rellenar huecos pequeños para que quede un muro continuo)
+                    for (let pass = 0; pass < 3; pass++) {
+                        for (let s = 1; s < aspVertCount - 1; s++) {
+                            if (needsFenceL[s-1] && needsFenceL[s+1]) needsFenceL[s] = true;
+                            if (needsFenceR[s-1] && needsFenceR[s+1]) needsFenceR[s] = true;
+                        }
+                    }
+
+                    // EXTENSIÓN DE SEGURIDAD MÁXIMA PARA CURVAS (LEAD-IN / LEAD-OUT):
+                    // Ampliamos 6 segmentos (antes 3) para proteger fuertemente las entradas de frenada y salidas de aceleración
+                    let expandedL = [...needsFenceL];
+                    let expandedR = [...needsFenceR];
+                    const expansion = 6; 
+                    for (let s = expansion; s < aspVertCount - expansion; s++) {
+                        if (needsFenceL[s]) { 
+                            for(let e=1; e<=expansion; e++) { expandedL[s-e] = true; expandedL[s+e] = true; }
+                        }
+                        if (needsFenceR[s]) { 
+                            for(let e=1; e<=expansion; e++) { expandedR[s-e] = true; expandedR[s+e] = true; }
+                        }
+                    }
+                    needsFenceL = expandedL;
+                    needsFenceR = expandedR;
+
+                    const fenceMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.7, roughness: 0.3 });
+                    const postMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.3, roughness: 0.7 });
+                    const postPositions = [];
+
+                    const buildFences = (needsArr, isLeft) => {
+                        let currentSegment = [];
+                        const processSegment = (seg) => {
+                            if (seg.length < 3) return; 
+                            const rawPts = seg.map(idx => {
+                                const base = idx * 6 + (isLeft ? 0 : 3);
+                                return new THREE.Vector3(asphaltVerts[base], asphaltVerts[base+1], asphaltVerts[base+2]);
+                            });
+
+                            // Mover ligeramente hacia afuera (0.4 uds)
+                            for (let i=0; i<rawPts.length; i++) {
+                                let prev = i > 0 ? rawPts[i-1] : rawPts[i];
+                                let next = i < rawPts.length - 1 ? rawPts[i+1] : rawPts[i];
+                                if (i===0) next = rawPts[1];
+                                if (i===rawPts.length-1) prev = rawPts[i-1];
+
+                                let dx = next.x - prev.x;
+                                let dz = next.z - prev.z;
+                                let len = Math.hypot(dx, dz);
+                                if (len > 0.001) { dx /= len; dz /= len; }
+                                
+                                let nx = isLeft ? dz : -dz;
+                                let nz = isLeft ? -dx : dx;
+                                
+                                rawPts[i].x += nx * 0.4;
+                                rawPts[i].z += nz * 0.4;
+                            }
+
+                            // 1. FILTRO AGRESIVO: El que funcionó para quitar todas las arrugas y nudos (separación de 2.5)
+                            const cleanPts = [rawPts[0]];
+                            for (let i = 1; i < rawPts.length - 1; i++) {
+                                if (rawPts[i].distanceTo(cleanPts[cleanPts.length - 1]) > 2.5) {
+                                    cleanPts.push(rawPts[i]);
+                                }
+                            }
+                            cleanPts.push(rawPts[rawPts.length - 1]); 
+
+                            if (cleanPts.length < 2) return;
+
+                            // 2. SUAVIZADO MATEMÁTICO: Convierte los cortes rectos en una curva sedosa perfecta
+                            if (cleanPts.length > 2) {
+                                for(let pass=0; pass<3; pass++) {
+                                    const temp = cleanPts.map(p => p.clone());
+                                    for(let i=1; i<cleanPts.length-1; i++) {
+                                        cleanPts[i].x = (temp[i-1].x + temp[i].x*2 + temp[i+1].x) / 4;
+                                        cleanPts[i].z = (temp[i-1].z + temp[i].z*2 + temp[i+1].z) / 4;
+                                    }
+                                }
+                            }
+
+                            const finalCurve = new THREE.CatmullRomCurve3(cleanPts, false, 'centripetal');
+                            const totalLen = finalCurve.getLength();
+
+                            // 3. GENERACIÓN EN ALTA RESOLUCIÓN: Dibuja la curva sin cortes visibles
+                            const createTube = (yPos) => {
+                                const segments = Math.max(16, Math.floor(totalLen * 2.0)); 
+                                const tube = new THREE.TubeGeometry(finalCurve, segments, 0.28, 6, false); 
+                                const mesh = new THREE.Mesh(tube, fenceMat);
+                                mesh.position.y = yPos; mesh.castShadow = true; mesh.receiveShadow = true;
+                                fenceGroup.add(mesh);
+                            };
+                            
+                            createTube(2.2); // Viga superior
+                            createTube(0.6); // Viga inferior
+
+                            // Postes anclados a los puntos reales limpios y distanciados
+                            let distCovered = 0;
+                            for (let i = 1; i < cleanPts.length; i++) {
+                                const d = cleanPts[i].distanceTo(cleanPts[i-1]);
+                                distCovered += d;
+                                if (distCovered >= 10.0 || i === cleanPts.length - 1) { 
+                                    const p = cleanPts[i].clone();
+                                    p.y += 1.30; 
+                                    postPositions.push(p);
+                                    distCovered = 0;
+                                }
+                            }
+                        };
+
+                        for (let s = 0; s < aspVertCount; s++) {
+                            if (needsArr[s]) currentSegment.push(s);
+                            else {
+                                if (currentSegment.length > 0) { processSegment(currentSegment); currentSegment = []; }
+                            }
+                        }
+                        if (currentSegment.length > 0) processSegment(currentSegment);
+                    };
+
+                    buildFences(needsFenceL, true);
+                    buildFences(needsFenceR, false);
+
+                    if (postPositions.length > 0) {
+                        // Poste extra alto (2.6 uds) y resistente (0.12 uds grosor)
+                        const postGeo = new THREE.CylinderGeometry(0.12, 0.12, 2.6, 6); 
+                        const postInstMesh = new THREE.InstancedMesh(postGeo, postMat, postPositions.length);
+                        postInstMesh.castShadow = true; postInstMesh.receiveShadow = true;
+                        const dummy = new THREE.Object3D();
+                        postPositions.forEach((pos, i) => {
+                            dummy.position.copy(pos);
+                            dummy.updateMatrix();
+                            postInstMesh.setMatrixAt(i, dummy.matrix);
+                        });
+                        fenceGroup.add(postInstMesh);
+                    }
+
                     // -----------------------------------------------------------------
 
                     let finalRallyPath = []; let rallyDists = [0]; let currentRallyDist = 0;
@@ -4986,7 +5452,8 @@
                         const pathR = new THREE.CatmullRomCurve3(rightPts);
                         const pathS = new THREE.CatmullRomCurve3(slotPts);
 
-                        const segments = Math.max(2, cp.length);
+                        // Incrementamos los segmentos tubulares para asegurar que las curvas y cambios de carril se dibujen suaves
+                        const segments = Math.max(8, cp.length * 2);
                         // OPTIMIZACIÓN GEOMÉTRICA: Reducido de 4/5 a 3 caras radiales (Prisma triangular). Altera miles de vértices y visualmente no se nota.
                         const gL = new THREE.TubeGeometry(pathL, segments, w/3.5, 3, false);
                         const gR = new THREE.TubeGeometry(pathR, segments, w/3.5, 3, false);
@@ -5048,7 +5515,7 @@
                     });
                     
                     for(let j=0; j<numLanes; j++) {
-                        createMultiSegmentRailMesh(rails.lanes[j], 0.7); 
+                        createMultiSegmentRailMesh(rails.visualLanes[j], 0.7); 
                     }
                     
                     createMultiSegmentRailMesh(rails.pit, 0.6); 
@@ -5192,6 +5659,89 @@
                                 dunlopGroup.add(bridge);
                             }, undefined, (err) => console.warn('Error cargando Dunlop:', err));
                         }
+                    }
+
+                    // --- SEÑALIZACIÓN FUEL EN PIT LANE ---
+                    const pitPieces = pieceMapRef.current.filter(p => p.subtype && p.subtype.includes('pit_parallel'));
+                    if (pitPieces.length > 0 && rails.pit.length > 0) {
+                        const getPosAt = (pa, d) => { 
+                            let i=0; 
+                            while(i < vertexDistances.length-1 && vertexDistances[i+1] < d) i++; 
+                            const r = (d - vertexDistances[i]) / (vertexDistances[i+1] - vertexDistances[i]); 
+                            if(!pa[i] || !pa[i+1]) return null; 
+                            return new THREE.Vector3().lerpVectors(pa[i], pa[i+1], r); 
+                        };
+                        
+                        pitPieces.forEach(pitPiece => {
+                            // Colocar la señal en el centro de cada pista paralela de boxes
+                            const midD = pitPiece.distStart + (pitPiece.distEnd - pitPiece.distStart) / 2;
+                            const p1 = getPosAt(rails.pit, midD);
+                            const p2 = getPosAt(rails.pit, midD + 1);
+                            
+                            if (p1 && p2) {
+                                const tangent = new THREE.Vector3().subVectors(p2, p1).normalize();
+                                
+                                // Crear un lienzo para dibujar la textura de FUEL y WiFi
+                                const fuelCanvas = document.createElement('canvas');
+                                fuelCanvas.width = 128;
+                                fuelCanvas.height = 256;
+                                const fuelCtx = fuelCanvas.getContext('2d');
+                                
+                                // Sombra ligera para que destaque sobre el asfalto oscuro
+                                fuelCtx.shadowColor = 'rgba(0,0,0,0.8)';
+                                fuelCtx.shadowBlur = 4;
+                                fuelCtx.shadowOffsetX = 2;
+                                fuelCtx.shadowOffsetY = 2;
+                                
+                                fuelCtx.strokeStyle = '#facc15'; // Amarillo Neón/Warning
+                                fuelCtx.fillStyle = '#facc15';
+                                fuelCtx.lineWidth = 10;
+                                fuelCtx.lineCap = 'round';
+                                
+                                const cx = 64;
+                                
+                                // Dibujar Símbolo WiFi
+                                fuelCtx.beginPath(); fuelCtx.arc(cx, 90, 8, 0, Math.PI*2); fuelCtx.fill(); // Punto central
+                                fuelCtx.beginPath(); fuelCtx.arc(cx, 90, 25, Math.PI*1.15, Math.PI*1.85); fuelCtx.stroke(); // Onda 1
+                                fuelCtx.beginPath(); fuelCtx.arc(cx, 90, 45, Math.PI*1.15, Math.PI*1.85); fuelCtx.stroke(); // Onda 2
+                                fuelCtx.beginPath(); fuelCtx.arc(cx, 90, 65, Math.PI*1.15, Math.PI*1.85); fuelCtx.stroke(); // Onda 3
+                                
+                                // Dibujar Texto FUEL
+                                fuelCtx.font = '900 36px "Orbitron", sans-serif';
+                                fuelCtx.textAlign = 'center';
+                                fuelCtx.textBaseline = 'middle';
+                                fuelCtx.fillText('FUEL', cx, 180);
+                                
+                                const fuelTex = new THREE.CanvasTexture(fuelCanvas);
+                                if(renderer.capabilities && renderer.capabilities.getMaxAnisotropy) {
+                                    fuelTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                                }
+                                
+                                // Crear el plano (proporción 1:2 para coincidir con el canvas 128x256)
+                                const fuelGeo = new THREE.PlaneGeometry(currentLaneSpacing * 0.9, currentLaneSpacing * 1.8);
+                                const fuelMat = new THREE.MeshBasicMaterial({
+                                    map: fuelTex,
+                                    transparent: true,
+                                    opacity: 0.9,
+                                    depthWrite: false, // Evitar z-fighting
+                                    polygonOffset: true,
+                                    polygonOffsetFactor: -4
+                                });
+                                
+                                const fuelMesh = new THREE.Mesh(fuelGeo, fuelMat);
+                                // Levantarla un pelo sobre el raíl para que no parpadee
+                                fuelMesh.position.set(p1.x, p1.y + 0.1, p1.z); 
+                                
+                                // Alinearla a la tangente del carril de boxes
+                                const lookAtPos = p1.clone().add(tangent);
+                                lookAtPos.y = p1.y + 0.1;
+                                fuelMesh.lookAt(lookAtPos);
+                                fuelMesh.rotateX(-Math.PI / 2); // Tumbarla sobre el asfalto
+                                fuelMesh.rotateZ(Math.PI); // Girar 180 para que apunte a la dirección de la marcha
+                                
+                                trackGroup.add(fuelMesh);
+                            }
+                        });
                     }
 
                     const b = new THREE.Box3().setFromObject(trackGroup); 
@@ -5427,61 +5977,73 @@
                             fileList.forEach(fileName => {
                                 const url = `https://raw.githubusercontent.com/slotsoftware/Telemetria/main/decora/${fileName}`;
                                 
-                                loader.load(url, (gltf) => {
-                                    const treeModel = gltf.scene;
-                                    
-                                    // Reset y centrado perfecto para TUS modelos
-                                    treeModel.position.set(0, 0, 0);
-                                    treeModel.scale.set(1, 1, 1);
-                                    treeModel.updateMatrixWorld(true);
-
-                                    const boxOriginal = new THREE.Box3().setFromObject(treeModel);
-                                    const centerOriginal = boxOriginal.getCenter(new THREE.Vector3());
-                                    
-                                    // Centrar el pivote geométricamente en X y Z
-                                    treeModel.position.x -= centerOriginal.x;
-                                    treeModel.position.z -= centerOriginal.z;
-
-                                    // Escalar los árboles a un tamaño estándar visual para Scalextric (aprox 22 cm/unidades)
-                                    const sizeOriginal = boxOriginal.getSize(new THREE.Vector3());
-                                    const targetHeight = 22.0; 
-                                    const scale = targetHeight / (sizeOriginal.y || 1);
-                                    treeModel.scale.set(scale, scale, scale);
-                                    treeModel.updateMatrixWorld(true);
-
-                                    // Alinear en Y para que la base del tronco toque perfectamente el suelo independientemente de su geometría
-                                    const boxScaled = new THREE.Box3().setFromObject(treeModel);
-                                    treeModel.position.y -= boxScaled.min.y;
-
-                                    treeModel.traverse(c => {
-                                        if (c.isMesh) {
-                                            // OPTIMIZACIÓN EXTREMA: Fuera sombras
-                                            c.castShadow = false;
-                                            c.receiveShadow = false;
+                                // Usamos fetch primero para evitar el error de parseo de JSON en caso de 404
+                                fetch(url)
+                                    .then(res => {
+                                        if (!res.ok) throw new Error("404 Tree not found");
+                                        return res.blob();
+                                    })
+                                    .then(blob => {
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        loader.load(blobUrl, (gltf) => {
+                                            const treeModel = gltf.scene;
                                             
-                                            // OPTIMIZACIÓN EXTREMA: Cambiamos a MeshBasicMaterial (Sin cálculos de luz)
-                                            if (c.material) {
-                                                const oldMat = c.material;
-                                                const basicMat = new THREE.MeshBasicMaterial({
-                                                    map: oldMat.map || null,
-                                                    color: oldMat.color || 0xffffff,
-                                                    side: THREE.DoubleSide,
-                                                    transparent: oldMat.transparent,
-                                                    alphaTest: oldMat.alphaTest || 0.5
-                                                });
-                                                c.material = basicMat;
-                                            }
-                                        }
+                                            // Reset y centrado perfecto para TUS modelos
+                                            treeModel.position.set(0, 0, 0);
+                                            treeModel.scale.set(1, 1, 1);
+                                            treeModel.updateMatrixWorld(true);
+
+                                            const boxOriginal = new THREE.Box3().setFromObject(treeModel);
+                                            const centerOriginal = boxOriginal.getCenter(new THREE.Vector3());
+                                            
+                                            // Centrar el pivote geométricamente en X y Z
+                                            treeModel.position.x -= centerOriginal.x;
+                                            treeModel.position.z -= centerOriginal.z;
+
+                                            // Escalar los árboles a un tamaño estándar visual para Scalextric (aprox 22 cm/unidades)
+                                            const sizeOriginal = boxOriginal.getSize(new THREE.Vector3());
+                                            const targetHeight = 22.0; 
+                                            const scale = targetHeight / (sizeOriginal.y || 1);
+                                            treeModel.scale.set(scale, scale, scale);
+                                            treeModel.updateMatrixWorld(true);
+
+                                            // Alinear en Y para que la base del tronco toque perfectamente el suelo independientemente de su geometría
+                                            const boxScaled = new THREE.Box3().setFromObject(treeModel);
+                                            treeModel.position.y -= boxScaled.min.y;
+
+                                            treeModel.traverse(c => {
+                                                if (c.isMesh) {
+                                                    // OPTIMIZACIÓN EXTREMA: Fuera sombras
+                                                    c.castShadow = false;
+                                                    c.receiveShadow = false;
+                                                    
+                                                    // OPTIMIZACIÓN EXTREMA: Cambiamos a MeshBasicMaterial (Sin cálculos de luz)
+                                                    if (c.material) {
+                                                        const oldMat = c.material;
+                                                        const basicMat = new THREE.MeshBasicMaterial({
+                                                            map: oldMat.map || null,
+                                                            color: oldMat.color || 0xffffff,
+                                                            side: THREE.DoubleSide,
+                                                            transparent: oldMat.transparent,
+                                                            alphaTest: oldMat.alphaTest || 0.5
+                                                        });
+                                                        c.material = basicMat;
+                                                    }
+                                                }
+                                            });
+                                            
+                                            loadedTrees.push(treeModel);
+                                            loadedCount++;
+                                            if(loadedCount === fileList.length) finalizeTrees();
+                                        }, undefined, (e) => {
+                                            loadedCount++;
+                                            if(loadedCount === fileList.length) finalizeTrees();
+                                        });
+                                    })
+                                    .catch(e => {
+                                        loadedCount++;
+                                        if(loadedCount === fileList.length) finalizeTrees();
                                     });
-                                    
-                                    loadedTrees.push(treeModel);
-                                    loadedCount++;
-                                    if(loadedCount === fileList.length) finalizeTrees();
-                                }, undefined, (e) => {
-                                    console.warn("Fallo en descarga individual:", url, e);
-                                    loadedCount++;
-                                    if(loadedCount === fileList.length) finalizeTrees();
-                                });
                             });
                         };
 
@@ -5495,19 +6057,19 @@
                                 // Filtrar SOLO los que se llamen pino o alamo
                                 const glbFiles = data.filter(f => {
                                     const n = f.name.toLowerCase();
-                                    return (n.includes('pino') || n.includes('alamo')) && (n.endsWith('.glb') || n.endsWith('.gltf'));
+                                    return (n.includes('pino') || n.includes('alamo') || n.includes('arbol') || n.includes('tree')) && (n.endsWith('.glb') || n.endsWith('.gltf'));
                                 }).map(f => f.name);
                                 
                                 if (glbFiles.length > 0) {
                                     loadRealTrees(glbFiles);
                                 } else {
                                     // Si no encuentra los nombres exactos, forzamos por si acaso
-                                    loadRealTrees(['pino.glb', 'alamo.glb']);
+                                    loadRealTrees(['pino.glb', 'alamo.glb', 'Pino.glb', 'Alamo.glb', 'arbol.glb', 'Arbol.glb']);
                                 }
                             })
                             .catch(err => {
                                 console.warn("API bloqueada, intentando cargar lista predefinida...");
-                                loadRealTrees(['pino.glb', 'alamo.glb']);
+                                loadRealTrees(['pino.glb', 'alamo.glb', 'Pino.glb', 'Alamo.glb', 'arbol.glb', 'Arbol.glb']);
                             });
 
                         // --- FIN GENERADOR BOSQUE ---
@@ -5638,14 +6200,35 @@
                                     cp = pieceMapRef.current.find(p => car.distance >= p.distStart && car.distance < p.distEnd) || pieceMapRef.current[0];
                                 }
 
-                                // 1. SISTEMA ANTICOLISIÓN PREDICTIVO OPTIMIZADO
+                                // 1. SISTEMA ANTICOLISIÓN PREDICTIVO OPTIMIZADO (INCLUYE CHICANE)
                                 if (activeButtonRef.current === 'DIGITAL') {
                                     if (numCarsRef.current > 1) {
                                         let dtc = Infinity;
                                         for (let j = 0; j < physicsState.current.length; j++) {
                                             const o = physicsState.current[j];
                                             if (o.id <= numCarsRef.current && o.id !== car.id && !o.isDerailled && nowTime > o.invulnerableUntil) {
-                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane) { 
+                                                // Chequear colisión frontal en el mismo carril
+                                                let collisionImminent = false;
+                                                
+                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane) {
+                                                    collisionImminent = true;
+                                                }
+                                                
+                                                // REGLA CHICANE: Si alguno de los dos está en la chicane central, se consideran en el "mismo carril" para la colisión
+                                                const carInChicane = cp && ['y_merge_out', 'single_lane_s', 'single_lane_curve', 'y_merge_in'].includes(cp.subtype);
+                                                
+                                                // Necesitamos saber si el OTRO coche está en la chicane
+                                                let o_cp = pieceMapRef.current[o.lastPieceIndex >= 0 && o.lastPieceIndex < pieceMapRef.current.length ? o.lastPieceIndex : 0];
+                                                if (!o_cp || o.distance < o_cp.distStart || o.distance >= o_cp.distEnd) {
+                                                    o_cp = pieceMapRef.current.find(p => o.distance >= p.distStart && o.distance < p.distEnd) || pieceMapRef.current[0];
+                                                }
+                                                const oInChicane = o_cp && ['y_merge_out', 'single_lane_s', 'single_lane_curve', 'y_merge_in'].includes(o_cp.subtype);
+
+                                                if (carInChicane || oInChicane) {
+                                                    collisionImminent = true; // Forzamos chequeo de distancia sin importar el carril lógico
+                                                }
+
+                                                if (collisionImminent) { 
                                                     let di = o.distance - car.distance; 
                                                     if (di < -totalDist / 2) di += totalDist; else if (di > totalDist / 2) di -= totalDist;
                                                     if (di > 0 && di < dtc) dtc = di; 
@@ -6110,6 +6693,13 @@
                                         if (car.isChanging) { car.isChanging = false; car.currentLane = car.targetLane; }
                                         if (car.currentLane === LANE_PIT && !currentPiece.isPitSection) { car.currentLane = (car.targetLane === LANE_PIT) ? 1 : car.targetLane; car.targetLane = car.currentLane; }
                                         if (car.targetLane === LANE_PIT && currentPiece.isPitSection) car.currentLane = LANE_PIT; else if (car.currentLane !== LANE_PIT) car.currentLane = car.targetLane;
+                                        
+                                        // FIX CHICANE: Sincronizar el carril lógico con el físico antes del desvío de salida
+                                        if (currentPiece.subtype === 'y_merge_in') {
+                                            const physLane = currentPiece.direction === 'right' ? 0 : 1;
+                                            car.currentLane = physLane;
+                                            car.targetLane = physLane;
+                                        }
                                     }
 
                                     for(let j=0; j<numLanes; j++) {
@@ -6151,7 +6741,7 @@
 
                                     // PROTECCIÓN CONTRA ESPASMOS AL CERRAR BUCLE
                                     _tan.subVectors(_flook, _fpos);
-                                    if (_tan.lengthSq() > 100.0) {
+                                    if (_tan.lengthSq() > 100.0 || _tan.lengthSq() < 0.0001) {
                                         // El lookahead ha saltado la meta y hay gap físico en el circuito
                                         if (car.lastValidTan) _tan.copy(car.lastValidTan);
                                         else _tan.set(0,0,1);
@@ -6200,8 +6790,11 @@
                                         
                                         if (!isReversedRef.current) {
                                             const isEarlyInPiece = distInPiece < (pieceLen * 0.35); 
-                                            if (!car.isChanging && laneActiveRef.current && currentPiece.canChangeLane && carShouldMove) {
-                                                // FIX: isPlayer ahora reconoce correctamente el modo Práctica para evitar que la IA tome el control y frene el coche
+                                            // NUEVO: Añadida excepción para que la IA/Mando ignore cambios de carril fantasma en y_merge_out
+                                            const isValidChangePiece = currentPiece.canChangeLane && !['y_merge_out'].includes(currentPiece.subtype);
+                                            
+                                            if (!car.isChanging && laneActiveRef.current && isValidChangePiece && carShouldMove) {
+                                                // FIX: Lógica de cambio de carril
                                                 let nl = car.currentLane, sc = false, isPlayer = (car.id === selectedCarIdRef.current && (activeButtonRef.current === 'DIGITAL' || activeButtonRef.current === 'PRACTICE'));
                                                 if (car.currentLane !== LANE_PIT && isEarlyInPiece) {
                                                     const pitEntryPiece = pieceMapRef.current.find(p => p.type === 'pit_entry' || p.subtype === 'pit_entry');
@@ -6218,6 +6811,7 @@
                                                             if (currentPiece.subtype === 'digital_x' || currentPiece.subtype === 'pit_parallel_double_x') { nl = (car.currentLane===0?1:0); sc = true; } 
                                                             else if (currentPiece.subtype === 'change_right' && car.currentLane === 0) { nl = 1; sc = true; } 
                                                             else if (currentPiece.subtype === 'change_left' && car.currentLane === 1) { nl = 0; sc = true; } 
+                                                            else if (currentPiece.subtype === 'y_merge_in') { nl = (car.currentLane===0?1:0); sc = true; }
                                                         }
                                                     } else { 
                                                         if ((currentPiece.type === 'pit_entry' || currentPiece.subtype === 'pit_entry') && car.currentLane === targetPitLane && car.wantsToPit) { 
@@ -6229,9 +6823,15 @@
                                                                 nl = targetPitLane; sc = true;
                                                             } else if (currentPiece.subtype === 'change_left' && car.currentLane === 1 && targetPitLane === 0) {
                                                                 nl = targetPitLane; sc = true;
+                                                            } else if (currentPiece.subtype === 'y_merge_in') {
+                                                                nl = targetPitLane; sc = true;
                                                             }
-                                                        } else if (!car.wantsToPit && (currentPiece.subtype === 'digital_x' || currentPiece.subtype === 'pit_parallel_double_x') && Math.random()>0.8) {
-                                                            nl = (car.currentLane===0?1:0); sc = true;
+                                                        } else if (!car.wantsToPit) {
+                                                            if ((currentPiece.subtype === 'digital_x' || currentPiece.subtype === 'pit_parallel_double_x') && Math.random()>0.8) {
+                                                                nl = (car.currentLane===0?1:0); sc = true;
+                                                            } else if (currentPiece.subtype === 'y_merge_in' && Math.random()>0.5) {
+                                                                nl = (car.currentLane===0?1:0); sc = true;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -6491,11 +7091,11 @@
 
                     {/* DASHBOARD SUPERIOR */}
                     {(activeButton === 'ANALOG' || activeButton === 'PRACTICE') && (
-                        <AnalogDashboard telemetry={telemetry.slice(0, numCars)} carSetups={carSetups} raceState={raceState} activeLights={activeLights} elapsedTime={elapsedTime} targetLaps={targetLaps} aiLevel={aiLevel} setAiLevel={setAiLevel} throttleProfile={throttleProfile} setThrottleProfile={setThrottleProfile} showTrees={showTrees} setShowTrees={setShowTrees} showGarage={showHomoViewer} setShowGarage={setShowHomoViewer} cameraMode={cameraMode} setCameraMode={setCameraMode} isRally={hasRotonda} showDunlop={showDunlop} setShowDunlop={setShowDunlop} />
+                        <AnalogDashboard telemetry={telemetry.slice(0, numCars)} carSetups={carSetups} raceState={raceState} activeLights={activeLights} elapsedTime={elapsedTime} targetLaps={targetLaps} aiLevel={aiLevel} setAiLevel={setAiLevel} throttleProfile={throttleProfile} setThrottleProfile={setThrottleProfile} showTrees={showTrees} setShowTrees={setShowTrees} showGarage={showHomoViewer} setShowGarage={setShowHomoViewer} cameraMode={cameraMode} setCameraMode={setCameraMode} isRally={hasRotonda} showDunlop={showDunlop} setShowDunlop={setShowDunlop} showFences={showFences} setShowFences={setShowFences} />
                     )}
                     
                     {activeButton === 'DIGITAL' && (
-                        <DigitalDashboard telemetry={telemetry} carSetups={carSetups} raceState={raceState} activeLights={activeLights} elapsedTime={elapsedTime} targetLaps={targetLaps} aiLevel={aiLevel} setAiLevel={setAiLevel} throttleProfile={throttleProfile} setThrottleProfile={setThrottleProfile} showTrees={showTrees} setShowTrees={setShowTrees} numCars={numCars} showGarage={showHomoViewer} setShowGarage={setShowHomoViewer} cameraMode={cameraMode} setCameraMode={setCameraMode} showDunlop={showDunlop} setShowDunlop={setShowDunlop} />
+                        <DigitalDashboard telemetry={telemetry} carSetups={carSetups} raceState={raceState} activeLights={activeLights} elapsedTime={elapsedTime} targetLaps={targetLaps} aiLevel={aiLevel} setAiLevel={setAiLevel} throttleProfile={throttleProfile} setThrottleProfile={setThrottleProfile} showTrees={showTrees} setShowTrees={setShowTrees} numCars={numCars} showGarage={showHomoViewer} setShowGarage={setShowHomoViewer} cameraMode={cameraMode} setCameraMode={setCameraMode} showDunlop={showDunlop} setShowDunlop={setShowDunlop} showFences={showFences} setShowFences={setShowFences} />
                     )}
 
                     {activeButton !== 'ANALOG' && activeButton !== 'DIGITAL' && activeButton !== 'PRACTICE' && (
@@ -6517,7 +7117,7 @@
                             
                             <div className="flex flex-col items-center mt-2 shrink-0 pointer-events-auto">
                                 <div className="flex gap-4 items-end mb-1">
-                                        <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} />
+                                        <DrivingStyleSelector profile={throttleProfile} setProfile={setThrottleProfile} showDunlop={showDunlop} setShowDunlop={setShowDunlop} showFences={showFences} setShowFences={setShowFences} />
                                         <AiLevelSelector aiLevel={aiLevel} setAiLevel={setAiLevel} />
                                         <TreeToggle showTrees={showTrees} setShowTrees={setShowTrees} />
                                         <GarageToggle showGarage={showHomoViewer} setShowGarage={setShowHomoViewer} />
@@ -7016,7 +7616,13 @@
 
                   const loadFromUrl = (rawUrl, fileName, targetId) => {
                       fetch(rawUrl)
-                          .then(r => r.blob())
+                          .then(r => {
+                              // PREVENIR ERROR DE GLTFLoader: Si devuelve 404 u otro error, abortar inmediatamente.
+                              if (!r.ok) {
+                                  throw new Error(`Archivo no disponible (${r.status}): ${rawUrl}`);
+                              }
+                              return r.blob();
+                          })
                           .then(blob => {
                               const file = new File([blob], fileName, { type: 'model/gltf-binary' });
                               setCustomCarAssets(prev => {
@@ -7026,7 +7632,7 @@
                               });
                               console.log(`🚗 Auto-cargado coche ${targetId} por defecto:`, fileName);
                           })
-                          .catch(e => console.error(`Error auto-loading car ${targetId}:`, e));
+                          .catch(e => console.warn(`Saltando carga automática del coche ${targetId}:`, e.message)); // Usamos warn en vez de error
                   };
 
                   fetch(apiUrl)
@@ -7093,18 +7699,15 @@
                           }
                       })
                       .catch(err => {
-                          console.log("GitHub API failed for auto-load:", err);
-                          // Fallback por límite de API de GitHub (60 peticiones/hora)
-                          if (config.owner === 'slotsoftware' && config.repo === 'Telemetria') {
-                              loadFromUrl(getRawUrl('amartin.glb'), 'amartin.glb', 1);
-                              loadFromUrl(getRawUrl('seat_leon.glb'), 'seat_leon.glb', 2);
-                              loadFromUrl(getRawUrl('seat_leon.glb'), 'seat_leon.glb', 3);
-                              loadFromUrl(getRawUrl('amartin.glb'), 'amartin.glb', 4);
-                              loadFromUrl(getRawUrl('seat_leon.glb'), 'seat_leon.glb', 5);
-                              loadFromUrl(getRawUrl('amartin.glb'), 'amartin.glb', 6);
-                              loadFromUrl(getRawUrl('seat_leon.glb'), 'seat_leon.glb', 7);
-                              loadFromUrl(getRawUrl('amartin.glb'), 'amartin.glb', 8);
-                          }
+                          console.warn("GitHub API límite excedido. Usando nombres de coches por defecto...");
+                          // Si la API falla, intentamos cargar los nombres conocidos directamente (sin API)
+                          const fallbacks = ['amartin.glb', 'seat_leon.glb', 'porsche.glb', 'audi.glb', 'coche1.glb', 'coche2.glb'];
+                          fallbacks.forEach((name, i) => {
+                              // Reutilizamos la lista para intentar llenar los 8 huecos
+                              const carToLoad = fallbacks[i] || fallbacks[0];
+                              loadFromUrl(getRawUrl(carToLoad), carToLoad, i + 1);
+                              loadFromUrl(getRawUrl(carToLoad), carToLoad, i + 5); 
+                          });
                       });
               }
           }, [circuitData]);
