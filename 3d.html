@@ -4365,12 +4365,11 @@
                             sL = currentOffsets.map(() => stOff); // Ambos parten superpuestos
                             tL = currentOffsets.map(() => tgOff); // Ambos se mueven hacia el lado opuesto
                             
-                            const narrowExtra = 2.5; // Margen extra para tapar huecos en los lados cerrados
-                            startHalfL = startSide === 'left' ? stdHalfL : narrowExtra;
-                            startHalfR = startSide === 'right' ? stdHalfR : narrowExtra;
+                            startHalfL = stdHalfL;
+                            startHalfR = stdHalfR;
                             
-                            endHalfL = targetSide === 'left' ? stdHalfL : narrowExtra;
-                            endHalfR = targetSide === 'right' ? stdHalfR : narrowExtra;
+                            endHalfL = stdHalfL;
+                            endHalfR = stdHalfR;
                             
                             chicaneActiveSide = targetSide;
                             currentOffsets = [...tL];
@@ -4517,8 +4516,11 @@
                                 railZ += pz * sShapeOffset;
                                 
                                 // Hacemos que el asfalto de la chicane ondule con el raíl para no salirnos de la pista
-                                asphaltX += px * sShapeOffset;
-                                asphaltZ += pz * sShapeOffset;
+                                // EXCEPCIÓN: La pista en zig-zag de SCX Advance (PT74) mantiene el asfalto recto
+                                if (p.subtype !== 'single_lane_s' && p.subtype !== 'single_lane_curve') {
+                                    asphaltX += px * sShapeOffset;
+                                    asphaltZ += pz * sShapeOffset;
+                                }
                             }
 
                             // IMPORTANTE: Le pasamos 'curL_Vis' (con el raíl oculto) al dibujante para que lo ignore visualmente,
@@ -6794,7 +6796,7 @@
                                             const isValidChangePiece = currentPiece.canChangeLane && !['y_merge_out'].includes(currentPiece.subtype);
                                             
                                             if (!car.isChanging && laneActiveRef.current && isValidChangePiece && carShouldMove) {
-                                                // FIX: Lógica de cambio de carril
+                                                // FIX: isPlayer ahora reconoce correctamente el modo Práctica para evitar que la IA tome el control y frene el coche
                                                 let nl = car.currentLane, sc = false, isPlayer = (car.id === selectedCarIdRef.current && (activeButtonRef.current === 'DIGITAL' || activeButtonRef.current === 'PRACTICE'));
                                                 if (car.currentLane !== LANE_PIT && isEarlyInPiece) {
                                                     const pitEntryPiece = pieceMapRef.current.find(p => p.type === 'pit_entry' || p.subtype === 'pit_entry');
