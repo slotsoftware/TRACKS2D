@@ -4498,7 +4498,7 @@
                                 // Fase 3: Retorna al centro. Inicia paralelo en el borde y termina paralelo en el centro (0)
                                 sShapeOffset = -(currentLaneSpacing * 0.5) + (easeSine(t) * (currentLaneSpacing * 0.5));
                             } else if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve') {
-                                // IA DE CHICANE PT74 DE SCX ADVANCE (Basada en tu foto)
+                                // IA DE CHICANE
                                 // Movimiento serpenteante DENTRO del medio ancho del carril
                                 // Math.PI en lugar de Math.PI * 2 para que haga 1 sola curva, no un zig-zag doble
                                 const waveAmplitude = currentLaneSpacing * 0.15; 
@@ -4516,8 +4516,10 @@
                                 railZ += pz * sShapeOffset;
                                 
                                 // Hacemos que el asfalto de la chicane ondule con el raíl para no salirnos de la pista
-                                // EXCEPCIÓN: La pista en zig-zag de SCX Advance (PT74) mantiene el asfalto recto
-                                if (p.subtype !== 'single_lane_s' && p.subtype !== 'single_lane_curve') {
+                                // EXCEPCIÓN: La pista en zig-zag de SCX Advance o piezas "single_lane_s" mantienen el asfalto recto
+                                const isAdvanceChicane = (p.brand === 'SCX_ADVANCE' || p.brandKey === 'SCX_ADVANCE') && (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve');
+                                
+                                if (p.subtype !== 'single_lane_s' && p.subtype !== 'single_lane_curve' && !isAdvanceChicane) {
                                     asphaltX += px * sShapeOffset;
                                     asphaltZ += pz * sShapeOffset;
                                 }
