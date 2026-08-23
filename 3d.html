@@ -4220,7 +4220,7 @@
                         
                         // Aumentamos la resolución geométrica de las entradas, salidas y cambios de carril para que la curva CatmullRom sea perfectamente suave
                         let steps = (p.type === 'curve') ? Math.max(12, Math.ceil(Math.abs(p.angle) * 1.5 * resMult)) : Math.max(10, Math.ceil((physicalLength / 3.0) * resMult));
-                        const isSmoothMergePiece = (p.subtype && ['y_merge_in', 'y_merge_out', 'single_lane_s', 'single_lane_curve', 'single_lane_1', 'single_lane_2', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype)) || ['pit_entry', 'pit_exit'].includes(p.type);
+                        const isSmoothMergePiece = (p.subtype && ['y_merge_in', 'y_merge_out', 'single_lane_s', 'single_lane_curve', 'single_lane_1', 'single_lane_2', 'chicane_entry', 'chicane_exit', 'chicane3_entry', 'chicane3_middle', 'chicane3_exit', 'digital_x', 'change_right', 'change_left', 'pit_parallel_double_x', 'full_chicane'].includes(p.subtype)) || ['pit_entry', 'pit_exit'].includes(p.type);
                         if (isSmoothMergePiece) {
                             steps = Math.max(steps, Math.ceil((physicalLength / 1.5) * resMult));
                         }
@@ -4278,6 +4278,7 @@
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
                         const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit';
+                        const isChicaneMiddle = p.subtype === 'chicane_middle' || p.subtype === 'chicane3_middle';
                         const pitSide = p.invert ? 'left' : 'right';
                         const pitDir = pitSide === 'right' ? 1 : -1;
                         
@@ -4404,29 +4405,52 @@
                             currentOffsets = [...tL];
                         }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
-                        else if (isChicaneEntry) { tL = sL.map(off => off * 0.2); currentOffsets = [...tL]; } 
-                        else if (isChicaneExit) { 
-                            let standardOffsets = [];
-                            if (hasGroups) {
-                                for (let i = 0; i < numLanes; i++) {
-                                    const pairIndex = Math.floor(i / 2);
-                                    const isRightLane = i % 2 === 1;
-                                    const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
-                                    standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
-                                }
-                            } else {
-                                for(let i=0; i<numLanes; i++) {
-                                    standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
-                                }
-                            }
+                        else if (isChicaneEntry || isChicaneExit || isChicaneMiddle || p.subtype === 'full_chicane') {
+                            const straightRailIdx = 1 % numLanes; // Un carril se mantiene totalmente recto (como en advance)
+                            const straightOffset = currentOffsets[straightRailIdx];
+                            const narrowGap = currentLaneSpacing * 0.25; // El otro carril se acerca (2 carriles juntos)
                             
-                            // FIX: Mantener la polaridad actual para evitar que los carriles se crucen en la salida
-                            tL = sL.map((val, i) => {
-                                const magnitude = Math.abs(standardOffsets[i]);
-                                return val === 0 ? 0 : Math.sign(val) * magnitude;
+                            const narrowedOffsets = currentOffsets.map((off, i) => {
+                                if (i === straightRailIdx) return off; // El raíl recto no cambia
+                                return straightOffset + (i < straightRailIdx ? -narrowGap : narrowGap); 
                             });
+
+                            if (isChicaneEntry) {
+                                sL = [...currentOffsets];
+                                tL = [...narrowedOffsets];
+                            } else if (isChicaneMiddle) {
+                                sL = [...narrowedOffsets];
+                                tL = [...narrowedOffsets];
+                            } else if (isChicaneExit) {
+                                sL = [...narrowedOffsets];
+                                let standardOffsets = [];
+                                if (hasGroups) {
+                                    for (let i = 0; i < numLanes; i++) {
+                                        const pairIndex = Math.floor(i / 2);
+                                        const isRightLane = i % 2 === 1;
+                                        const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
+                                        standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
+                                    }
+                                } else {
+                                    for(let i=0; i<numLanes; i++) {
+                                        standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
+                                    }
+                                }
+                                tL = [...standardOffsets];
+                            } else if (p.subtype === 'full_chicane') {
+                                sL = [...currentOffsets];
+                                tL = [...currentOffsets]; // Se calcula dinámicamente en el bucle
+                            }
+
+                            // Asfalto completamente recto en todas las fases de la chicane
+                            startHalfL = stdHalfL;
+                            startHalfR = stdHalfR;
+                            endHalfL = stdHalfL;
+                            endHalfR = stdHalfR;
                             
-                            currentOffsets = [...tL];
+                            if (p.subtype !== 'full_chicane') {
+                                currentOffsets = [...tL];
+                            }
                         }
                         
                         const d12 = [], d21 = [];
@@ -4460,8 +4484,66 @@
                             let mixT = (isCrossing || isChicaneEntry || isChicaneExit || isSmoothMerge || isSCXAdvanceSingleCurve || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
                             
                             let cL = [];
-                            for(let j=0; j<numLanes; j++) {
-                                cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                            if (p.subtype === 'full_chicane') {
+                                // SCX Classic PT74 (105cm). 3 Fases idénticas a las 3 piezas de SCX Advance.
+                                // 1. Estrecharse, 2. Curva única (Campana), 3. Ensancharse.
+                                const phase1 = 0.333; 
+                                const phase2 = 0.666; 
+                                
+                                let narrowT = 0;
+                                let waveT = 0;
+                                
+                                if (t < phase1) {
+                                    narrowT = easeSine(t / phase1);
+                                } else if (t <= phase2) {
+                                    narrowT = 1.0;
+                                    waveT = (t - phase1) / (phase2 - phase1);
+                                } else {
+                                    narrowT = 1.0 - easeSine((t - phase2) / (1.0 - phase2));
+                                }
+
+                                const straightRailIdx = 1 % numLanes; // El raíl que se mantiene recto
+                                const straightOffset = sL[straightRailIdx];
+                                const narrowGap = currentLaneSpacing * 0.25;
+
+                                for(let j=0; j<numLanes; j++) {
+                                    let normalOffset = sL[j];
+                                    let narrowOffset = straightOffset + (j === straightRailIdx ? 0 : (j < straightRailIdx ? -narrowGap : narrowGap));
+                                    
+                                    let currentOff = normalOffset + (narrowOffset - normalOffset) * narrowT;
+                                    
+                                    if (waveT > 0 && waveT < 1) {
+                                        const waveAmp = currentLaneSpacing * 0.45; // Suave como el Advance
+                                        const dir = p.direction === 'left' ? -1 : 1;
+                                        // Campana ultrasuave (0 -> 1 -> 0) para que no haya ángulos bruscos
+                                        const bellCurve = 0.5 - 0.5 * Math.cos(waveT * Math.PI * 2);
+                                        currentOff += bellCurve * waveAmp * dir;
+                                    }
+                                    cL.push(currentOff);
+                                }
+                            } else if (isChicaneMiddle) {
+                                const waveT = t; 
+                                for(let j=0; j<numLanes; j++) {
+                                    let currentOff = sL[j]; 
+                                    const waveAmp = currentLaneSpacing * 0.45;
+                                    const dir = p.direction === 'left' ? -1 : 1;
+                                    const bellCurve = 0.5 - 0.5 * Math.cos(waveT * Math.PI * 2);
+                                    currentOff += bellCurve * waveAmp * dir;
+                                    cL.push(currentOff);
+                                }
+                            } else if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve') {
+                                for(let j=0; j<numLanes; j++) {
+                                    let currentOff = sL[j] + (tL[j] - sL[j]) * mixT;
+                                    const waveAmp = currentLaneSpacing * 0.15; 
+                                    const waveDirection = p.direction === 'left' ? -1 : 1;
+                                    const sWave = Math.sin(t * Math.PI) * waveAmp * waveDirection;
+                                    currentOff += sWave;
+                                    cL.push(currentOff);
+                                }
+                            } else {
+                                for(let j=0; j<numLanes; j++) {
+                                    cL.push(sL[j] + (tL[j] - sL[j]) * mixT);
+                                }
                             }
 
                             const pcd = (currentLaneSpacing / 2) + currentLaneSpacing;
@@ -4486,47 +4568,9 @@
 
                             let railX = curX;
                             let railZ = curZ;
-                            let sShapeOffset = 0;
-
-                            if (p.subtype === 'chicane3_entry') {
-                                // Fase 1: Suavemente hacia un lado. Inicia paralelo al asfalto (0) y termina paralelo en el borde
-                                sShapeOffset = easeSine(t) * (currentLaneSpacing * 0.5);
-                            } else if (p.subtype === 'chicane3_middle') {
-                                // Fase 2: Cruza de un borde al otro. Inicia paralelo y termina paralelo en el otro extremo
-                                sShapeOffset = (currentLaneSpacing * 0.5) - (easeSine(t) * currentLaneSpacing);
-                            } else if (p.subtype === 'chicane3_exit') {
-                                // Fase 3: Retorna al centro. Inicia paralelo en el borde y termina paralelo en el centro (0)
-                                sShapeOffset = -(currentLaneSpacing * 0.5) + (easeSine(t) * (currentLaneSpacing * 0.5));
-                            } else if (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve') {
-                                // IA DE CHICANE
-                                // Movimiento serpenteante DENTRO del medio ancho del carril
-                                // Math.PI en lugar de Math.PI * 2 para que haga 1 sola curva, no un zig-zag doble
-                                const waveAmplitude = currentLaneSpacing * 0.15; 
-                                const waveDirection = p.direction === 'left' ? -1 : 1;
-                                sShapeOffset = Math.sin(t * Math.PI) * waveAmplitude * waveDirection;
-                            }
-
                             let asphaltX = curX;
                             let asphaltZ = curZ;
 
-                            if (sShapeOffset !== 0) {
-                                const px = Math.cos(curAngle + Math.PI/2);
-                                const pz = Math.sin(curAngle + Math.PI/2);
-                                railX += px * sShapeOffset;
-                                railZ += pz * sShapeOffset;
-                                
-                                // Hacemos que el asfalto de la chicane ondule con el raíl para no salirnos de la pista
-                                // EXCEPCIÓN: La pista en zig-zag de SCX Advance o piezas "single_lane_s" mantienen el asfalto recto
-                                const isAdvanceChicane = (p.brand === 'SCX_ADVANCE' || p.brandKey === 'SCX_ADVANCE') && (p.subtype === 'single_lane_s' || p.subtype === 'single_lane_curve');
-                                
-                                if (p.subtype !== 'single_lane_s' && p.subtype !== 'single_lane_curve' && !isAdvanceChicane) {
-                                    asphaltX += px * sShapeOffset;
-                                    asphaltZ += pz * sShapeOffset;
-                                }
-                            }
-
-                            // IMPORTANTE: Le pasamos 'curL_Vis' (con el raíl oculto) al dibujante para que lo ignore visualmente,
-                            // pero las coordenadas físicas 'cL' están perfectas y contiguas
                             addRailPoint(railX, railZ, curAngle, cL, cPit, stepPhysDist, pieceBrand, curL_Vis); 
 
                             addAsphaltSlice(asphaltX, asphaltZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
