@@ -944,7 +944,7 @@
                 } else { 
                     dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); da = aRad; 
                 }
-            } else if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+            } else if (p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') {
                 da = Math.PI;
             } else if (p.type === 'compound_curve_change') {
                 const r = Math.abs(effectiveRadius);
@@ -966,7 +966,7 @@
             let midY = (p.y + exitY) / 2;
             let hitRadius = (p.type === 'straight' || (p.type && p.type.includes('pit')) || (p.type && p.type.includes('branch'))) ? p.length / 2 : Math.abs(effectiveRadius);
 
-            if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+            if (p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') {
                 const straightLen = 1.0;
                 midX = p.x + (straightLen + (p.radius || 15)) * Math.cos(rot);
                 midY = p.y + (straightLen + (p.radius || 15)) * Math.sin(rot);
@@ -1034,7 +1034,7 @@
             } else if (p.subtype === 'single_lane_2') {
                 inNodes.push({ x: p.x - laneOff * Math.sin(rot), y: p.y + laneOff * Math.cos(rot), angle: rot, role: 'rail' });
                 outNodes.push({ x: exitX - laneOff * Math.sin(exitAngle), y: exitY + laneOff * Math.cos(exitAngle), angle: exitAngle, role: 'rail' });
-            } else if (p.type === 'rotonda' || p.subtype === 'rotonda') {
+            } else if (p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') {
                 inNodes.push({ x: p.x + laneOff * Math.sin(rot), y: p.y - laneOff * Math.cos(rot), angle: rot, role: 'rail' });
                 outNodes.push({ x: p.x - laneOff * Math.sin(rot), y: p.y + laneOff * Math.cos(rot), angle: exitAngle, role: 'rail' });
             } else {
@@ -1212,16 +1212,29 @@
                 if ((p.subtype === 'full_chicane' || p.subtype === 'digital_full_chicane') && expandMacros) {
                     const partLength = p.length / 3;
                     
-                    const p1 = { ...p, uid: p.uid + "_1", id: "adv_desvio_in", label: "Desvío Entrada", subtype: 'y_merge_in', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
-                    const p2 = { ...p, uid: p.uid + "_2", id: "adv_chicane_mid", label: "Recta S (1C)", subtype: 'single_lane_1', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
-                    const p3 = { ...p, uid: p.uid + "_3", id: "adv_desvio_out", label: "Desvío Salida", subtype: 'y_merge_out', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
-                    
-                    p2.x = p1.x + partLength * Math.cos(p.rot || 0);
-                    p2.y = p1.y + partLength * Math.sin(p.rot || 0);
-                    p3.x = p2.x + partLength * Math.cos(p.rot || 0);
-                    p3.y = p2.y + partLength * Math.sin(p.rot || 0);
-                    
-                    expandedPieces.push(p1, p2, p3);
+                    if (p.subtype === 'digital_full_chicane' || p.brandKey === 'SCX_ADVANCE') {
+                        const p1 = { ...p, uid: p.uid + "_1", id: "adv_desvio_in", label: "Desvío Entrada", subtype: 'y_merge_in', direction: 'right', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        const p2 = { ...p, uid: p.uid + "_2", id: "adv_chicane_mid", label: "Recta S (1C)", subtype: 'single_lane_s', direction: 'left', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        const p3 = { ...p, uid: p.uid + "_3", id: "adv_desvio_out", label: "Desvío Salida", subtype: 'y_merge_out', direction: 'left', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        
+                        p2.x = p1.x + partLength * Math.cos(p.rot || 0);
+                        p2.y = p1.y + partLength * Math.sin(p.rot || 0);
+                        p3.x = p2.x + partLength * Math.cos(p.rot || 0);
+                        p3.y = p2.y + partLength * Math.sin(p.rot || 0);
+                        
+                        expandedPieces.push(p1, p2, p3);
+                    } else {
+                        const p1 = { ...p, uid: p.uid + "_1", id: p.id+"_in", subtype: 'chicane_entry', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        const p2 = { ...p, uid: p.uid + "_2", id: p.id+"_mid", subtype: 'chicane_middle', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        const p3 = { ...p, uid: p.uid + "_3", id: p.id+"_out", subtype: 'chicane_exit', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        
+                        p2.x = p1.x + partLength * Math.cos(p.rot || 0);
+                        p2.y = p1.y + partLength * Math.sin(p.rot || 0);
+                        p3.x = p2.x + partLength * Math.cos(p.rot || 0);
+                        p3.y = p2.y + partLength * Math.sin(p.rot || 0);
+                        
+                        expandedPieces.push(p1, p2, p3);
+                    }
                     return;
                 }
 
@@ -1450,8 +1463,6 @@
                     if (isShared) {
                         p.isSharedBus = true; // El motor 3D leerá esto y forzará a los 8 coches a ir en fila india
                         p.lane = 0; // Forzamos lógicamente el carril central
-                    } else if (p.lane === undefined) {
-                        p.lane = 0;
                     }
 
                     // Inyectar paleta de colores individual para circuitos mixtos
@@ -1461,7 +1472,9 @@
 
                     // Adjuntar geometría absoluta explícita de carriles para el 3D
                     const geo = getPieceGeometry(p);
-                    if (geo) {
+                    const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect';
+                    
+                    if (geo && !isRotonda) {
                         p.worldGeo = {
                             inX: geo.inX, inY: geo.inY, inAngle: geo.inAngle,
                             outX: geo.outX, outY: geo.outY, outAngle: geo.outAngle,
