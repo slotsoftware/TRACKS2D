@@ -928,7 +928,7 @@
             
             const brand = TRACK_DEFINITIONS[p.brandKey || 'NINCO'] || TRACK_DEFINITIONS['NINCO'];
             const laneOff = brand.laneSpacing / 2;
-            const isSingleLane = p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2';
+            const isSingleLane = p.subtype && p.subtype.includes('single_lane');
 
             let dx = 0, dy = 0, da = 0;
             let effectiveRadius = p.radius || 20;
@@ -1086,22 +1086,22 @@
                 if (p.invert && p.subtype !== 'rotonda') pRot += Math.PI;
 
                 let dx = 0, dy = 0, dAngle = 0;
-                if (p.type === 'rotonda' || p.subtype === 'rotonda') { dAngle = Math.PI; }
+                if (p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') { dAngle = Math.PI; }
                 else if (p.type === 'straight' || (p.type && p.type.includes('pit')) || (p.type && p.type.includes('branch'))) { 
                     dx = p.length; 
                     if (p.shiftY) dy = p.shiftY;
                 }
                 else if (p.type === 'compound_curve_change') {
-                    let effectiveRadius = Math.abs(p.radius);
-                    const aRad = (p.angle * Math.PI) / 180;
-                    if (p.direction === 'left') { dx = p.length + effectiveRadius * Math.sin(aRad); dy = -effectiveRadius * (1 - Math.cos(aRad)); dAngle = -aRad; }
-                    else { dx = p.length + effectiveRadius * Math.sin(aRad); dy = effectiveRadius * (1 - Math.cos(aRad)); dAngle = aRad; }
+                    let effectiveRadius = Math.abs(p.radius || 30);
+                    const aRad = ((p.angle || 60) * Math.PI) / 180;
+                    if (p.direction === 'left') { dx = (p.length||34.5) + effectiveRadius * Math.sin(aRad); dy = -effectiveRadius * (1 - Math.cos(aRad)); dAngle = -aRad; }
+                    else { dx = (p.length||34.5) + effectiveRadius * Math.sin(aRad); dy = effectiveRadius * (1 - Math.cos(aRad)); dAngle = aRad; }
                 }
                 else if (p.type === 'curve') {
-                    let effectiveRadius = Math.abs(p.radius);
+                    let effectiveRadius = Math.abs(p.radius || 30);
                     
                     const r = effectiveRadius;
-                    const aRad = (p.angle * Math.PI) / 180;
+                    const aRad = ((p.angle || 45) * Math.PI) / 180;
                     if (p.direction === 'left') { dx = r * Math.sin(aRad); dy = -r * (1 - Math.cos(aRad)); dAngle = -aRad; }
                     else { dx = r * Math.sin(aRad); dy = r * (1 - Math.cos(aRad)); dAngle = aRad; }
                 }
@@ -1172,6 +1172,7 @@
                 if (!rawP) return;
                 const p = JSON.parse(JSON.stringify(rawP));
                 p.originalUid = rawP.uid; // INYECCIÓN: Protegemos la referencia original para evitar que los bloques se rompan
+                // Clave basada en posición con precisión de 1mm
                 const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
                 uniquePiecesMap.set(key, p);
             });
@@ -1222,26 +1223,26 @@
                         
                         expandedPieces.push(p1, p2, p3);
                     } else {
-                        let prefix = 'n_';
-                        if (currentBrandKey === 'SCX_CLASSIC') prefix = 'c_';
-                        else if (currentBrandKey === 'SCX_ANALOG') prefix = 's_';
-                        else if (currentBrandKey === 'SCX_ADVANCE') prefix = 'adv_';
-                        else if (currentBrandKey === 'SCALEXTRIC_UK') prefix = 'suk_';
-                        else if (currentBrandKey === 'CARRERA') prefix = 'car_';
-
-                        const isSCX = currentBrandKey.startsWith('SCX');
-
-                        let inId = isSCX ? `${prefix}pt74_in` : `${prefix}chicane_in`;
-                        let midId = isSCX ? `${prefix}pt74_mid` : `${prefix}chicane_mid`;
-                        let outId = isSCX ? `${prefix}pt74_out` : `${prefix}chicane_out`;
+                        let inId = 'n_chicane_in', midId = 'n_chicane_mid', outId = 'n_chicane_out';
+                        const isSCX = currentBrandKey === 'SCX_CLASSIC' || currentBrandKey === 'SCX_ANALOG';
                         
+                        if (currentBrandKey === 'SCX_CLASSIC') {
+                            inId = 'c_pt55'; midId = 'c_pt61'; outId = 'c_pt56';
+                        } else if (currentBrandKey === 'SCX_ANALOG') {
+                            inId = 's_chicane_in'; midId = 's_chicane_mid'; outId = 's_chicane_out';
+                        } else if (currentBrandKey === 'SCALEXTRIC_UK') {
+                            inId = 'suk_chicane_in'; midId = 'suk_chicane_in'; outId = 'suk_chicane_out'; // fallback
+                        } else if (currentBrandKey === 'CARRERA') {
+                            inId = 'car_345'; midId = 'car_345'; outId = 'car_345'; // Carrera doesn't have standard chicane
+                        }
+
                         const subIn = isSCX ? 'chicane3_entry' : 'chicane_entry';
                         const subMid = isSCX ? 'chicane3_middle' : 'chicane_middle';
                         const subOut = isSCX ? 'chicane3_exit' : 'chicane_exit';
 
-                        const p1 = { ...p, uid: p.uid + "_1", id: inId, label: isSCX ? "Chicane In (PT74)" : "Chicane In", subtype: subIn, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
-                        const p2 = { ...p, uid: p.uid + "_2", id: midId, label: isSCX ? "Chicane Med (PT74)" : "Chicane Med", subtype: subMid, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
-                        const p3 = { ...p, uid: p.uid + "_3", id: outId, label: isSCX ? "Chicane Out (PT74)" : "Chicane Out", subtype: subOut, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                        const p1 = { ...p, uid: p.uid + "_1", id: inId, label: isSCX ? "Chicane In" : "Chicane In", subtype: subIn, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                        const p2 = { ...p, uid: p.uid + "_2", id: midId, label: isSCX ? "Chicane Med" : "Chicane Med", subtype: subMid, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                        const p3 = { ...p, uid: p.uid + "_3", id: outId, label: isSCX ? "Chicane Out" : "Chicane Out", subtype: subOut, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
                         
                         p2.x = p1.x + partLength * Math.cos(p.rot || 0);
                         p2.y = p1.y + partLength * Math.sin(p.rot || 0);
@@ -1473,6 +1474,19 @@
                         p.lane = 0;
                     }
 
+                    // --- GARANTÍA DE BUS DIGITAL COMPARTIDO (HASTA 8 COCHES) ---
+                    // Etiquetamos explícitamente las piezas de un carril para el Motor 3D
+                    const isShared = p.subtype === 'single_lane_1' || 
+                                     p.subtype === 'single_lane_2' || 
+                                     p.subtype === 'single_lane_s' || 
+                                     p.subtype === 'y_merge_in' || 
+                                     p.subtype === 'y_merge_out';
+                                     
+                    if (isShared) {
+                        p.isSharedBus = true; // El motor 3D leerá esto y forzará a los 8 coches a ir en fila india
+                        p.lane = 0; // Forzamos lógicamente el carril central
+                    }
+
                     // Inyectar paleta de colores individual para circuitos mixtos
                     const pBrandKey = p.brandKey || (rawPieces.find(rp => rp.brandKey)?.brandKey) || 'NINCO';
                     const bDef = TRACK_DEFINITIONS[pBrandKey] || TRACK_DEFINITIONS['NINCO'];
@@ -1480,7 +1494,9 @@
 
                     // Adjuntar geometría absoluta explícita de carriles para el 3D
                     const geo = getPieceGeometry(p);
-                    if (geo) {
+                    const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect';
+                    
+                    if (geo && !isRotonda) {
                         p.worldGeo = {
                             inX: geo.inX, inY: geo.inY, inAngle: geo.inAngle,
                             outX: geo.outX, outY: geo.outY, outAngle: geo.outAngle,
@@ -1514,7 +1530,7 @@
                 const isSingle = isSingle1 || isSingle2;
                 const laneOff = (brand.laneSpacing / 2) * s;
                 
-                if (p.type.includes('pit') || p.type.includes('branch') || p.type === 'rotonda' || p.subtype === 'rotonda' || (p.subtype && (p.subtype.startsWith('chicane3_') || p.subtype === 'full_chicane' || p.subtype.startsWith('y_merge_') || p.subtype === 'single_lane_s'))) return; 
+                if (p.type.includes('pit') || p.type.includes('branch') || p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect' || (p.subtype && (p.subtype.startsWith('chicane3_') || p.subtype === 'full_chicane' || p.subtype.startsWith('y_merge_') || p.subtype === 'single_lane_s'))) return; 
                 ctx.beginPath();
                 
                 let effectiveTrueR = trueR;
@@ -1607,9 +1623,9 @@
                         else { ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = -5 * Math.abs(el); }
                     }
 
-                    const s = view.scale, w = brand.width * s, hw = w / 2, l = p.length * s, laneOff = (brand.laneSpacing / 2) * s, laneSpacing = brand.laneSpacing * s;
+                    const s = view.scale, w = brand.width * s, hw = w / 2, l = (p.length || 0) * s, laneOff = (brand.laneSpacing / 2) * s, laneSpacing = brand.laneSpacing * s;
                     const bWidth = (brand.borderWidth || 5) * s;
-                    const trueR = p.type === 'curve' ? Math.abs(p.radius * s) : 0;
+                    const trueR = p.type === 'curve' || p.type === 'compound_curve_change' ? Math.abs((p.radius || 30) * s) : 0;
                     const isLeft = p.direction === 'left';
                     const startA = isLeft ? Math.PI/2 : -Math.PI/2;
                     const sweep = p.type === 'curve' ? ((p.angle * Math.PI / 180) * (isLeft ? -1 : 1)) : 0;
@@ -1677,103 +1693,9 @@
                                 ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
                                 ctx.beginPath(); ctx.moveTo(0, railStartL); ctx.bezierCurveTo(l*0.4, railStartL, l*0.6, railEndL, l, railEndL); ctx.stroke();
                                 ctx.beginPath(); ctx.moveTo(0, railStartR); ctx.bezierCurveTo(l*0.4, railStartR, l*0.6, railEndR, l, railEndR); ctx.stroke();
-                            } else if (p.subtype && p.subtype.startsWith('digital_chicane_')) {
-                                const narrowHW = hw * 0.55;
-                                const c1 = hw * 0.2;
                                 
-                                let yStartLeft, yStartRight, yEndLeft, yEndRight;
-                                let slotStarts = [], slotEnds = [];
-                                let isSplit = false;
-
-                                if (p.subtype === 'digital_chicane_entry') {
-                                    yStartLeft = -hw; yStartRight = hw;
-                                    yEndLeft = c1 - narrowHW; yEndRight = c1 + narrowHW;
-                                    slotStarts = [-laneOff, laneOff];
-                                    slotEnds = [c1, c1];
-                                } else if (p.subtype === 'digital_chicane_middle') {
-                                    yStartLeft = c1 - narrowHW; yStartRight = c1 + narrowHW;
-                                    yEndLeft = -c1 - narrowHW; yEndRight = -c1 + narrowHW;
-                                    slotStarts = [c1];
-                                    slotEnds = [-c1];
-                                } else if (p.subtype === 'digital_chicane_exit') {
-                                    yStartLeft = -c1 - narrowHW; yStartRight = -c1 + narrowHW;
-                                    yEndLeft = -hw; yEndRight = hw;
-                                    slotStarts = [-c1, -c1];
-                                    slotEnds = [-laneOff, laneOff];
-                                    isSplit = true;
-                                }
-
-                                ctx.fillStyle = brand.trackColor;
-                                ctx.beginPath();
-                                ctx.moveTo(0, yStartLeft);
-                                ctx.bezierCurveTo(l*0.4, yStartLeft, l*0.6, yEndLeft, l, yEndLeft);
-                                ctx.lineTo(l, yEndRight);
-                                ctx.bezierCurveTo(l*0.6, yEndRight, l*0.4, yStartRight, 0, yStartRight);
-                                ctx.closePath();
-                                ctx.fill();
-                                
-                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
-                                ctx.beginPath(); ctx.moveTo(0, yStartLeft); ctx.bezierCurveTo(l*0.4, yStartLeft, l*0.6, yEndLeft, l, yEndLeft); ctx.stroke();
-                                ctx.beginPath(); ctx.moveTo(0, yStartRight); ctx.bezierCurveTo(l*0.4, yStartRight, l*0.6, yEndRight, l, yEndRight); ctx.stroke();
-                                
-                                for (let i=0; i<slotStarts.length; i++) {
-                                    ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
-                                    ctx.beginPath(); ctx.moveTo(0, slotStarts[i]); ctx.bezierCurveTo(l*0.4, slotStarts[i], l*0.6, slotEnds[i], l, slotEnds[i]); ctx.stroke();
-                                    ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1;
-                                    ctx.beginPath(); ctx.moveTo(0, slotStarts[i]); ctx.bezierCurveTo(l*0.4, slotStarts[i], l*0.6, slotEnds[i], l, slotEnds[i]); ctx.stroke();
-                                }
-
-                                if (isSplit) {
-                                     DrawEngine2D.drawDigitalWedge(ctx, l, slotStarts[0], 1, s);
-                                }
-                            } else if (p.subtype === 'y_merge_in' || p.subtype === 'y_merge_out') {
-                                const isIn = p.subtype === 'y_merge_in';
-                                const isLeft = p.direction !== 'right';
-                                const singleY = isLeft ? -laneOff : laneOff;
-                                
-                                let yTopIn, yBotIn, yTopOut, yBotOut;
-                                let r1In, r2In, r1Out, r2Out;
-
-                                if (isIn) {
-                                    yTopIn = isLeft ? -hw : 0;
-                                    yBotIn = isLeft ? 0 : hw;
-                                    yTopOut = -hw;
-                                    yBotOut = hw;
-                                    r1In = singleY; r2In = singleY;
-                                    r1Out = -laneOff; r2Out = laneOff;
-                                } else {
-                                    yTopIn = -hw;
-                                    yBotIn = hw;
-                                    yTopOut = isLeft ? -hw : 0;
-                                    yBotOut = isLeft ? 0 : hw;
-                                    r1In = -laneOff; r2In = laneOff;
-                                    r1Out = singleY; r2Out = singleY;
-                                }
-
-                                ctx.fillStyle = brand.trackColor;
-                                ctx.beginPath();
-                                ctx.moveTo(0, yTopIn);
-                                if (isLeft && isIn) ctx.lineTo(l, yTopOut); else if (isLeft && !isIn) ctx.lineTo(l, yTopOut); else ctx.bezierCurveTo(l*0.4, yTopIn, l*0.6, yTopOut, l, yTopOut);
-                                ctx.lineTo(l, yBotOut);
-                                if (!isLeft && isIn) ctx.lineTo(0, yBotIn); else if (!isLeft && !isIn) ctx.lineTo(0, yBotIn); else ctx.bezierCurveTo(l*0.6, yBotOut, l*0.4, yBotIn, 0, yBotIn);
-                                ctx.closePath();
-                                ctx.fill();
-                                
-                                ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
-                                ctx.beginPath(); ctx.moveTo(0, yTopIn); if (isLeft) ctx.lineTo(l, yTopOut); else ctx.bezierCurveTo(l*0.4, yTopIn, l*0.6, yTopOut, l, yTopOut); ctx.stroke();
-                                ctx.beginPath(); ctx.moveTo(0, yBotIn); if (!isLeft) ctx.lineTo(l, yBotOut); else ctx.bezierCurveTo(l*0.4, yBotIn, l*0.6, yBotOut, l, yBotOut); ctx.stroke();
-                                
-                                ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3;
-                                ctx.beginPath(); ctx.moveTo(0, r1In); if (isLeft) ctx.lineTo(l, r1Out); else ctx.bezierCurveTo(l*0.4, r1In, l*0.6, r1Out, l, r1Out); ctx.stroke();
-                                ctx.beginPath(); ctx.moveTo(0, r2In); if (!isLeft) ctx.lineTo(l, r2Out); else ctx.bezierCurveTo(l*0.4, r2In, l*0.6, r2Out, l, r2Out); ctx.stroke();
-                                
-                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
-                                ctx.beginPath(); ctx.moveTo(0, r1In); if (isLeft) ctx.lineTo(l, r1Out); else ctx.bezierCurveTo(l*0.4, r1In, l*0.6, r1Out, l, r1Out); ctx.stroke();
-                                ctx.beginPath(); ctx.moveTo(0, r2In); if (!isLeft) ctx.lineTo(l, r2Out); else ctx.bezierCurveTo(l*0.4, r2In, l*0.6, r2Out, l, r2Out); ctx.stroke();
-                                
-                                if (isIn) {
-                                    DrawEngine2D.drawDigitalWedge(ctx, l, singleY, isLeft ? 1 : -1, s);
-                                }
+                                ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, railStartL); ctx.bezierCurveTo(l*0.4, railStartL, l*0.6, railEndL, l, railEndL); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(0, railStartR); ctx.bezierCurveTo(l*0.4, railStartR, l*0.6, railEndR, l, railEndR); ctx.stroke();
                             } else if (p.subtype === 'full_chicane') {
                                 // MACRO SÓLIDA GRAN CHICANE PT74: RECORRIDO DIAGONAL EXACTO
                                 const sl = l / 3;
@@ -2052,7 +1974,7 @@
                                 ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, l, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, l, w); drawCarreraCenterLineStraight(); if (p.subtype === 'analog_connect') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.3; const boxH = w * 0.3; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = brand.connectionBoxColor || '#ef4444'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#222'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#ffffff'; ctx.font = `bold ${8 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand.name, l/2, boxY + boxH/2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(l/2, -hw); ctx.lineTo(l/2, hw); ctx.stroke(); ctx.setLineDash([]); } else if (p.subtype === 'connection') { DrawEngine2D.drawRails(ctx, l, laneOff, brand); const boxW = l * 0.25; const boxH = w * 0.4; const boxX = (l - boxW) / 2; const boxY = hw; ctx.fillStyle = '#111'; ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeStyle = '#333'; ctx.strokeRect(boxX, boxY, boxW, boxH); ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(l/2, boxY + boxH/2, boxH*0.3, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; const cx = l/2, cy = boxY + boxH/2, r = boxH*0.15; ctx.beginPath(); ctx.moveTo(cx-r/2, cy-r); ctx.lineTo(cx+r/2, cy); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx+r/2, cy-r); ctx.lineTo(cx-r/2, cy+r); ctx.moveTo(cx, cy-r*1.2); ctx.lineTo(cx, cy+r*1.2); ctx.stroke(); ctx.fillStyle = '#fff'; ctx.font = `bold ${6 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.fillText("CONEXIÓN", l/2, boxY + boxH * 0.85); } else { DrawEngine2D.drawRails(ctx, l, laneOff, brand); }
                             }
                        } else if (p.type === 'pit_entry') {
-                            const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(l, pitY + (w/2 * 0.6)); ctx.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); drawCarreraCenterLineStraight(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(l, hw); c.lineTo(l, pitY + (w/2 * 0.6)); c.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); DrawEngine2D.drawDigitalWedge(ctx, l, laneOff, 1, s);
+                            const pitY = laneOff + laneSpacing; ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.lineTo(l, pitY + (w/2 * 0.6)); ctx.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); drawCarreraCenterLineStraight(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(l, hw); c.lineTo(l, pitY + (w/2 * 0.6)); c.bezierCurveTo(l*0.5, pitY, l*0.3, hw, 0, hw); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, laneOff); ctx.bezierCurveTo(l*0.3, laneOff, l*0.6, pitY, l, pitY); ctx.stroke(); ctx.fillStyle = '#333'; ctx.beginPath(); ctx.moveTo(l*0.2, laneOff); ctx.lineTo(l*0.25, laneOff+5); ctx.lineTo(l*0.25, laneOff-5); ctx.fill();
                        } else if (p.type === 'pit_exit') {
                             const pitY = laneOff + laneSpacing; const pitBottom = pitY + (w/2 * 0.6); ctx.fillStyle = brand.trackColor; ctx.beginPath(); ctx.moveTo(0, -hw); ctx.lineTo(l, -hw); ctx.lineTo(l, hw); ctx.bezierCurveTo(l*0.7, hw, l*0.5, pitY, 0, pitBottom); ctx.lineTo(0, -hw); ctx.fill(); ctx.strokeStyle = '#222'; ctx.stroke(); drawCarreraCenterLineStraight(); DrawEngine2D.drawHazardZone(ctx, (c) => { c.beginPath(); c.moveTo(0, hw); c.lineTo(l, hw); c.bezierCurveTo(l*0.7, hw, l*0.5, pitY, 0, pitBottom); c.closePath(); }, s); DrawEngine2D.drawRails(ctx, l, laneOff, brand); ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.7, laneOff, l, laneOff); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.7, laneOff, l, laneOff); ctx.stroke();
                        } else if (p.type === 'branch_entry') {
@@ -2096,8 +2018,8 @@
                             ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; 
                             ctx.beginPath(); ctx.moveTo(0, -laneOff); ctx.lineTo(l, -laneOff); ctx.stroke(); 
                             ctx.beginPath(); ctx.moveTo(0, pitY); ctx.bezierCurveTo(l*0.4, pitY, l*0.6, laneOff, l, laneOff); ctx.stroke(); 
-                       } else if (p.type === 'rotonda') {
-                               const r = p.radius * s; const straightLen = 1.0 * s; const loopRadius = r; const loopCenterX = r * 1.3; const singleTrackWidth = (brand.width / 2) * s; 
+                       } else if (p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect') {
+                               const r = (p.radius || 15.0) * s; const straightLen = 1.0 * s; const loopRadius = r; const loopCenterX = r * 1.3; const singleTrackWidth = (brand.width / 2) * s; 
                                ctx.fillStyle = brand.trackColor; ctx.fillRect(0, -hw, straightLen, w); ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.strokeRect(0, -hw, straightLen, w);
                                DrawEngine2D.drawRails(ctx, straightLen, laneOff, brand); 
                                
@@ -2107,10 +2029,13 @@
 
                                ctx.save(); ctx.translate(straightLen, 0); ctx.save();
                                const innerRadius = loopRadius - (singleTrackWidth / 2) - (1 * s); 
-                               ctx.beginPath(); ctx.moveTo(0, 0); const innerCtrl = loopCenterX * 0.35; ctx.bezierCurveTo(innerCtrl, 0, innerCtrl, -innerRadius, loopCenterX, -innerRadius); ctx.arc(loopCenterX, 0, innerRadius, -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(innerCtrl, innerRadius, innerCtrl, 0, 0, 0); ctx.closePath(); ctx.clip();
+                               ctx.beginPath(); ctx.moveTo(0, 0); const innerCtrl = loopCenterX * 0.35; ctx.bezierCurveTo(innerCtrl, 0, innerCtrl, -innerRadius, loopCenterX, -innerRadius); ctx.arc(loopCenterX, 0, Math.max(0.1, innerRadius), -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(innerCtrl, innerRadius, innerCtrl, 0, 0, 0); ctx.closePath(); ctx.clip();
                                ctx.fillStyle = '#64748b'; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
-                               const defineLoopPath = (ctx) => { ctx.beginPath(); ctx.moveTo(0, -laneOff); const controlX = loopCenterX * 0.4; ctx.bezierCurveTo(controlX, -laneOff, controlX, -loopRadius, loopCenterX, -loopRadius); ctx.arc(loopCenterX, 0, loopRadius, -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(controlX, loopRadius, controlX, laneOff, 0, laneOff); };
-                               ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; defineLoopPath(ctx); ctx.stroke(); ctx.restore(); 
+                               const defineLoopPath = (ctx) => { ctx.beginPath(); ctx.moveTo(0, -laneOff); const controlX = loopCenterX * 0.4; ctx.bezierCurveTo(controlX, -laneOff, controlX, -loopRadius, loopCenterX, -loopRadius); ctx.arc(loopCenterX, 0, Math.max(0.1, loopRadius), -Math.PI/2, Math.PI/2, false); ctx.bezierCurveTo(controlX, loopRadius, controlX, laneOff, 0, laneOff); };
+                               ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#222'; ctx.lineWidth = singleTrackWidth + (2 * s); defineLoopPath(ctx); ctx.stroke();
+                               ctx.strokeStyle = brand.trackColor; ctx.lineWidth = singleTrackWidth; defineLoopPath(ctx); ctx.stroke();
+                               ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = `bold ${5 * (s/5)}px Arial`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("RALLY", loopCenterX, 0); ctx.restore();
+                               ctx.strokeStyle = brand.railColor; ctx.lineWidth = 3; ctx.setLineDash([]); defineLoopPath(ctx); ctx.stroke(); ctx.strokeStyle = brand.slotColor; ctx.lineWidth = 1; defineLoopPath(ctx); ctx.stroke(); ctx.restore(); 
                        } else if (p.type === 'curve') {
                            const isSingle1 = p.subtype === 'single_lane_1';
                            const isSingle2 = p.subtype === 'single_lane_2';
