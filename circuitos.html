@@ -1149,7 +1149,6 @@
             
             const upperStr = String(bStr).toUpperCase();
             if (upperStr.includes('UNIVERSAL') || upperStr === 'SCX_UNIVERSAL_GRISES' || upperStr === 'SCX_ANALOG') return 'SCX_ANALOG';
-            // Si el circuito se etiquetó como "SCALEXTRIC" genérico (sin matizar clásico), asume SCX_ANALOG (Scalextric Gris)
             if (upperStr === 'SCALEXTRIC' || upperStr === 'SCX') return 'SCX_ANALOG'; 
             if (upperStr === 'SCX_ORIGINAL' || upperStr === 'SCX_CLASSIC' || upperStr === 'SCX CLÁSICO (NEGRO)' || upperStr === 'SCX_CLASSIC_NEGRAS') return 'SCX_CLASSIC';
             if (upperStr.includes('UK') || upperStr === 'SUPER_SLOT') return 'SCALEXTRIC_UK';
@@ -1173,7 +1172,6 @@
                 if (!rawP) return;
                 const p = JSON.parse(JSON.stringify(rawP));
                 p.originalUid = rawP.uid; // INYECCIÓN: Protegemos la referencia original para evitar que los bloques se rompan
-                // Clave basada en posición con precisión de 1mm
                 const key = `${Math.round(p.x * 10) / 10}_${Math.round(p.y * 10) / 10}_${Math.round((p.rot || 0) * 10) / 10}_${p.lane || 0}`;
                 uniquePiecesMap.set(key, p);
             });
@@ -1224,9 +1222,26 @@
                         
                         expandedPieces.push(p1, p2, p3);
                     } else {
-                        const p1 = { ...p, uid: p.uid + "_1", id: p.id+"_in", subtype: 'chicane_entry', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
-                        const p2 = { ...p, uid: p.uid + "_2", id: p.id+"_mid", subtype: 'chicane_middle', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
-                        const p3 = { ...p, uid: p.uid + "_3", id: p.id+"_out", subtype: 'chicane_exit', length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}` };
+                        let prefix = 'n_';
+                        if (currentBrandKey === 'SCX_CLASSIC') prefix = 'c_';
+                        else if (currentBrandKey === 'SCX_ANALOG') prefix = 's_';
+                        else if (currentBrandKey === 'SCX_ADVANCE') prefix = 'adv_';
+                        else if (currentBrandKey === 'SCALEXTRIC_UK') prefix = 'suk_';
+                        else if (currentBrandKey === 'CARRERA') prefix = 'car_';
+
+                        const isSCX = currentBrandKey.startsWith('SCX');
+
+                        let inId = isSCX ? `${prefix}pt74_in` : `${prefix}chicane_in`;
+                        let midId = isSCX ? `${prefix}pt74_mid` : `${prefix}chicane_mid`;
+                        let outId = isSCX ? `${prefix}pt74_out` : `${prefix}chicane_out`;
+                        
+                        const subIn = isSCX ? 'chicane3_entry' : 'chicane_entry';
+                        const subMid = isSCX ? 'chicane3_middle' : 'chicane_middle';
+                        const subOut = isSCX ? 'chicane3_exit' : 'chicane_exit';
+
+                        const p1 = { ...p, uid: p.uid + "_1", id: inId, label: isSCX ? "Chicane In (PT74)" : "Chicane In", subtype: subIn, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                        const p2 = { ...p, uid: p.uid + "_2", id: midId, label: isSCX ? "Chicane Med (PT74)" : "Chicane Med", subtype: subMid, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
+                        const p3 = { ...p, uid: p.uid + "_3", id: outId, label: isSCX ? "Chicane Out (PT74)" : "Chicane Out", subtype: subOut, length: partLength, width: brandDef.width, laneSpacing: brandDef.laneSpacing, brandKey: currentBrandKey, groupId: `macro_${Math.floor(p.uid)}_l8xv0` };
                         
                         p2.x = p1.x + partLength * Math.cos(p.rot || 0);
                         p2.y = p1.y + partLength * Math.sin(p.rot || 0);
@@ -1387,6 +1402,7 @@
                                 nextPiece.subtype = 'chicane3_exit'; 
                                 if (nextPiece.id === 'c_pt74_in') nextPiece.id = 'c_pt74_out';
                                 else if (nextPiece.id === 's_pt74_in') nextPiece.id = 's_pt74_out';
+                                else if (nextPiece.id === 'adv_pt74_in') nextPiece.id = 'adv_pt74_out';
                             }
                             else if (nextPiece.subtype === 'chicane3_exit') { 
                                 nextPiece.subtype = 'chicane3_entry'; 
@@ -1452,17 +1468,9 @@
                         currentLaneMap = { 1: currentLaneMap[2], 2: currentLaneMap[1] };
                     }
 
-                    // --- GARANTÍA DE BUS DIGITAL COMPARTIDO (HASTA 8 COCHES) ---
-                    // Etiquetamos explícitamente las piezas de un carril para el Motor 3D
-                    const isShared = p.subtype === 'single_lane_1' || 
-                                     p.subtype === 'single_lane_2' || 
-                                     p.subtype === 'single_lane_s' || 
-                                     p.subtype === 'y_merge_in' || 
-                                     p.subtype === 'y_merge_out';
-                                     
-                    if (isShared) {
-                        p.isSharedBus = true; // El motor 3D leerá esto y forzará a los 8 coches a ir en fila india
-                        p.lane = 0; // Forzamos lógicamente el carril central
+                    // Forzamos lane 0 para evitar el bug de los 8 carriles paralelos en el 3D
+                    if (p.lane === undefined || p.subtype === 'single_lane_1' || p.subtype === 'single_lane_2') {
+                        p.lane = 0;
                     }
 
                     // Inyectar paleta de colores individual para circuitos mixtos
@@ -1472,9 +1480,7 @@
 
                     // Adjuntar geometría absoluta explícita de carriles para el 3D
                     const geo = getPieceGeometry(p);
-                    const isRotonda = p.type === 'rotonda' || p.subtype === 'rotonda' || p.subtype === 'rotonda_connect';
-                    
-                    if (geo && !isRotonda) {
+                    if (geo) {
                         p.worldGeo = {
                             inX: geo.inX, inY: geo.inY, inAngle: geo.inAngle,
                             outX: geo.outX, outY: geo.outY, outAngle: geo.outAngle,
