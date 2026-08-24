@@ -5067,7 +5067,7 @@
                     let needsFenceL = new Array(aspVertCount).fill(false);
                     let needsFenceR = new Array(aspVertCount).fill(false);
 
-                    for (let s = 0; s < aspVertCount; s++) {
+                    for (let s = 1; s < aspVertCount - 1; s++) {
                         const dist = asphaltDists[s];
                         const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd + 0.1);
                         if (!piece) continue;
@@ -5075,31 +5075,35 @@
                         const yL = asphaltVerts[s * 6 + 1];
                         const yR = asphaltVerts[s * 6 + 4];
 
-                        // 1. PUENTES Y DESNIVELES: Elevación sobre el tapete base
+                        // 1. PUENTES Y DESNIVELES: Cualquier elevación sobre el tapete base (Y > 0.3) necesita valla obligatoria a ambos lados.
                         if (yL > 0.3) needsFenceL[s] = true;
                         if (yR > 0.3) needsFenceR[s] = true;
 
                         // 2. CURVAS, ROTONDAS, CHICANES Y PITLANE
                         if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
-                            needsFenceL[s] = true; // Rotonda gira a la derecha, exterior es el izquierdo
+                            needsFenceL[s] = true; // Por la topología de bucle simple, L es el borde exterior real de la rotonda.
                         } else if (piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'))) {
-                            // CÁLCULO MATEMÁTICO INFALIBLE: Detecta hacia dónde gira la malla realmente
-                            const sweepSign = (piece.angle || 45) * (piece.direction === 'left' ? -1 : 1);
-                            if (sweepSign < 0) {
-                                needsFenceR[s] = true; // Gira Izquierda -> Exterior es la Derecha
-                            } else {
-                                needsFenceL[s] = true; // Gira Derecha -> Exterior es la Izquierda
+                            // IA INFALIBLE BASADA EN GEOMETRÍA (100% FÍSICA): 
+                            // Calcula la distancia real que recorre el borde izquierdo y derecho del asfalto en este segmento.
+                            // En cualquier curva, el radio EXTERIOR siempre dibuja una línea más larga.
+                            const distL = Math.hypot(asphaltVerts[(s+1)*6] - asphaltVerts[(s-1)*6], asphaltVerts[(s+1)*6+2] - asphaltVerts[(s-1)*6+2]);
+                            const distR = Math.hypot(asphaltVerts[(s+1)*6+3] - asphaltVerts[(s-1)*6+3], asphaltVerts[(s+1)*6+5] - asphaltVerts[(s-1)*6+5]);
+                            
+                            if (distR > distL + 0.001) {
+                                needsFenceR[s] = true; // El lado derecho es más largo -> Exterior = Derecha
+                            } else if (distL > distR + 0.001) {
+                                needsFenceL[s] = true; // El lado izquierdo es más largo -> Exterior = Izquierda
                             }
                         } else if (piece.type === 'chicane' || (piece.subtype && piece.subtype.includes('chicane'))) {
                             needsFenceL[s] = true; 
                             needsFenceR[s] = true;
                         } else if (piece.type === 'pit_entry' || piece.type === 'pit_exit' || (piece.subtype && piece.subtype.includes('pit'))) {
-                            needsFenceL[s] = true;
+                            needsFenceL[s] = true; // Toda la zona de Pitlane lleva vallas en el exterior
                             needsFenceR[s] = true;
                         }
                     }
 
-                    // Suavizado de tramos cortos (Rellenar huecos pequeños)
+                    // Suavizado de tramos cortos (Rellenar huecos pequeños para que quede un muro continuo)
                     for (let pass = 0; pass < 3; pass++) {
                         for (let s = 1; s < aspVertCount - 1; s++) {
                             if (needsFenceL[s-1] && needsFenceL[s+1]) needsFenceL[s] = true;
@@ -5108,6 +5112,7 @@
                     }
 
                     // EXTENSIÓN DE SEGURIDAD MÁXIMA PARA CURVAS (LEAD-IN / LEAD-OUT):
+                    // Ampliamos 6 segmentos para proteger las entradas de frenada y salidas de aceleración
                     let expandedL = [...needsFenceL];
                     let expandedR = [...needsFenceR];
                     const expansion = 6; 
@@ -5122,21 +5127,24 @@
                     needsFenceL = expandedL;
                     needsFenceR = expandedR;
 
-                    // POST-PROCESO ESTRICTO: Limpieza de interiores
-                    // Garantiza que la expansión no invada la cara interior de las curvas y rotondas
-                    for (let s = 0; s < aspVertCount; s++) {
+                    // POST-PROCESO ESTRICTO DE ANIQUILACIÓN: Limpieza milimétrica de interiores
+                    // Garantiza por fuerza bruta que NINGUNA valla (ni siquiera las expansiones) pise el interior
+                    for (let s = 1; s < aspVertCount - 1; s++) {
                         const dist = asphaltDists[s];
                         const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd + 0.1);
                         if (!piece) continue;
                         
                         if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
-                            needsFenceR[s] = false; // INTERIOR de la rotonda SIEMPRE limpio
+                            needsFenceR[s] = false; // INTERIOR de la rotonda borrado obligatoriamente
                         } else if (piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'))) {
-                            const sweepSign = (piece.angle || 45) * (piece.direction === 'left' ? -1 : 1);
-                            if (sweepSign < 0) {
-                                needsFenceL[s] = false; // Gira Izquierda -> Interior Izquierdo prohibido
-                            } else {
-                                needsFenceR[s] = false; // Gira Derecha -> Interior Derecho prohibido
+                            const distL = Math.hypot(asphaltVerts[(s+1)*6] - asphaltVerts[(s-1)*6], asphaltVerts[(s+1)*6+2] - asphaltVerts[(s-1)*6+2]);
+                            const distR = Math.hypot(asphaltVerts[(s+1)*6+3] - asphaltVerts[(s-1)*6+3], asphaltVerts[(s+1)*6+5] - asphaltVerts[(s-1)*6+5]);
+                            
+                            // Si el derecho es más largo (es el exterior), eliminamos el izquierdo (interior) sea como sea.
+                            if (distR > distL + 0.001) {
+                                needsFenceL[s] = false; 
+                            } else if (distL > distR + 0.001) {
+                                needsFenceR[s] = false;
                             }
                         }
                     }
