@@ -4262,10 +4262,28 @@
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
                         const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit';
+                        const isYMergeOut = p.subtype === 'y_merge_out';
+                        const isYMergeIn = p.subtype === 'y_merge_in';
+                        const isSingleLaneS = p.subtype === 'single_lane_s';
                         const pitSide = p.invert ? 'left' : 'right';
                         const pitDir = pitSide === 'right' ? 1 : -1;
                         
                         let sL = [...currentOffsets];
+
+                        let standardOffsets = [];
+                        if (hasGroups) {
+                            for (let i = 0; i < numLanes; i++) {
+                                const pairIndex = Math.floor(i / 2);
+                                const isRightLane = i % 2 === 1;
+                                const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
+                                standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
+                            }
+                        } else {
+                            for(let i=0; i<numLanes; i++) {
+                                standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
+                            }
+                        }
+
                         let tL = [...currentOffsets];
                         let startHalfL = stdHalfL, startHalfR = stdHalfR;
                         let endHalfL = stdHalfL, endHalfR = stdHalfR;
@@ -4322,26 +4340,28 @@
                             stdHalfR = endHalfR;
                             currentOffsets = [...tL];
                         }
+                        else if (isYMergeOut) {
+                            const straightLaneIdx = p.invert ? 1 : 0;
+                            const targetOffset = standardOffsets[straightLaneIdx];
+                            tL = sL.map(() => targetOffset);
+                            currentOffsets = [...tL];
+                        }
+                        else if (isSingleLaneS) {
+                            const newStraightLaneIdx = p.invert ? 0 : 1; 
+                            const targetOffset = standardOffsets[newStraightLaneIdx];
+                            tL = sL.map(() => targetOffset);
+                            currentOffsets = [...tL];
+                        }
+                        else if (isYMergeIn) {
+                            tL = [...standardOffsets];
+                            currentOffsets = [...tL];
+                        }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
                         else if (isChicaneEntry) { tL = sL.map(off => off * 0.2); currentOffsets = [...tL]; } 
                         else if (isChicaneExit) { 
-                            let standardOffsets = [];
-                            if (hasGroups) {
-                                for (let i = 0; i < numLanes; i++) {
-                                    const pairIndex = Math.floor(i / 2);
-                                    const isRightLane = i % 2 === 1;
-                                    const localOffset = isRightLane ? (currentLaneSpacing / 2) : (-currentLaneSpacing / 2);
-                                    standardOffsets.push(localOffset + (pairIndex * currentTrackWidth));
-                                }
-                            } else {
-                                for(let i=0; i<numLanes; i++) {
-                                    standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
-                                }
-                            }
-                            
-                            // FIX: Mantener la polaridad actual para evitar que los carriles se crucen en la salida
+                            let standardOffsetsExit = [];
                             tL = sL.map((val, i) => {
-                                const magnitude = Math.abs(standardOffsets[i]);
+                                const magnitude = Math.abs(standardOffsetsExit[i]);
                                 return val === 0 ? 0 : Math.sign(val) * magnitude;
                             });
                             
@@ -4373,7 +4393,7 @@
 
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps; if (p.type === 'curve') { const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2; curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle; } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
-                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
+                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || isYMergeOut || isYMergeIn || isSingleLaneS || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
                             
                             let cL = [];
                             for(let j=0; j<numLanes; j++) {
@@ -4391,6 +4411,14 @@
                             let curL_Vis = [...cL];
                             if (p.subtype === 'single_lane_1') { curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); cTWR = 0; }
                             if (p.subtype === 'single_lane_2') { curL_Vis = curL_Vis.map((v, idx) => idx === 1 ? v : null); cTWL = 0; }
+
+                            for (let l1 = 0; l1 < numLanes; l1++) {
+                                for (let l2 = 0; l2 < l1; l2++) {
+                                    if (Math.abs(cL[l1] - cL[l2]) < 0.1) {
+                                        curL_Vis[l1] = null;
+                                    }
+                                }
+                            }
 
                             let railX = curX;
                             let railZ = curZ;
@@ -5110,6 +5138,75 @@
                         let currentSegment = [];
                         const processSegment = (seg) => {
                             if (seg.length < 3) return; 
+                            
+                            // Filtrar puntos que están muy cerca del centro geométrico en rotondas
+                            // Esto evita que se generen vallas en la parte interior
+                            let isRotondaInnerFence = false;
+                            
+                            // Obtenemos el punto central aproximado del segmento para ver si pertenece a una rotonda
+                            const midSegIdx = seg[Math.floor(seg.length / 2)];
+                            const midDist = asphaltDists[midSegIdx];
+                            const midPiece = pieceMapRef.current.find(p => midDist >= p.distStart && midDist <= p.distEnd + 0.1);
+                            
+                            if (midPiece && (midPiece.subtype === 'rotonda' || midPiece.type === 'rotonda')) {
+                                // Es una rotonda, vamos a verificar si estamos en la curva o en la recta
+                                // Para ello, comprobamos el ángulo del segmento
+                                const pStart = new THREE.Vector3(asphaltVerts[seg[0] * 6], 0, asphaltVerts[seg[0] * 6 + 2]);
+                                const pEnd = new THREE.Vector3(asphaltVerts[seg[seg.length - 1] * 6], 0, asphaltVerts[seg[seg.length - 1] * 6 + 2]);
+                                const directDist = pStart.distanceTo(pEnd);
+                                
+                                // Calcular la distancia por la curva
+                                let pathDist = 0;
+                                for (let i = 1; i < seg.length; i++) {
+                                    const p1 = new THREE.Vector3(asphaltVerts[seg[i-1] * 6], 0, asphaltVerts[seg[i-1] * 6 + 2]);
+                                    const p2 = new THREE.Vector3(asphaltVerts[seg[i] * 6], 0, asphaltVerts[seg[i] * 6 + 2]);
+                                    pathDist += p1.distanceTo(p2);
+                                }
+                                
+                                // Si la distancia directa es mucho menor que la curva, estamos en el bucle interior
+                                // Otra forma: Si la curva se dobla sobre sí misma, es el interior
+                                if (pathDist > directDist * 1.5) {
+                                    // Es una curva muy cerrada, es probable que sea la gota de la rotonda
+                                    // Comprobamos si el lado que estamos generando es el interior
+                                    // En la rotonda que has programado, la curva es hacia la izquierda siempre (para formar la gota)
+                                    // Por lo tanto, isLeft = true es el interior de la curva de vuelta
+                                    // y isLeft = false es el interior de la curva de ida
+                                    // Necesitamos una heurística basada en la curvatura
+                                    
+                                    // Calcular centro de curvatura
+                                    let sumCenter = new THREE.Vector3();
+                                    for(let i=0; i<seg.length; i++) {
+                                         sumCenter.x += asphaltVerts[seg[i]*6];
+                                         sumCenter.z += asphaltVerts[seg[i]*6 + 2];
+                                    }
+                                    sumCenter.divideScalar(seg.length);
+                                    
+                                    // Tomar un punto de prueba de nuestra valla
+                                    const testBase = seg[Math.floor(seg.length / 2)] * 6 + (isLeft ? 0 : 3);
+                                    const pTest = new THREE.Vector3(asphaltVerts[testBase], 0, asphaltVerts[testBase+2]);
+                                    
+                                    // Tomar el punto opuesto del asfalto
+                                    const oppBase = seg[Math.floor(seg.length / 2)] * 6 + (isLeft ? 3 : 0);
+                                    const pOpp = new THREE.Vector3(asphaltVerts[oppBase], 0, asphaltVerts[oppBase+2]);
+                                    
+                                    // Si nuestra valla está más cerca del centro de curvatura que el lado opuesto, es la valla interior
+                                    if (pTest.distanceTo(sumCenter) < pOpp.distanceTo(sumCenter)) {
+                                        isRotondaInnerFence = true;
+                                    }
+                                } else {
+                                     // En las rectas de la rotonda, solo queremos vallas en los bordes exteriores absolutos
+                                     // Suponiendo que la rotonda va por la derecha y vuelve por la izquierda
+                                     if ((!isLeft && midDist < midPiece.distStart + (midPiece.distEnd - midPiece.distStart)/2) || // Ida, lado derecho = exterior
+                                         (isLeft && midDist > midPiece.distStart + (midPiece.distEnd - midPiece.distStart)/2)) { // Vuelta, lado izquierdo = exterior
+                                         isRotondaInnerFence = false;
+                                     } else {
+                                         isRotondaInnerFence = true;
+                                     }
+                                }
+                            }
+                            
+                            if (isRotondaInnerFence) return; // No generar valla interior en rotondas
+                            
                             const rawPts = seg.map(idx => {
                                 const base = idx * 6 + (isLeft ? 0 : 3);
                                 return new THREE.Vector3(asphaltVerts[base], asphaltVerts[base+1], asphaltVerts[base+2]);
@@ -6093,10 +6190,15 @@
                                 if (activeButtonRef.current === 'DIGITAL') {
                                     if (numCarsRef.current > 1) {
                                         let dtc = Infinity;
+                                        let car_merged = cp && (cp.subtype === 'single_lane_s' || cp.subtype === 'y_merge_out' || cp.subtype === 'y_merge_in' || cp.subtype === 'full_chicane');
+
                                         for (let j = 0; j < physicsState.current.length; j++) {
                                             const o = physicsState.current[j];
                                             if (o.id <= numCarsRef.current && o.id !== car.id && !o.isDerailled && nowTime > o.invulnerableUntil) {
-                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane) { 
+                                                let opiece = pieceMapRef.current[o.lastPieceIndex >= 0 && o.lastPieceIndex < pieceMapRef.current.length ? o.lastPieceIndex : 0];
+                                                let o_merged = opiece && (opiece.subtype === 'single_lane_s' || opiece.subtype === 'y_merge_out' || opiece.subtype === 'y_merge_in' || opiece.subtype === 'full_chicane');
+
+                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane || car_merged || o_merged) { 
                                                     let di = o.distance - car.distance; 
                                                     if (di < -totalDist / 2) di += totalDist; else if (di > totalDist / 2) di -= totalDist;
                                                     if (di > 0 && di < dtc) dtc = di; 
