@@ -3960,7 +3960,7 @@
                     const numLanes = typeof circuitData.numLanes === 'number' ? circuitData.numLanes : detectedLanes;
                     
                     // --- GENERACIÓN DINÁMICA DE CARRILES (SOPORTA 2, 4, 6, 8... CARRILES) ---
-                    const rails = { lanes: Array.from({length: numLanes}, () => []), pit: [], changes: [] }, vertexDistances = [0]; let accumulatedDist = 0;
+                    const rails = { lanes: Array.from({length: numLanes}, () => []), visualLanes: Array.from({length: numLanes}, () => []), pit: [], changes: [] }, vertexDistances = [0]; let accumulatedDist = 0;
                     
                     scene = new THREE.Scene(); scene.background = new THREE.Color(0x60a5fa); scene.fog = new THREE.Fog(0x60a5fa, 500, 3000); 
                     
@@ -4077,14 +4077,19 @@
                     
                     let curX = 0, curZ = 0, curAngle = 0;
 
-                    const addRailPoint = (x, z, ang, lOffs, po, di, brand) => { 
+                    const addRailPoint = (x, z, ang, lOffs, lOffsVis, po, di, brand) => { 
                         const px = Math.cos(ang + Math.PI/2), pz = Math.sin(ang + Math.PI/2); 
                         for(let i=0; i<numLanes; i++) {
-                            if (lOffs && lOffs[i] !== null && lOffs[i] !== undefined) {
-                                const pt = new THREE.Vector3(x + px * lOffs[i], 0.2, z + pz * lOffs[i]);
-                                pt.brand = brand;
-                                rails.lanes[i].push(pt); 
-                            } else rails.lanes[i].push(null);
+                            let physOff = (lOffs && lOffs[i] !== null && lOffs[i] !== undefined) ? lOffs[i] : 0;
+                            const pt = new THREE.Vector3(x + px * physOff, 0.2, z + pz * physOff);
+                            pt.brand = brand;
+                            rails.lanes[i].push(pt); 
+                            
+                            if (lOffsVis && lOffsVis[i] !== null && lOffsVis[i] !== undefined) {
+                                rails.visualLanes[i].push(pt);
+                            } else {
+                                rails.visualLanes[i].push(null);
+                            }
                         }
                         if (po !== null) {
                             const pt = new THREE.Vector3(x + px * po, 0.2, z + pz * po);
@@ -4093,7 +4098,7 @@
                         } else rails.pit.push(null); 
                         if (di > 0) { accumulatedDist += di; vertexDistances.push(accumulatedDist); } 
                     };
-                    addRailPoint(0,0,0, currentOffsets, null, 0, currentBrandKey); 
+                    addRailPoint(0,0,0, currentOffsets, currentOffsets, null, 0, currentBrandKey); 
                     addAsphaltSlice(0,0,0, stdHalfL, stdHalfR, 0, currentBrandKey); 
                     
                     const easeSine = (t) => (1 - Math.cos(t * Math.PI)) / 2;
@@ -4195,7 +4200,7 @@
                             rails.changes.push({ points: loopRailPoints, refIdx: rotVertexIndex, count: loopRailPoints.length, isRotonda: true });
                             curX = startX; curZ = startZ; curAngle = startAngle + Math.PI; accumulatedDist += totalPieceLen;
                             
-                            addRailPoint(curX, curZ, curAngle, currentOffsets, null, 0, currentBrandKey); 
+                            addRailPoint(curX, curZ, curAngle, currentOffsets, currentOffsets, null, 0, currentBrandKey); 
                             vertexDistances.push(accumulatedDist); 
                             
                             // TRANSICIÓN DE SALIDA: Cierre de asfalto ancho completo para empalmar limpio con la siguiente pista
@@ -4262,13 +4267,16 @@
                         const isPitExit = p.type === 'pit_exit' || p.subtype === 'pit_exit';
                         const isChicaneEntry = p.subtype === 'chicane_entry' || p.subtype === 'chicane3_entry';
                         const isChicaneExit = p.subtype === 'chicane_exit' || p.subtype === 'chicane3_exit';
-                        const isYMergeOut = p.subtype === 'y_merge_out';
-                        const isYMergeIn = p.subtype === 'y_merge_in';
-                        const isSingleLaneS = p.subtype === 'single_lane_s';
+                        const isAdvChicaneIn = p.id === 'adv_desvio_in' || (p.brandKey === 'SCX_ADVANCE' && p.subtype === 'y_merge_out');
+                        const isAdvChicaneMid = p.id === 'adv_chicane_mid' || (p.brandKey === 'SCX_ADVANCE' && p.subtype === 'single_lane_s');
+                        const isAdvChicaneOut = p.id === 'adv_desvio_out' || (p.brandKey === 'SCX_ADVANCE' && p.subtype === 'y_merge_in');
                         const pitSide = p.invert ? 'left' : 'right';
                         const pitDir = pitSide === 'right' ? 1 : -1;
                         
                         let sL = [...currentOffsets];
+                        let tL = [...currentOffsets];
+                        let startHalfL = stdHalfL, startHalfR = stdHalfR;
+                        let endHalfL = stdHalfL, endHalfR = stdHalfR;
 
                         let standardOffsets = [];
                         if (hasGroups) {
@@ -4283,10 +4291,6 @@
                                 standardOffsets.push((i - (numLanes - 1) / 2) * currentLaneSpacing);
                             }
                         }
-
-                        let tL = [...currentOffsets];
-                        let startHalfL = stdHalfL, startHalfR = stdHalfR;
-                        let endHalfL = stdHalfL, endHalfR = stdHalfR;
 
                         if (p.subtype && p.subtype.includes('adapter')) {
                             let wIn = p.widthIn || currentTrackWidth;
@@ -4340,31 +4344,30 @@
                             stdHalfR = endHalfR;
                             currentOffsets = [...tL];
                         }
-                        else if (isYMergeOut) {
-                            const straightLaneIdx = p.invert ? 1 : 0;
-                            const targetOffset = standardOffsets[straightLaneIdx];
-                            tL = sL.map(() => targetOffset);
-                            currentOffsets = [...tL];
-                        }
-                        else if (isSingleLaneS) {
-                            const newStraightLaneIdx = p.invert ? 0 : 1; 
-                            const targetOffset = standardOffsets[newStraightLaneIdx];
-                            tL = sL.map(() => targetOffset);
-                            currentOffsets = [...tL];
-                        }
-                        else if (isYMergeIn) {
-                            tL = [...standardOffsets];
-                            currentOffsets = [...tL];
-                        }
                         else if (isCrossing) { tL.reverse(); currentOffsets = [...tL]; } 
                         else if (isChicaneEntry) { tL = sL.map(off => off * 0.2); currentOffsets = [...tL]; } 
                         else if (isChicaneExit) { 
-                            let standardOffsetsExit = [];
+                            // FIX: Mantener la polaridad actual para evitar que los carriles se crucen en la salida
                             tL = sL.map((val, i) => {
-                                const magnitude = Math.abs(standardOffsetsExit[i]);
+                                const magnitude = Math.abs(standardOffsets[i]);
                                 return val === 0 ? 0 : Math.sign(val) * magnitude;
                             });
-                            
+                            currentOffsets = [...tL];
+                        }
+                        else if (isAdvChicaneIn) {
+                            const tgt = p.invert ? standardOffsets[numLanes - 1] : standardOffsets[0];
+                            tL = sL.map(() => tgt);
+                            currentOffsets = [...tL];
+                        }
+                        else if (isAdvChicaneMid) {
+                            const isRight = Math.abs(sL[0] - standardOffsets[0]) < 0.1;
+                            const tgt = isRight ? standardOffsets[numLanes - 1] : standardOffsets[0];
+                            tL = sL.map(() => tgt);
+                            currentOffsets = [...tL];
+                        }
+                        else if (isAdvChicaneOut) {
+                            tL = [...standardOffsets];
+                            if (p.invert) tL.reverse();
                             currentOffsets = [...tL];
                         }
                         
@@ -4393,7 +4396,7 @@
 
                         for (let i = 1; i <= steps; i++) {
                             const t = i / steps; if (p.type === 'curve') { const r = p.radius, chordLen = 2 * r * Math.sin(Math.abs(stepAngle)/2), chordDir = curAngle + stepAngle/2; curX += chordLen * Math.cos(chordDir); curZ += chordLen * Math.sin(chordDir); curAngle += stepAngle; } else { curX += stepLen * Math.cos(curAngle); curZ += stepLen * Math.sin(curAngle); }
-                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || isYMergeOut || isYMergeIn || isSingleLaneS || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
+                            let mixT = (isCrossing || isChicaneEntry || isChicaneExit || isAdvChicaneIn || isAdvChicaneMid || isAdvChicaneOut || (p.subtype && p.subtype.includes('adapter'))) ? easeSine(t) : t; 
                             
                             let cL = [];
                             for(let j=0; j<numLanes; j++) {
@@ -4411,14 +4414,7 @@
                             let curL_Vis = [...cL];
                             if (p.subtype === 'single_lane_1') { curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); cTWR = 0; }
                             if (p.subtype === 'single_lane_2') { curL_Vis = curL_Vis.map((v, idx) => idx === 1 ? v : null); cTWL = 0; }
-
-                            for (let l1 = 0; l1 < numLanes; l1++) {
-                                for (let l2 = 0; l2 < l1; l2++) {
-                                    if (Math.abs(cL[l1] - cL[l2]) < 0.1) {
-                                        curL_Vis[l1] = null;
-                                    }
-                                }
-                            }
+                            if (isAdvChicaneMid) { curL_Vis = curL_Vis.map((v, idx) => idx === 0 ? v : null); } // Dibuja solo 1 raíl en el centro de la chicane SCX Advance
 
                             let railX = curX;
                             let railZ = curZ;
@@ -4442,7 +4438,7 @@
                                 railZ += pz * sShapeOffset;
                             }
 
-                            addRailPoint(railX, railZ, curAngle, curL_Vis, cPit, stepPhysDist, pieceBrand); 
+                            addRailPoint(railX, railZ, curAngle, cL, curL_Vis, cPit, stepPhysDist, pieceBrand); 
                             addAsphaltSlice(curX, curZ, curAngle, cTWL, cTWR, accumulatedDist, pieceBrand);
                             
                             if (['digital_x', 'change_right', 'change_left', 'pit_parallel_double_x'].includes(p.subtype) && numLanes >= 2) { 
@@ -5501,7 +5497,7 @@
                     });
                     
                     for(let j=0; j<numLanes; j++) {
-                        createMultiSegmentRailMesh(rails.lanes[j], 0.7); 
+                        createMultiSegmentRailMesh(rails.visualLanes[j], 0.7); 
                     }
                     
                     createMultiSegmentRailMesh(rails.pit, 0.6); 
@@ -6190,15 +6186,10 @@
                                 if (activeButtonRef.current === 'DIGITAL') {
                                     if (numCarsRef.current > 1) {
                                         let dtc = Infinity;
-                                        let car_merged = cp && (cp.subtype === 'single_lane_s' || cp.subtype === 'y_merge_out' || cp.subtype === 'y_merge_in' || cp.subtype === 'full_chicane');
-
                                         for (let j = 0; j < physicsState.current.length; j++) {
                                             const o = physicsState.current[j];
                                             if (o.id <= numCarsRef.current && o.id !== car.id && !o.isDerailled && nowTime > o.invulnerableUntil) {
-                                                let opiece = pieceMapRef.current[o.lastPieceIndex >= 0 && o.lastPieceIndex < pieceMapRef.current.length ? o.lastPieceIndex : 0];
-                                                let o_merged = opiece && (opiece.subtype === 'single_lane_s' || opiece.subtype === 'y_merge_out' || opiece.subtype === 'y_merge_in' || opiece.subtype === 'full_chicane');
-
-                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane || car_merged || o_merged) { 
+                                                if (o.currentLane === car.currentLane || o.targetLane === car.currentLane) { 
                                                     let di = o.distance - car.distance; 
                                                     if (di < -totalDist / 2) di += totalDist; else if (di > totalDist / 2) di -= totalDist;
                                                     if (di > 0 && di < dtc) dtc = di; 
