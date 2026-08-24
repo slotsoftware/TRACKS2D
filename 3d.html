@@ -4114,7 +4114,14 @@
                         if (p.subtype === 'rotonda') {
                             const steps = 40; const r = p.radius || 14.5; const loopCenterX = r * 1.3; const laneOffVal = laneSpacing / 2; const startX = curX; const startZ = curZ; const startAngle = curAngle; const straightLen = 10.0;
                             const rotVertexIndex = rails.lanes[0].length;
-                            for(let i=0; i<numLanes; i++) rails.lanes[i].push(null); rails.pit.push(null); vertexDistances.push(accumulatedDist);
+                            
+                            // FIX: Añadido visualLanes.push(null) para cortar la malla y evitar raíles cruzando la pista
+                            for(let i=0; i<numLanes; i++) { 
+                                rails.lanes[i].push(null); 
+                                rails.visualLanes[i].push(null); 
+                            } 
+                            rails.pit.push(null); 
+                            vertexDistances.push(accumulatedDist);
                             
                             const loopRailPoints = []; 
                             const loopArcLength = Math.PI * r; 
@@ -5068,41 +5075,31 @@
                         const yL = asphaltVerts[s * 6 + 1];
                         const yR = asphaltVerts[s * 6 + 4];
 
-                        // 1. PUENTES Y DESNIVELES: Cualquier elevación sobre el tapete base (Y > 0.3) necesita valla obligatoria a ambos lados.
+                        // 1. PUENTES Y DESNIVELES: Elevación sobre el tapete base
                         if (yL > 0.3) needsFenceL[s] = true;
                         if (yR > 0.3) needsFenceR[s] = true;
 
                         // 2. CURVAS, ROTONDAS, CHICANES Y PITLANE
-                        const isCurve = piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'));
-                        
-                        if (isCurve) {
-                            // En las curvas, la valla exterior es VITAL. Calculamos la dirección real teniendo en cuenta si está invertida.
-                            let dir = piece.direction;
-                            if (!dir) dir = (piece.angle < 0) ? 'right' : 'left'; // Fallback por si no hay dirección explícita
-                            if (piece.invert) dir = (dir === 'left') ? 'right' : 'left'; // Invertir gira la curva hacia el otro lado
-                            
-                            if (dir === 'right') {
-                                needsFenceL[s] = true; // Curva a derecha, la fuerza centrífuga empuja a la izquierda
-                            } else if (dir === 'left') {
-                                needsFenceR[s] = true;  // Curva a izquierda, la fuerza centrífuga empuja a la derecha
+                        if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
+                            needsFenceL[s] = true; // Rotonda gira a la derecha, exterior es el izquierdo
+                        } else if (piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'))) {
+                            // CÁLCULO MATEMÁTICO INFALIBLE: Detecta hacia dónde gira la malla realmente
+                            const sweepSign = (piece.angle || 45) * (piece.direction === 'left' ? -1 : 1);
+                            if (sweepSign < 0) {
+                                needsFenceR[s] = true; // Gira Izquierda -> Exterior es la Derecha
                             } else {
-                                // Fallback de seguridad: si no logramos detectar el giro, protegemos ambos lados
-                                needsFenceL[s] = true;
-                                needsFenceR[s] = true;
+                                needsFenceL[s] = true; // Gira Derecha -> Exterior es la Izquierda
                             }
-                        } else if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
-                            needsFenceL[s] = true; 
-                            needsFenceR[s] = true;
                         } else if (piece.type === 'chicane' || (piece.subtype && piece.subtype.includes('chicane'))) {
                             needsFenceL[s] = true; 
                             needsFenceR[s] = true;
                         } else if (piece.type === 'pit_entry' || piece.type === 'pit_exit' || (piece.subtype && piece.subtype.includes('pit'))) {
-                            needsFenceL[s] = true; // Toda la zona de Pitlane lleva vallas
+                            needsFenceL[s] = true;
                             needsFenceR[s] = true;
                         }
                     }
 
-                    // Suavizado de tramos cortos (Rellenar huecos pequeños para que quede un muro continuo)
+                    // Suavizado de tramos cortos (Rellenar huecos pequeños)
                     for (let pass = 0; pass < 3; pass++) {
                         for (let s = 1; s < aspVertCount - 1; s++) {
                             if (needsFenceL[s-1] && needsFenceL[s+1]) needsFenceL[s] = true;
@@ -5111,7 +5108,6 @@
                     }
 
                     // EXTENSIÓN DE SEGURIDAD MÁXIMA PARA CURVAS (LEAD-IN / LEAD-OUT):
-                    // Ampliamos 6 segmentos (antes 3) para proteger fuertemente las entradas de frenada y salidas de aceleración
                     let expandedL = [...needsFenceL];
                     let expandedR = [...needsFenceR];
                     const expansion = 6; 
@@ -5126,6 +5122,25 @@
                     needsFenceL = expandedL;
                     needsFenceR = expandedR;
 
+                    // POST-PROCESO ESTRICTO: Limpieza de interiores
+                    // Garantiza que la expansión no invada la cara interior de las curvas y rotondas
+                    for (let s = 0; s < aspVertCount; s++) {
+                        const dist = asphaltDists[s];
+                        const piece = pieceMapRef.current.find(p => dist >= p.distStart && dist <= p.distEnd + 0.1);
+                        if (!piece) continue;
+                        
+                        if (piece.subtype === 'rotonda' || piece.type === 'rotonda') {
+                            needsFenceR[s] = false; // INTERIOR de la rotonda SIEMPRE limpio
+                        } else if (piece.type === 'curve' || (piece.subtype && piece.subtype.toLowerCase().includes('curve'))) {
+                            const sweepSign = (piece.angle || 45) * (piece.direction === 'left' ? -1 : 1);
+                            if (sweepSign < 0) {
+                                needsFenceL[s] = false; // Gira Izquierda -> Interior Izquierdo prohibido
+                            } else {
+                                needsFenceR[s] = false; // Gira Derecha -> Interior Derecho prohibido
+                            }
+                        }
+                    }
+
                     const fenceMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.7, roughness: 0.3 });
                     const postMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.3, roughness: 0.7 });
                     const postPositions = [];
@@ -5134,74 +5149,6 @@
                         let currentSegment = [];
                         const processSegment = (seg) => {
                             if (seg.length < 3) return; 
-                            
-                            // Filtrar puntos que están muy cerca del centro geométrico en rotondas
-                            // Esto evita que se generen vallas en la parte interior
-                            let isRotondaInnerFence = false;
-                            
-                            // Obtenemos el punto central aproximado del segmento para ver si pertenece a una rotonda
-                            const midSegIdx = seg[Math.floor(seg.length / 2)];
-                            const midDist = asphaltDists[midSegIdx];
-                            const midPiece = pieceMapRef.current.find(p => midDist >= p.distStart && midDist <= p.distEnd + 0.1);
-                            
-                            if (midPiece && (midPiece.subtype === 'rotonda' || midPiece.type === 'rotonda')) {
-                                // Es una rotonda, vamos a verificar si estamos en la curva o en la recta
-                                // Para ello, comprobamos el ángulo del segmento
-                                const pStart = new THREE.Vector3(asphaltVerts[seg[0] * 6], 0, asphaltVerts[seg[0] * 6 + 2]);
-                                const pEnd = new THREE.Vector3(asphaltVerts[seg[seg.length - 1] * 6], 0, asphaltVerts[seg[seg.length - 1] * 6 + 2]);
-                                const directDist = pStart.distanceTo(pEnd);
-                                
-                                // Calcular la distancia por la curva
-                                let pathDist = 0;
-                                for (let i = 1; i < seg.length; i++) {
-                                    const p1 = new THREE.Vector3(asphaltVerts[seg[i-1] * 6], 0, asphaltVerts[seg[i-1] * 6 + 2]);
-                                    const p2 = new THREE.Vector3(asphaltVerts[seg[i] * 6], 0, asphaltVerts[seg[i] * 6 + 2]);
-                                    pathDist += p1.distanceTo(p2);
-                                }
-                                
-                                // Si la distancia directa es mucho menor que la curva, estamos en el bucle interior
-                                // Otra forma: Si la curva se dobla sobre sí misma, es el interior
-                                if (pathDist > directDist * 1.5) {
-                                    // Es una curva muy cerrada, es probable que sea la gota de la rotonda
-                                    // Comprobamos si el lado que estamos generando es el interior
-                                    // En la rotonda que has programado, la curva es hacia la izquierda siempre (para formar la gota)
-                                    // Por lo tanto, isLeft = true es el interior de la curva de vuelta
-                                    // y isLeft = false es el interior de la curva de ida
-                                    // Necesitamos una heurística basada en la curvatura
-                                    
-                                    // Calcular centro de curvatura
-                                    let sumCenter = new THREE.Vector3();
-                                    for(let i=0; i<seg.length; i++) {
-                                         sumCenter.x += asphaltVerts[seg[i]*6];
-                                         sumCenter.z += asphaltVerts[seg[i]*6 + 2];
-                                    }
-                                    sumCenter.divideScalar(seg.length);
-                                    
-                                    // Tomar un punto de prueba de nuestra valla
-                                    const testBase = seg[Math.floor(seg.length / 2)] * 6 + (isLeft ? 0 : 3);
-                                    const pTest = new THREE.Vector3(asphaltVerts[testBase], 0, asphaltVerts[testBase+2]);
-                                    
-                                    // Tomar el punto opuesto del asfalto
-                                    const oppBase = seg[Math.floor(seg.length / 2)] * 6 + (isLeft ? 3 : 0);
-                                    const pOpp = new THREE.Vector3(asphaltVerts[oppBase], 0, asphaltVerts[oppBase+2]);
-                                    
-                                    // Si nuestra valla está más cerca del centro de curvatura que el lado opuesto, es la valla interior
-                                    if (pTest.distanceTo(sumCenter) < pOpp.distanceTo(sumCenter)) {
-                                        isRotondaInnerFence = true;
-                                    }
-                                } else {
-                                     // En las rectas de la rotonda, solo queremos vallas en los bordes exteriores absolutos
-                                     // Suponiendo que la rotonda va por la derecha y vuelve por la izquierda
-                                     if ((!isLeft && midDist < midPiece.distStart + (midPiece.distEnd - midPiece.distStart)/2) || // Ida, lado derecho = exterior
-                                         (isLeft && midDist > midPiece.distStart + (midPiece.distEnd - midPiece.distStart)/2)) { // Vuelta, lado izquierdo = exterior
-                                         isRotondaInnerFence = false;
-                                     } else {
-                                         isRotondaInnerFence = true;
-                                     }
-                                }
-                            }
-                            
-                            if (isRotondaInnerFence) return; // No generar valla interior en rotondas
                             
                             const rawPts = seg.map(idx => {
                                 const base = idx * 6 + (isLeft ? 0 : 3);
