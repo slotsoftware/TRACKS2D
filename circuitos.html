@@ -2804,16 +2804,11 @@
                   if (authMode === 'register') {
                       const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
                       await updateProfile(userCredential.user, { displayName: authUsername });
-                      // Temporalmente permitimos acceso sin verificación hasta que se resuelva el problema de Firebase
-                      // try { await sendEmailVerification(userCredential.user); } catch (e) { }
+                      // try { await sendEmailVerification(userCredential.user); } catch (e) { } // Bypass verification sending
                       setUser({ ...userCredential.user, displayName: authUsername }); 
-                      setAuthMessage('¡Registro exitoso! Ya puedes usar la comunidad.'); 
+                      setAuthMessage('¡Registro exitoso! Ya puedes acceder a la comunidad y al chat.'); 
                       setTimeout(() => setShowAuthModal(false), 2000);
-                  } else { 
-                      const userCredential = await signInWithEmailAndPassword(auth, authEmail, authPassword); 
-                      setUser({ ...userCredential.user });
-                      setShowAuthModal(false);
-                  }
+                  } else { await signInWithEmailAndPassword(auth, authEmail, authPassword); setShowAuthModal(false); }
               } catch (error) {
                   if (error.code === 'auth/email-already-in-use') setAuthError('Este correo ya está registrado.');
                   else if (error.code === 'auth/invalid-credential') setAuthError('Correo o contraseña incorrectos.');
@@ -2840,74 +2835,10 @@
           const handleProtectedAction = async (actionFn) => {
               const auth = window.FirebaseAPI.getAuth();
               const currentUser = auth.currentUser;
-              if (!currentUser || currentUser.isAnonymous) { alert(t.auth.reqVerify); setShowAuthModal(true); return; }
+              if (!currentUser || currentUser.isAnonymous) { alert("Debes iniciar sesión para usar esta función."); setShowAuthModal(true); return; }
               try { await currentUser.reload(); setUser({ ...auth.currentUser }); } catch(e) {}
-              // Deshabilitamos temporalmente el chequeo de verificación de email debido a problemas de entrega de Firebase
               // if (auth.currentUser && auth.currentUser.emailVerified) { actionFn(); } else { alert(t.auth.reqVerify); setShowAuthModal(true); }
-              actionFn();
-          };
-
-          const handleSignOut = () => { const { getAuth, signOut } = window.FirebaseAPI; signOut(getAuth()); };
-
-          useEffect(() => {
-              if (!user || !dbRef.current || !showCommunityModal) return;
-              setIsCommunityLoading(true);
-              const { collection, onSnapshot } = window.FirebaseAPI;
-              const colRef = collection(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'community_circuits');
-              const unsubscribe = onSnapshot(colRef, (snapshot) => {
-                  const fetchedData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                  fetchedData.sort((a, b) => { const timeA = a.createdAt ? a.createdAt.toMillis() : 0; const timeB = b.createdAt ? b.createdAt.toMillis() : 0; return timeB - timeA; });
-                  setCommunityCircuits(fetchedData); setIsCommunityLoading(false);
-              }, (error) => { console.error(error); setIsCommunityLoading(false); });
-              return () => unsubscribe();
-          }, [user, showCommunityModal]);
-
-          const handlePublishToCommunity = async () => {
-              if (pieces.length === 0) { alert(t.alerts.pieces); return; }
-              const auth = window.FirebaseAPI.getAuth();
-              // Removida la restricción !auth.currentUser.emailVerified
-              if (!auth.currentUser || auth.currentUser.isAnonymous) { alert("Debes iniciar sesión para publicar en la comunidad."); setShowAuthModal(true); return; }
-              if (!dbRef.current) { alert("Conexión con la comunidad no establecida aún."); return; }
-              setIsPublishing(true);
-              try {
-                  const { collection, addDoc, serverTimestamp } = window.FirebaseAPI;
-                  const bDef = TRACK_DEFINITIONS[activeBrand] || TRACK_DEFINITIONS['NINCO'];
-                  const bColors = { neonColor: bDef.neonColor, trackColor: bDef.trackColor, railColor: bDef.railColor, slotColor: bDef.slotColor, borderColor1: bDef.borderColor1, borderColor2: bDef.borderColor2 };
-                  const circuitData = { 
-                      version: "2.0", brand: activeBrand, brandColors: bColors, mixedBrands: getMixedBrandsPayload(pieces), pieces: pieces, boardPoints: boardPoints, boardClosed: boardClosed, 
-                      autoBorders: autoBorders, authorId: user.uid, authorName: user.displayName || 'Piloto', pieceCount: pieces.length, createdAt: serverTimestamp() 
-                  };
-                  const colRef = collection(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'community_circuits');
-                  await addDoc(colRef, circuitData);
-                  alert(t.communityModal.success);
-              } catch (e) { alert("Hubo un error al compartir tu circuito."); } finally { setIsPublishing(false); }
-          };
-
-          const loadCommunityCircuit = (circuit) => {
-              const resolvedBrand = getResolvedBrand(circuit.brand, circuit.pieces);
-              setActiveBrand(resolvedBrand);
-              if (circuit.pieces) { 
-                  const safePieces = circuit.pieces.map(p => ({ 
-                      ...p, 
-                      uid: p.uid || Date.now() + Math.random(),
-                      brandKey: getResolvedBrand(p.brandKey || circuit.brand, [p])
-                  })); 
-                  setHistory([migrateToAbsolute(safePieces)]); setHistoryStep(0); 
-              }
-              if (circuit.boardPoints) setBoardPoints(circuit.boardPoints);
-              if (circuit.boardClosed !== undefined) setBoardClosed(circuit.boardClosed);
-              if (circuit.autoBorders !== undefined) setAutoBorders(circuit.autoBorders); else setAutoBorders(false);
-              setShowCommunityModal(false);
-              pendingFit.current = true;
-          };
-
-          const handleDeleteCommunityCircuit = async (circuitId) => {
-              if (!window.confirm(t.communityModal.confirmDel)) return;
-              try {
-                  const { doc, deleteDoc } = window.FirebaseAPI;
-                  const docRef = doc(dbRef.current, 'artifacts', appIdRef.current, 'public', 'data', 'community_circuits', circuitId);
-                  await deleteDoc(docRef);
-              } catch (error) { alert("No se pudo eliminar el circuito. Permiso denegado."); }
+              actionFn(); // Allow directly
           };
 
           useEffect(() => {
@@ -2933,7 +2864,6 @@
           const handleSendMessage = async (e) => {
               e.preventDefault(); if (!newMessage.trim()) return;
               const auth = window.FirebaseAPI.getAuth();
-              // Removida la restricción !auth.currentUser.emailVerified
               if (!auth.currentUser || auth.currentUser.isAnonymous) { alert("Debes iniciar sesión para usar el chat."); setShowAuthModal(true); return; }
               if (!dbRef.current) return;
               try {
@@ -4465,7 +4395,7 @@
                                                   const auth = window.FirebaseAPI.getAuth();
                                                   await auth.currentUser.reload();
                                                   setUser({ ...auth.currentUser });
-                                                  return; // Removed emailVerified check
+                                                  return;
                                               } catch(err) {}
                                           }
                                           setShowAuthModal(true); 
